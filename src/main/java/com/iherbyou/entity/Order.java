@@ -13,7 +13,7 @@ public class Order {
     private Long orderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn("user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
@@ -25,8 +25,5 @@ public class Order {
     private Date orderDate;
 
     private BigDecimal totalPrice;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    private OrderStatus orderStatus;
 
 }

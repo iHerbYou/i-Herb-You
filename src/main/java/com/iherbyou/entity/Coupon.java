@@ -31,5 +31,6 @@ public class Coupon {
     @Column(name = "coupon_ends_at")
     private LocalDate couponEndsAt;
 
-    public Coupon() {}
+    public Coupon() {
+    }
 }

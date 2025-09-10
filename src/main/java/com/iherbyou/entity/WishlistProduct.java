@@ -18,6 +18,7 @@ public class WishlistProduct {
     @JoinColumn(name = "wishlistId", nullable = false)
     private Wishlist wishlist;
 
-    public WishlistProduct() {}
+    public WishlistProduct() {
+    }
 
 }

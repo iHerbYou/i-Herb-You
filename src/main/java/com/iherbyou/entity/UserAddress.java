@@ -41,7 +41,8 @@ public class UserAddress {
     private User userId;
 
 
-    public UserAddress() {}
+    public UserAddress() {
+    }
 
     public UserAddress(Long addressId, String recipient, String phone, String postcode, String address, boolean isDefault, String addressDetail, User userId) {
         this.addressId = addressId;

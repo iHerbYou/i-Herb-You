@@ -16,5 +16,6 @@ public class Banner {
     @Column(name = "image_url", length = 255)
     private String imageUrl;
 
-    public Banner() {}
+    public Banner() {
+    }
 }

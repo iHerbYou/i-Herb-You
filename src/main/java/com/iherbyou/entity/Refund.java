@@ -34,7 +34,8 @@ public class Refund {
     @Column
     private Integer refundAmount;
 
-    protected Refund() {}
+    protected Refund() {
+    }
 
     public Refund(Payment payment, Code code, LocalDateTime refundDate, String refundReason, Integer refundAmount) {
         this.payment = payment;

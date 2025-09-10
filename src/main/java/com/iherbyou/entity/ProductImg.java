@@ -28,7 +28,8 @@ public class ProductImg {
     @Column
     private Integer sortIdx;
 
-    protected  ProductImg() {}
+    protected ProductImg() {
+    }
 
     public ProductImg(Product product, String imageUrl, String altText, Integer sortIdx) {
         this.product = product;

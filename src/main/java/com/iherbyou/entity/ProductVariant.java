@@ -30,7 +30,8 @@ public class ProductVariant {
     @Column
     private Integer volume;
 
-    protected ProductVariant() {}
+    protected ProductVariant() {
+    }
 
     public ProductVariant(Product product, Integer price, String size, Integer weight, Integer volume) {
         this.product = product;

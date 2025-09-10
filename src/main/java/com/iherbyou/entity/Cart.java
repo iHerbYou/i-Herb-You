@@ -1,6 +1,7 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
+
 import java.util.List;
 
 @Entity
@@ -25,5 +26,6 @@ public class Cart {
     @Column(name = "grand_total")
     private Integer grandTotal;
 
-    public Cart() {}
+    public Cart() {
+    }
 }

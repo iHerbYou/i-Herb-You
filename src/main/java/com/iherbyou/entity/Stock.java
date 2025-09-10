@@ -21,7 +21,8 @@ public class Stock {
     @Column
     private Integer amount;
 
-    protected Stock() {}
+    protected Stock() {
+    }
 
     public Stock(ProductVariant productVariant, Integer amount) {
         this.productVariant = productVariant;

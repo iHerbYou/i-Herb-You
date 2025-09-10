@@ -28,6 +28,7 @@ public class Wishlist {
     private List<Wishlist> wishlists = new ArrayList<>();
 
 
-    public Wishlist() {}
+    public Wishlist() {
+    }
 
 }

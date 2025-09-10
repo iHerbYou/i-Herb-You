@@ -23,7 +23,8 @@ public class Point {
     @Column(nullable = false)
     private int balance;
 
-    public Point() {}
+    public Point() {
+    }
 
     public Point(Long userId, User user, int balance) {
         this.userId = userId;

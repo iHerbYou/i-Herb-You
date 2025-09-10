@@ -36,7 +36,8 @@ public class Payment {
     @Column
     private Integer paymentAmount;
 
-    protected Payment() {}
+    protected Payment() {
+    }
 
     public Payment(Order order, Code paymentStatus, Code paymentMethod, LocalDateTime paymentDate, Integer paymentAmount) {
         this.order = order;
