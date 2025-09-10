@@ -1,17 +1,17 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-@Entity
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@Entity
 public class Point {
 
-    @Id
+    @Id //TODO 질문
     private Long userId;
 
     // userId가 PK이자 FK
@@ -23,12 +23,4 @@ public class Point {
     @Column(nullable = false)
     private int balance;
 
-    public Point() {
-    }
-
-    public Point(Long userId, User user, int balance) {
-        this.userId = userId;
-        this.user = user;
-        this.balance = balance;
-    }
 }

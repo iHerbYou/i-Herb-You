@@ -9,23 +9,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
-@Entity
-@Table(
-        name = "product_ranking_cache",
-        indexes = {
-                @Index(name = "idx_prc_product", columnList = "product_id"),
-                @Index(name = "idx_prc_snapshot", columnList = "snapshot_date")
-        },
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "uk_prc_product_date_source",
-                        columnNames = {"product_id", "snapshot_date", "source"}
-                )
-        }
-)
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
+@Table(indexes = {@Index(name = "idx_prc_product", columnList = "product_id"), @Index(name = "idx_prc_snapshot", columnList = "snapshot_date")},
+        uniqueConstraints = {@UniqueConstraint(name = "uk_prc_product_date_source", columnNames = {"product_id", "snapshot_date", "source"})})
+@Entity
 public class ProductRankingCache {
 
     @Id
@@ -34,8 +23,7 @@ public class ProductRankingCache {
 
     // 어떤 상품의 랭킹인지
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "product_id",
-            foreignKey = @ForeignKey(name = "fk_prc_product"))
+    @JoinColumn(name = "product_id", foreignKey = @ForeignKey(name = "fk_prc_product"))
     private Product product;
 
     // 일자 스냅샷(일 단위 집계 가정)

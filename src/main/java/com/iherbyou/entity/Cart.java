@@ -1,16 +1,18 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.List;
-
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
-@Table(name = "Cart")   //
 public class Cart {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cart_id")
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -26,6 +28,4 @@ public class Cart {
     @Column(name = "grand_total")
     private Integer grandTotal;
 
-    public Cart() {
-    }
 }

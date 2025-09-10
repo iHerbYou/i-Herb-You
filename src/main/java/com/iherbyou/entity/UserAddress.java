@@ -2,20 +2,20 @@ package com.iherbyou.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.beans.ConstructorProperties;
-
-@Entity
+@ToString
+@NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@Entity
 public class UserAddress {
 
     @Id
     @GeneratedValue
-    private Long addressId;
+    private Long addressId; //TODO Long id
 
     @Column(nullable = false, length = 20)
     private String recipient;
@@ -36,13 +36,9 @@ public class UserAddress {
     private boolean isDefault;
 
     // FK (user_id 생성)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY) //TODO 이거 User 객체를 가져 오는거랑 차이 설명해주세요
     @JoinColumn(name = "id", nullable = false)
     private User userId;
-
-
-    public UserAddress() {
-    }
 
     public UserAddress(Long addressId, String recipient, String phone, String postcode, String address, boolean isDefault, String addressDetail, User userId) {
         this.addressId = addressId;

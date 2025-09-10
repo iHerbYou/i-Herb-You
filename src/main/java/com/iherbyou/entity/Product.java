@@ -7,27 +7,22 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Entity
-@Getter
-@Setter
 @NoArgsConstructor
+@Setter
+@Getter
+@Entity
 public class Product {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(
-            name = "brand_id",
-            foreignKey = @ForeignKey(name = "fk_product_brand")
-    )
+    @JoinColumn(name = "brand_id", foreignKey = @ForeignKey(name = "fk_product_brand"))
     private Brand brand;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(
-            name = "category_id",
-            foreignKey = @ForeignKey(name = "fk_product_category")
-    )
+    @JoinColumn(name = "category_id", foreignKey = @ForeignKey(name = "fk_product_category"))
     private Category category;
 
     @Column(name = "product_name", length = 50)

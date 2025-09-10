@@ -1,18 +1,19 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-@Entity
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@Entity
 public class ProductVariant {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productVariantId;
+    private Long id; //TODO
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "productId", nullable = false)
@@ -30,9 +31,7 @@ public class ProductVariant {
     @Column
     private Integer volume;
 
-    protected ProductVariant() {
-    }
-
+    //TODO 질문 AllArgsConstructor
     public ProductVariant(Product product, Integer price, String size, Integer weight, Integer volume) {
         this.product = product;
         this.price = price;

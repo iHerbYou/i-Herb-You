@@ -1,18 +1,19 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-@Entity
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@Entity
 public class Stock {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long stockId;
+    private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "productVariantId", nullable = false)
@@ -21,9 +22,7 @@ public class Stock {
     @Column
     private Integer amount;
 
-    protected Stock() {
-    }
-
+    //TODO
     public Stock(ProductVariant productVariant, Integer amount) {
         this.productVariant = productVariant;
         this.amount = amount;

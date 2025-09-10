@@ -1,14 +1,14 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-@Entity
+@ToString
+@AllArgsConstructor //TODO 질문
+@NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@Entity
 public class ProductImg {
 
     @Id
@@ -28,9 +28,7 @@ public class ProductImg {
     @Column
     private Integer sortIdx;
 
-    protected ProductImg() {
-    }
-
+    //TODO 질문
     public ProductImg(Product product, String imageUrl, String altText, Integer sortIdx) {
         this.product = product;
         this.imageUrl = imageUrl;

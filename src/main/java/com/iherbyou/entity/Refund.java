@@ -1,21 +1,21 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import org.aspectj.apache.bcel.classfile.Code;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@Entity
 public class Refund {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long refundId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paymentId", nullable = false)
@@ -34,9 +34,7 @@ public class Refund {
     @Column
     private Integer refundAmount;
 
-    protected Refund() {
-    }
-
+    //TODO 질문
     public Refund(Payment payment, Code code, LocalDateTime refundDate, String refundReason, Integer refundAmount) {
         this.payment = payment;
         this.code = code;

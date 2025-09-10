@@ -1,18 +1,15 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.util.Objects;
-
+@NoArgsConstructor
 @Entity
-@Table(name = "user_coupon")   // 테이블명은 소문자로
 public class UserCoupon {
 
-    @Id
+    //TODO 팀원들과 리뷰
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User userId;
@@ -21,6 +18,4 @@ public class UserCoupon {
     @JoinColumn(name = "coupon_id")
     private Coupon couponId;
 
-    public UserCoupon() {
-    }
 }

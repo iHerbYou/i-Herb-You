@@ -1,16 +1,22 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 @Entity
-@Table(name = "Coupon")
 public class Coupon {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
-    @Column(name = "coupon_id")
     private Long id;
 
     @Column(name = "code", length = 100, nullable = false, unique = true)
@@ -31,6 +37,4 @@ public class Coupon {
     @Column(name = "coupon_ends_at")
     private LocalDate couponEndsAt;
 
-    public Coupon() {
-    }
 }

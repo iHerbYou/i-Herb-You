@@ -1,17 +1,20 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.Objects;
-
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 @Entity
-@Table(
-        name = "Cart_product")
 public class CartProduct {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
-    @Column(name = "cart_product_id", nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -28,6 +31,4 @@ public class CartProduct {
     @Column(name = "is_selected", nullable = false)
     private Boolean isSelected;
 
-    public CartProduct() {
-    }
 }

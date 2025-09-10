@@ -5,19 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Table(
-        name = "brand",
-        indexes = {
-                @Index(name = "idx_brand_name", columnList = "name")
-        },
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uk_brand_code", columnNames = {"code"})
-        }
-)
 @Getter
 @Setter
 @NoArgsConstructor
+@Table(indexes = {@Index(name = "idx_brand_name", columnList = "name")},
+        uniqueConstraints = {@UniqueConstraint(name = "uk_brand_code", columnNames = {"code"})})
+@Entity
 public class Brand {
 
     @Id

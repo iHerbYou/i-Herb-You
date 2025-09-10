@@ -1,22 +1,20 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import org.aspectj.apache.bcel.classfile.Code;
+import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
-@Entity
-@Getter
-@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString
+@Setter
+@Getter
+@Entity
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long paymentId;
+    private Long id;
 
     @OneToOne
     @JoinColumn(name = "orderId", nullable = false)
@@ -36,9 +34,7 @@ public class Payment {
     @Column
     private Integer paymentAmount;
 
-    protected Payment() {
-    }
-
+    //TODO 질문있습니다
     public Payment(Order order, Code paymentStatus, Code paymentMethod, LocalDateTime paymentDate, Integer paymentAmount) {
         this.order = order;
         this.paymentStatus = paymentStatus;

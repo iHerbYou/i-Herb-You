@@ -2,20 +2,19 @@ package com.iherbyou.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.query.Order;
-import org.springframework.web.servlet.view.RedirectView;
 
-import javax.smartcardio.CardTerminal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Entity
+@ToString
+@NoArgsConstructor
 @Getter
 @Setter
-@ToString
+@Entity
 public class User {
 
     @Id
@@ -73,9 +72,4 @@ public class User {
     // 1:1 (회원 - 장바구니)
 //    @OneToOne(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private Cart cart;
-
-
-    public User() {
-    }
-
 }
