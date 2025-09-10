@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/iherbyou?serverTimezone=UTC&characterEncoding=UTF-8
-    username: root
-    password: your_password
+    username: iherbyou
+    password: iherbyou123!
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
