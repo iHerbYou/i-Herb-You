@@ -18,3 +18,7 @@
 - **Build Tool**: Gradle
 - **Utilities**: Lombok
 - **Testing**: JUnit 5, Spring Boot Starter Test
+
+## 📊 ERD
+
+![ERD Diagram](./docs/erd.png)
