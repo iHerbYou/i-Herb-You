@@ -3,41 +3,49 @@ package com.iherbyou.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@ToString
-@AllArgsConstructor
+import java.time.LocalDateTime;
+
+
 @NoArgsConstructor
 @Getter
-@Setter
 @Entity
 public class ProductVariant {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; //TODO
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "productId", nullable = false)
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column
-    private Integer price;
-
     @Column(length = 100)
-    private String size;
+    private String variantName;
 
     @Column
-    private Integer weight;
+    private Integer listPrice;
+
+    @Column
+    private Integer salePrice;
+
+    @Column(length = 50)
+    private String size;
 
     @Column
     private Integer volume;
 
-    //TODO 질문 AllArgsConstructor
-    public ProductVariant(Product product, Integer price, String size, Integer weight, Integer volume) {
-        this.product = product;
-        this.price = price;
-        this.size = size;
-        this.weight = weight;
-        this.volume = volume;
-    }
-}
+    @Column(length = 50)
+    private String upcCode;
 
+    @Column(length = 20)
+    private String pillSize;
+
+    @Lob
+    @Column(columnDefinition = "TEXT") // 긴 텍스트(예: 수천~수만 글자)
+    private String nutritionFacts;
+
+    @Column
+    private Integer maxQtyPerOrder;
+
+    @Column
+    private LocalDateTime restockEta;
+}
