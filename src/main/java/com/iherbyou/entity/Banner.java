@@ -1,26 +1,21 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 public class Banner {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id;    // 광고 id
 
-    @Column(name = "banner_name", length = 50)
-    private String bannerName;
+    @Column(length = 50)
+    private String bannerName;  // 광고명
 
-    @Column(name = "image_url", length = 255)
-    private String imageUrl;
+    @Column(length = 255)
+    private String imageUrl;    // 이미지 url
 
 }
