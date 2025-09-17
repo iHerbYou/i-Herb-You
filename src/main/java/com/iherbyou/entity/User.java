@@ -1,19 +1,16 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-@ToString
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Setter
 @Entity
 public class User {
 
@@ -21,55 +18,46 @@ public class User {
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false, length = 30)
-    private String name;
+    private String name; // 실명
 
-    @Column(nullable = false, length = 50)
+    @Column(length = 50, unique = true)
     private String phone;
 
-    @Column
-    private Date createdDate;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-    @Column
-    private Date updatedDate;
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
-    @Column
-    private boolean isTermsAgreed;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_code_id")
+    private Code roleCode; // 회원 권한 (일반 사용자, 관리자)
 
-    @Column
-    private boolean isVerified;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "status_code_id")
+    private Code statusCode; // 회원 상태 (활성화, 비활성화, 탈퇴)
 
-    // 1:N 관계 (회원 한 명에 여러 주소)
-    @OneToMany(mappedBy = "user_address", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserAddress> addresses = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserAddress> addresses = new ArrayList<>(); //마이페이지에서 주소 목록 주기로했으니 추가함
 
-    // 1:1 관계 (회원 - 포인트)
-    @OneToOne(mappedBy = "point", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Point point;
 
-    // 1:1 (회원 - 위시리스트)
-    @OneToOne(mappedBy = "wishlist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Wishlist wishlist;
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 
-    // 1:N (회원 한명에 여러 리뷰)
-//    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Review> reviews = new ArrayList<>();
-
-    // 1:N (회원 한명에 여러 쿠폰)
-//    @OneToMany(mappedBy = "user_coupon", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<UserCoupon> coupons = new ArrayList<>();
-
-    // 1:N (회원 한명에 여러 주문)
-//    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Order> orders = new ArrayList<>();
-
-    // 1:1 (회원 - 장바구니)
-//    @OneToOne(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private Cart cart;
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

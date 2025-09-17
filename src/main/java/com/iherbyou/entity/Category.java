@@ -10,9 +10,6 @@ import java.util.List;
 
 @NoArgsConstructor
 @Getter
-@Setter
-@Table(indexes = {@Index(name = "idx_category_parent", columnList = "parent_id"), @Index(name = "idx_category_name", columnList = "name")},
-        uniqueConstraints = {@UniqueConstraint(name = "uk_category_code", columnNames = {"code"})})
 @Entity
 public class Category {
 
@@ -20,26 +17,23 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 예: “VITAMINS”, “SPORTS”, …
     @Column(length = 50, nullable = false)
-    private String name;
+    private String name; // 카테고리 이름
 
-    // 내부 식별/URL 슬러그 등으로 활용
-    @Column(length = 50, nullable = false)
-    private String code;
-
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id", foreignKey = @ForeignKey(name = "fk_category_parent"))
-    private Category parent;
+    @JoinColumn(name = "parent_id")
+    private Category parent; // 상위 카테고리
 
-    // 단순 정렬/표시 우선순위
-    @Column(nullable = false)
-    private Integer sortOrder = 0;
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    private List<Category> children = new ArrayList<>(); // 하위 카테고리
 
-    @Column(nullable = false)
-    private Boolean active = true;
+    @OneToMany(mappedBy = "category")
+    private List<ProductCategory> productCategories = new ArrayList<>(); // 카테고리에 속한 상품들
 
-    // 양방향이 꼭 필요하지 않다면 생략 가능
-    @OneToMany(mappedBy = "parent")
-    private List<Category> children = new ArrayList<>();
+    public void addChildCategory(Category child) {
+        children.add(child);
+        child.setParent(this);
+    }
+
 }

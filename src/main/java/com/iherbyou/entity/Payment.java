@@ -2,45 +2,35 @@ package com.iherbyou.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
-@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
 public class Payment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id;    // 결제 id
 
-    @OneToOne
-    @JoinColumn(name = "orderId", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JoinColumn(name = "order_id", nullable = false, unique = true)    // 주문 id
     private Order order;
 
-    @ManyToOne
-    @JoinColumn(name = "paymentStatusId", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_status_id", nullable = false)   // 결제 상태 코드 id
     private Code paymentStatus;
 
-    @ManyToOne
-    @JoinColumn(name = "paymentMethodId", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_method_id", nullable = false) // 결제 방법 코드 id
     private Code paymentMethod;
 
-    @Column
-    private LocalDateTime paymentDate;
+    @Column(nullable = false,
+            columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime paymentDate;  // 결제 일시
 
-    @Column
-    private Integer paymentAmount;
-
-    //TODO 질문있습니다
-    public Payment(Order order, Code paymentStatus, Code paymentMethod, LocalDateTime paymentDate, Integer paymentAmount) {
-        this.order = order;
-        this.paymentStatus = paymentStatus;
-        this.paymentMethod = paymentMethod;
-        this.paymentDate = paymentDate;
-        this.paymentAmount = paymentAmount;
-    }
+    @Column(nullable = false,
+            columnDefinition = "BIGINT CHECK (payment_amount >= 0)")
+    private Long paymentAmount; // 결제 금액
 
 }
