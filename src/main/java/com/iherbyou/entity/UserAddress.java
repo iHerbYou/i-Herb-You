@@ -3,51 +3,36 @@ package com.iherbyou.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
-@ToString
 @NoArgsConstructor
 @Getter
-@Setter
 @Entity
 public class UserAddress {
 
     @Id
     @GeneratedValue
-    private Long addressId; //TODO Long id
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false, length = 20)
-    private String recipient;
+    private String recipient; //수령인
 
     @Column(nullable = false, length = 30)
-    private String phone;
+    private String phone; //수령인 전화번호
 
-    @Column(nullable = false, length = 255)
-    private String postcode;
+    @Column(nullable = false)
+    private String postcode; //우편번호
 
-    @Column(nullable = false, length = 255)
-    private String address;
-
-    @Column(nullable = false, length = 255)
-    private String addressDetail;
+    @Column(nullable = false)
+    private String address; // 기본주소
 
     @Column
-    private boolean isDefault;
+    private String addressDetail; // 상세 주소 (null 가능)
 
-    // FK (user_id 생성)
-    @ManyToOne(fetch = FetchType.LAZY) //TODO 이거 User 객체를 가져 오는거랑 차이 설명해주세요
-    @JoinColumn(name = "id", nullable = false)
-    private User userId;
+    @Column
+    private boolean isDefault; // 기본 배송지 여부 0=아님, 1=기본
 
-    public UserAddress(Long addressId, String recipient, String phone, String postcode, String address, boolean isDefault, String addressDetail, User userId) {
-        this.addressId = addressId;
-        this.recipient = recipient;
-        this.phone = phone;
-        this.postcode = postcode;
-        this.address = address;
-        this.isDefault = isDefault;
-        this.addressDetail = addressDetail;
-        this.userId = userId;
-    }
 }
