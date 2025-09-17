@@ -36,5 +36,4 @@ public class Coupon {
 
     @Column(name = "coupon_ends_at")
     private LocalDate couponEndsAt;
-
 }
