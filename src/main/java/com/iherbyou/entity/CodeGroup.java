@@ -1,30 +1,41 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import java.time.LocalDateTime;
 
-import java.util.List;
-
-@AllArgsConstructor
 @NoArgsConstructor
-@Setter
 @Getter
 @Entity
 public class CodeGroup {
 
     @Id
-    @GeneratedValue
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;    // 코드 그룹 ID
 
-    @Column(length = 50)
-    private String groupName;
+    @Column(nullable = false, unique = true)
+    private String groupKey;    // 그룹 키
 
-    @Column(length = 50)
-    private String groupKey;
+    @Column(length = 100, nullable = false)
+    private String groupName;   // 그룹 표시명
 
-    @OneToMany(mappedBy = "code")
-    private List<Code> codes; //TODO 이 부분 정확히 이해 안된다
+    @Column(length = 255)
+    private String description; // 설명
+
+    @Column(columnDefinition = "TINYINT(1) DEFAULT 1")
+    private Boolean isActive;   // 그룹 사용 여부
+
+    @Column(columnDefinition = "INT DEFAULT 0", nullable = false)
+    private Integer sortOrder;  // 그룹 정렬
+
+    @CreationTimestamp
+    @Column(updatable = false, nullable = false)
+    private LocalDateTime createdAt;    // 생성 시각
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;    // 수정 시각
 }
