@@ -77,5 +77,5 @@ public class Coupon {
 
     @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;    // 수정일시
-
+  
 }

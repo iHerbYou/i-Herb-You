@@ -1,67 +1,60 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+// ↓ Hibernate @Check 쓰면 활성화, 아니면 삭제해도 동작함
+import org.hibernate.annotations.Check;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
-
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Setter
-@NoArgsConstructor
-@Table(indexes = {@Index(name = "idx_review_product", columnList = "product_id"), @Index(name = "idx_review_user", columnList = "user_id")}
-        // 중복 허용 정책에 따라 다음과 같은 유니크를 둘 수도 있음:
-        // , uniqueConstraints = @UniqueConstraint(
-        //     name = "uk_review_order_item",
-        //     columnNames = {"order_item_id"}
-        // )
-)
 @Entity
+@Table(
+        name = "review",
+        indexes = {
+                @Index(name = "idx_review_product", columnList = "product_id"),
+                @Index(name = "idx_review_user", columnList = "user_id")
+        }
+)
+@Check(constraints = "rating BETWEEN 1 AND 5")
 public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "review_id", nullable = false)                // PK
     private Long id;
 
-    // 리뷰 작성자 (User 엔티티가 있다고 가정)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_review_user"))
-    private User user;
-
-    // 대상 상품
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "product_id", foreignKey = @ForeignKey(name = "fk_review_product"))
+    @JoinColumn(name = "product_id", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_review_product"))    // FK NOT NULL
     private Product product;
 
-    // 1~5점
-    @Column(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_review_user"))       // FK NOT NULL
+    private User user;
+
+    @Column(name = "rating", nullable = false)                   // TINYINT, 1~5
     private Integer rating;
 
-    @Column(length = 100)
-    private String title;
-
-    // 길이가 길 수 있어 TEXT 권장 (DB에 따라 columnDefinition 수정)
     @Lob
-    @Column(columnDefinition = "TEXT")
-    private String content;
+    @Column(name = "text", columnDefinition = "TEXT")            // 본문(NULL 허용)
+    private String text;
 
-    // 구매자만 리뷰 강제하고 싶을 때: 해당 주문상품과 연결(정규 FK로 모델링해도 됨)
-    @Column(name = "order_item_id")
-    private Long orderItemId;
+    @Column(name = "is_deleted", nullable = false,               // TINYINT DEFAULT 0
+            columnDefinition = "TINYINT(1) DEFAULT 0")
+    private Boolean isDeleted = false;
 
-    @Column(nullable = false)
-    private OffsetDateTime createdAt = OffsetDateTime.now();
+    @Column(name = "created_at", nullable = false,               // DEFAULT CURRENT_TIMESTAMP
+            updatable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createdAt;
 
-    @Column(nullable = false)
-    private OffsetDateTime updatedAt = OffsetDateTime.now();
-
-    @Column(nullable = false)
-    private Boolean deleted = false;
-
-    @PreUpdate
-    public void touchUpdatedAt() {
-        this.updatedAt = OffsetDateTime.now();
+    @PrePersist
+    void onCreate() {
+        if (this.createdAt == null) this.createdAt = LocalDateTime.now();
     }
 }
