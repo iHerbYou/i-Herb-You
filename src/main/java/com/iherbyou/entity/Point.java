@@ -1,26 +1,33 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
-@ToString
-@AllArgsConstructor
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 @Getter
-@Setter
 @Entity
-public class Point {
+public class Point { // 현재 잔액과 생성/수정 일자 저장 (포인트 내역은 PointHistory 에서 관리)
 
-    @Id //TODO 질문
-    private Long userId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    // userId가 PK이자 FK
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "user_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Column(nullable = false)
-    private int balance;
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private Integer balance; // 포인트 잔액
 
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 }
