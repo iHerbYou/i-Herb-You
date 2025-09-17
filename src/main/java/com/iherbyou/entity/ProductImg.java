@@ -3,11 +3,8 @@ package com.iherbyou.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@ToString
-@AllArgsConstructor //TODO 질문
 @NoArgsConstructor
 @Getter
-@Setter
 @Entity
 public class ProductImg {
 
@@ -15,25 +12,19 @@ public class ProductImg {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "productId", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(length = 255)
+    @Column(nullable = false)
     private String imageUrl;
 
-    @Column(length = 255)
+    @Column
     private String altText;
 
-    @Column
-    private Integer sortIdx;
+    @Column(columnDefinition = "INT DEFAULT 0")
+    private Integer sortIdx;   // 정렬 순서 (낮을수록 우선)
 
-    //TODO 질문
-    public ProductImg(Product product, String imageUrl, String altText, Integer sortIdx) {
-        this.product = product;
-        this.imageUrl = imageUrl;
-        this.altText = altText;
-        this.sortIdx = sortIdx;
-    }
-
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    private Boolean isPrimary; // 대표 이미지 여부 (0=일반, 1=대표)
 }
