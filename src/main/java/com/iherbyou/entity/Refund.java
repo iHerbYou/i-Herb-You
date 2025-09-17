@@ -5,42 +5,30 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@ToString
-@AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Setter
 @Entity
 public class Refund {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id;    // 환불 id
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "paymentId", nullable = false)
+    @JoinColumn(name = "payment_id", nullable = false)   // 결제 id
     private Payment payment;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "codeId", nullable = false)
+    @JoinColumn(name = "code_id", nullable = false)  // 코드 id
     private Code code;
 
     @Column
-    private LocalDateTime refundDate;
+    private LocalDateTime refundDate;   // 환불 일자
 
     @Column(length = 255)
-    private String refundReason;
+    private String refundReason;    // 환불 사유
 
     @Column
-    private Integer refundAmount;
+    private Integer refundAmount;   // 환불 금액
 
-    //TODO 질문
-    public Refund(Payment payment, Code code, LocalDateTime refundDate, String refundReason, Integer refundAmount) {
-        this.payment = payment;
-        this.code = code;
-        this.refundDate = refundDate;
-        this.refundReason = refundReason;
-        this.refundAmount = refundAmount;
-
-    }
 }
