@@ -13,14 +13,15 @@ import java.util.List;
 @Getter
 @Entity
 public class Wishlist {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // 1:1 회원-위시리스트, FK NOT NULL, UNIQUE
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(nullable = false, unique = true)
-    private User user;        // user_id (FK)
+    @JoinColumn(name="user_id", nullable = false, unique = true)
+    private User user;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

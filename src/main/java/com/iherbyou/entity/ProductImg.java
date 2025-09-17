@@ -7,6 +7,7 @@ import lombok.*;
 @Getter
 @Entity
 public class ProductImg {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,10 +16,10 @@ public class ProductImg {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String imageUrl;
 
-    @Column(length = 255)
+    @Column
     private String altText;
 
     @Column(columnDefinition = "INT DEFAULT 0")
