@@ -1,24 +1,26 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 @Getter
 @Entity
-@Table(
-        name = "brand",
-        uniqueConstraints = @UniqueConstraint(name = "uk_brand_name", columnNames = "brand_name")
-)
 public class Brand {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "brand_id", nullable = false)
     private Long id;
 
-    @Column(name = "brand_name", length = 255, nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String name;
+
+    @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL) // 브랜드 없어지면, 해당 브랜드의 상품 같이 삭제
+    private List<Product> products = new ArrayList<>();
+
 }

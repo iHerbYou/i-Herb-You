@@ -5,7 +5,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 @Getter
 @Entity
 public class ProductVariant {
@@ -19,33 +21,30 @@ public class ProductVariant {
     private Product product;
 
     @Column(length = 100)
-    private String variantName;
+    private String variantName; // 120정, 60정
 
     @Column
-    private Integer listPrice;
+    private Integer listPrice; // 정가
 
     @Column
-    private Integer salePrice;
-
-    @Column(length = 50)
-    private String size;
+    private Integer salePrice; // 판매가
 
     @Column
-    private Integer volume;
+    private Integer volume; // 약 통의 부피
 
     @Column(length = 50)
     private String upcCode;
 
-    @Column(length = 20)
-    private String pillSize;
+    @Column(length = 50)
+    private String pillSize; // 알약 크기 (5mm x 3mm x 7mm)
 
     @Lob
     @Column(columnDefinition = "TEXT") // 긴 텍스트(예: 수천~수만 글자)
-    private String nutritionFacts;
+    private String nutritionFacts; // 영양 성분 정보
 
     @Column
-    private Integer maxQtyPerOrder;
+    private Integer maxQtyPerOrder; // 옵션별 구매 한도
 
     @Column
-    private LocalDateTime restockEta;
+    private LocalDateTime restockEta; // 재입고 예정일
 }
