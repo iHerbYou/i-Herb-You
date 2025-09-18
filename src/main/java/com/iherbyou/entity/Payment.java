@@ -6,6 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,6 +31,9 @@ public class Payment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_method_code_id", nullable = false)
     private Code paymentMethodCode; // 결제 방법 코드 id
+
+    @OneToMany(mappedBy = "payment")
+    private List<Refund> refunds = new ArrayList<>();
 
     @CreationTimestamp
     @Column(updatable = false, nullable = false)

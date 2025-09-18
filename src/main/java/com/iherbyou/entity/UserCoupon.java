@@ -1,13 +1,14 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 @Getter
 @Entity
 public class UserCoupon {
@@ -28,11 +29,16 @@ public class UserCoupon {
     @JoinColumn(name = "order_id")
     private Order order; // 사용된 주문
 
+    @Column(nullable = false)
     private LocalDateTime issuedAt; // 발행일
 
+    @Column(nullable = false)
     private LocalDate expiredAt; // 만료일
 
+    @Column(nullable = false)
     private LocalDateTime usedAt; // 사용일
 
+    @Column(nullable = false)
     private boolean isUsed; // 사용 여부 (0 = 미사용, 1 = 사용)
+
 }

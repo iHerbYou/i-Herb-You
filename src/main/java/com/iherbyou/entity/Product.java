@@ -66,4 +66,6 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<ProductVariant> productVariants = new ArrayList<>();
 
+    @OneToMany(mappedBy = "product")
+    private List<Review> reviews = new ArrayList<>(); // 댓글 조회
 }

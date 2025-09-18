@@ -1,31 +1,33 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.LocalDateTime;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 @Getter
 @Entity
-public class RestockSubscription {
+public class RestockSubscription { // 재입고 알림
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;    // 재입고 구독 ID
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;  // 회원 ID
+    private User user; // 회원 ID
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_variant_id", nullable = false)
-    private ProductVariant productVariant;  // 상품 옵션 ID
+    private ProductVariant productVariant; // 상품 옵션 ID
 
-    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
-    private Boolean isActive = true;    // 구독 활성화 여부
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean isActive; // 구독 활성화 여부
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -33,5 +35,6 @@ public class RestockSubscription {
 
     @UpdateTimestamp
     @Column
-    private LocalDateTime lastNotifiedAt;   // 마지막 알림 발송 시각
+    private LocalDateTime lastNotifiedAt; // 마지막 알림 발송 시각
+
 }
