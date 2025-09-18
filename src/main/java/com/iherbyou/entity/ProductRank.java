@@ -1,29 +1,31 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.LocalDateTime;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 @Getter
 @Entity
 public class ProductRank {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;    // 랭킹 id
+    private Long id;
 
-    // 어떤 상품의 랭킹인지
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)  // 상품 id
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
     @Column
-    private Integer recentSales;    // 최근 판매량
+    private Integer recentSales; // 최근 판매량
 
-    @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @UpdateTimestamp
+    @Column
     private LocalDateTime updatedAt;
 
 }

@@ -1,14 +1,15 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 @Getter
 @Entity
 public class Point { // 현재 잔액과 생성/수정 일자 저장 (포인트 내역은 PointHistory 에서 관리)
@@ -24,10 +25,11 @@ public class Point { // 현재 잔액과 생성/수정 일자 저장 (포인트 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer balance; // 포인트 잔액
 
-    @CreatedDate
+    @CreatedDate // TODO
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    @LastModifiedDate
+    @LastModifiedDate // TODO
     private LocalDateTime updatedAt;
+
 }

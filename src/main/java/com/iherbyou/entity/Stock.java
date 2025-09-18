@@ -1,52 +1,33 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 @Getter
 @Entity
-@Table(
-        name = "stock",
-        indexes = @Index(name = "idx_stock_product_variant_id", columnList = "product_variant_id"),
-        uniqueConstraints = @UniqueConstraint(name = "uk_stock_product_variant_id", columnNames = {"product_variant_id"})
-)
 public class Stock {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "stock_id", nullable = false)                         // 재고 id
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_variant_id", nullable = false)           // 옵션(SKU) 1:1
-    private ProductVariant productVariant;
+    @JoinColumn(name = "product_variant_id", nullable = false)
+    private ProductVariant productVariant; // 옵션(SKU) 1:1
 
-    // NOT NULL, DEFAULT 0
-    @Column(name = "amount", nullable = false, columnDefinition = "INT DEFAULT 0")
-    private Integer amount = 0;
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private Integer amount = 0; // 0보다 항상 크거나 같아야 하는데 check 옵션 필요?
 
-    //NOT NULL, DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     @UpdateTimestamp
-    @Column(
-            name = "updated_at",
-            nullable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
-    )
+    @Column
     private LocalDateTime updatedAt;
 
-    //선택 컬럼 (NULL 허용)
-    @Column(name = "received_at")
-    private LocalDateTime receivedAt;
+    private LocalDateTime restockedAt; // 입고일
 
-    // 생성 편의 생성자
-    public Stock(ProductVariant productVariant, Integer amount) {
-        this.productVariant = productVariant;
-        this.amount = (amount == null ? 0 : amount);
-    }
 }

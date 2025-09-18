@@ -1,10 +1,11 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 @Getter
 @Entity
 public class UserAddress {
@@ -18,16 +19,16 @@ public class UserAddress {
     private User user;
 
     @Column(nullable = false, length = 20)
-    private String recipient; //수령인
+    private String recipient; // 택배 수령인
 
     @Column(nullable = false, length = 30)
-    private String phone; //수령인 전화번호
+    private String phone; // 수령인 전화번호
 
     @Column(nullable = false)
-    private String postcode; //우편번호
+    private String zipcode; // 우편번호
 
     @Column(nullable = false)
-    private String address; // 기본주소
+    private String address; // 주소
 
     @Column
     private String addressDetail; // 상세 주소 (null 가능)

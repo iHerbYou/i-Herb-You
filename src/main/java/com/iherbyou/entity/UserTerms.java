@@ -1,16 +1,17 @@
 package com.iherbyou.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 @Getter
-@Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "terms_id"})})
-public class UserTerms {
+@Entity
+public class UserTerms { // User, Terms의 중간 테이블
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,10 +25,10 @@ public class UserTerms {
     @JoinColumn(name = "terms_id", nullable = false)
     private Terms terms;
 
-    @Column(name = "is_terms_agreed", nullable = false, columnDefinition = "BOOLEAN DEFAULT 0")
-    private Boolean isTermsAgreed = true;  // 동의 여부 (1 = 동의, 0 = 비동의)
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT 1")
+    private Boolean isTermsAgreed = true; // 동의 여부 (1 = 동의, 0 = 비동의)
 
-    @Column(name = "agreed_at", nullable = false, updatable = true,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime agreedAt;  // 동의 시각
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime agreedAt; // 동의 시각
+
 }
