@@ -43,7 +43,7 @@ public class Cart {
     private LocalDateTime updatedAt; // 수정일시
 
     // 1:N (장바구니 하나에 여러 항목)
-    @OneToMany(mappedBy = "cart_product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartProduct> cartProducts = new ArrayList<>();
 
 }

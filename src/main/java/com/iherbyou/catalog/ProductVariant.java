@@ -22,10 +22,11 @@ public class ProductVariant {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @OneToMany(mappedBy = "product_variant")
+    @Builder.Default
+    @OneToMany(mappedBy = "productVariant")
     private List<RestockSubscription> restockSubscriptions = new ArrayList<>(); // 관리자 페이지에서 유용
 
-    @OneToOne(mappedBy = "product_variant", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "productVariant", fetch = FetchType.LAZY)
     private Stock stock;
 
     @Column(length = 100)
