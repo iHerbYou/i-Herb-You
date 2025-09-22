@@ -1,7 +1,7 @@
 package com.iherbyou.ordering.service;
 
-import com.iherbyou.ordering.Order;
-import com.iherbyou.ordering.OrderProduct;
+import com.iherbyou.ordering.entity.Order;
+import com.iherbyou.ordering.entity.OrderProduct;
 import com.iherbyou.ordering.dto.OrderDetailDto;
 import com.iherbyou.ordering.dto.OrderItemDto;
 import com.iherbyou.ordering.dto.OrderSummaryDto;

@@ -1,7 +1,7 @@
 package com.iherbyou.community.controller;
 
-import com.iherbyou.community.QnaAnswer;
-import com.iherbyou.community.QnaQuestion;
+import com.iherbyou.community.entity.QnaAnswer;
+import com.iherbyou.community.entity.QnaQuestion;
 import com.iherbyou.community.service.QnaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

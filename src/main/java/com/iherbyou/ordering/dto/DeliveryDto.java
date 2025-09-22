@@ -1,6 +1,6 @@
 package com.iherbyou.ordering.dto;
 
-import com.iherbyou.ordering.Delivery;
+import com.iherbyou.ordering.entity.Delivery;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

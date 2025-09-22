@@ -1,6 +1,6 @@
 package com.iherbyou.ordering.controller;
 
-import com.iherbyou.ordering.Payment;
+import com.iherbyou.ordering.entity.Payment;
 import com.iherbyou.ordering.dto.PaymentRequestDto;
 import com.iherbyou.ordering.dto.PaymentResponseDto;
 import com.iherbyou.ordering.service.PaymentService;

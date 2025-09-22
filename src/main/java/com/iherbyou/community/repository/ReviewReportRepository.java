@@ -1,7 +1,7 @@
 package com.iherbyou.community.repository;
 
 import com.iherbyou.common.code.entity.Code;
-import com.iherbyou.community.ReviewReport;
+import com.iherbyou.community.entity.ReviewReport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;

@@ -1,6 +1,5 @@
 package com.iherbyou.ordering.dto;
 
-import com.iherbyou.ordering.Order;
 import lombok.*;
 
 import java.time.LocalDateTime;

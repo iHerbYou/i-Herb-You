@@ -1,6 +1,6 @@
 package com.iherbyou.community.repository;
 
-import com.iherbyou.community.QnaAnswer;
+import com.iherbyou.community.entity.QnaAnswer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
