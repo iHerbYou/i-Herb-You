@@ -22,7 +22,6 @@ public class ProductVariant {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Builder.Default
     @OneToMany(mappedBy = "productVariant")
     private List<RestockSubscription> restockSubscriptions = new ArrayList<>(); // 관리자 페이지에서 유용
 
