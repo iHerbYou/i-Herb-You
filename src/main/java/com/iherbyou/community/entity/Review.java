@@ -1,4 +1,4 @@
-package com.iherbyou.community;
+package com.iherbyou.community.entity;
 
 import com.iherbyou.catalog.entity.Product;
 import com.iherbyou.user.entity.User;

@@ -1,7 +1,7 @@
 package com.iherbyou.community.service;
 
 import com.iherbyou.catalog.entity.Product;
-import com.iherbyou.community.Review;
+import com.iherbyou.community.entity.Review;
 import com.iherbyou.community.repository.ReviewRepository;
 import com.iherbyou.user.entity.User;
 import jakarta.persistence.EntityManager;
@@ -117,7 +117,7 @@ public class ReviewService {
     private boolean isVerifiedPurchaser(Long userId, Long productId) {
         //TODO
 //        Long cnt = em.createQuery(
-//                        "select count(oi) from com.iherbyou.ordering.OrderProduct oi " +
+//                        "select count(oi) from com.iherbyou.ordering.entity.OrderProduct oi " +
 //                                "where oi.user.id = :uid and oi.product.id = :pid and oi.status = :st",
 //                        Long.class)
 //                .setParameter("uid", userId)

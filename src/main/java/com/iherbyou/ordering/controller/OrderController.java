@@ -1,6 +1,6 @@
 package com.iherbyou.ordering.controller;
 
-import com.iherbyou.ordering.Order;
+import com.iherbyou.ordering.entity.Order;
 import com.iherbyou.ordering.dto.OrderCreateDto;
 import com.iherbyou.ordering.dto.OrderDetailDto;
 import com.iherbyou.ordering.dto.OrderSummaryDto;

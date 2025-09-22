@@ -1,7 +1,7 @@
 package com.iherbyou.ordering.service;
 
-import com.iherbyou.ordering.Delivery;
-import com.iherbyou.ordering.Order;
+import com.iherbyou.ordering.entity.Delivery;
+import com.iherbyou.ordering.entity.Order;
 import com.iherbyou.ordering.repository.DeliveryRepository;
 import com.iherbyou.ordering.repository.OrderRepository;
 import com.iherbyou.ordering.common.CodeFinder;

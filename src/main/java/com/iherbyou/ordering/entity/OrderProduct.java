@@ -1,4 +1,4 @@
-package com.iherbyou.ordering;
+package com.iherbyou.ordering.entity;
 
 import com.iherbyou.catalog.entity.ProductVariant;
 import jakarta.persistence.*;

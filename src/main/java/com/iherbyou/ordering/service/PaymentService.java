@@ -1,8 +1,8 @@
 package com.iherbyou.ordering.service;
 
 import com.iherbyou.common.code.entity.Code;
-import com.iherbyou.ordering.Order;
-import com.iherbyou.ordering.Payment;
+import com.iherbyou.ordering.entity.Order;
+import com.iherbyou.ordering.entity.Payment;
 import com.iherbyou.ordering.common.CodeFinder;
 import com.iherbyou.ordering.repository.OrderRepository;
 import com.iherbyou.ordering.repository.PaymentRepository;

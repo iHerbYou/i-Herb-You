@@ -1,9 +1,8 @@
 package com.iherbyou.community.service;
 
-import com.iherbyou.user.entity.User;
 import com.iherbyou.common.code.entity.Code;
-import com.iherbyou.community.Review;
-import com.iherbyou.community.ReviewReport;
+import com.iherbyou.community.entity.Review;
+import com.iherbyou.community.entity.ReviewReport;
 import com.iherbyou.community.repository.ReviewReportRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

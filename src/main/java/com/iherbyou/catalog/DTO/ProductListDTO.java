@@ -2,7 +2,7 @@ package com.iherbyou.catalog.DTO;
 
 import com.iherbyou.catalog.entity.Product;
 import com.iherbyou.catalog.entity.ProductImg;
-import com.iherbyou.community.Review;
+import com.iherbyou.community.entity.Review;
 import lombok.*;
 
 @NoArgsConstructor
