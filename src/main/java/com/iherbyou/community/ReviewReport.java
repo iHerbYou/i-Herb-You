@@ -1,7 +1,7 @@
 package com.iherbyou.community;
 
-import com.iherbyou.common.Code;
-import com.iherbyou.user.User;
+import com.iherbyou.common.code.entity.Code;
+import com.iherbyou.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
