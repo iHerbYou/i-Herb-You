@@ -3,7 +3,6 @@ package com.iherbyou.ordering;
 import com.iherbyou.common.Code;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -14,14 +13,15 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Getter
+@Setter
 @Entity
 public class Payment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 결제 id
+    private Long id; // 결제 id (주문 id와 동일하게 사용)
 
     @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
+    @MapsId
     @JoinColumn(name = "order_id", nullable = false, unique = true)
     private Order order;
 
@@ -33,17 +33,30 @@ public class Payment {
     @JoinColumn(name = "payment_method_code_id", nullable = false)
     private Code paymentMethodCode; // 결제 방법 코드 id
 
+    @Builder.Default
     @OneToMany(mappedBy = "payment")
     private List<Refund> refunds = new ArrayList<>();
 
-    @CreationTimestamp
-    @Column(updatable = false, nullable = false)
-    private LocalDateTime paymentDate;  // 결제 일시
-
-    @Column(updatable = false)
-    private LocalDateTime cancelDate; // 결제 취소일
-
-    @Column(nullable = false, columnDefinition = "BIGINT CHECK (payment_price >= 0)")
+    @Column(nullable = false)
     private BigDecimal paymentPrice; // 결제 금액
+
+    @Column(nullable = false)
+    private LocalDateTime requestedAt; // 결제 요청 시각
+
+    @Column
+    private LocalDateTime paidAt; // 결제 완료 시각
+
+    public void markRequested(Code status, Code method, BigDecimal amount, LocalDateTime requestedAt) {
+        this.paymentStatusCode = status;
+        this.paymentMethodCode = method;
+        this.paymentPrice = amount;
+        this.requestedAt = requestedAt;
+        this.paidAt = null;
+    }
+
+    public void markPaid(Code status, LocalDateTime paidAt) {
+        this.paymentStatusCode = status;
+        this.paidAt = paidAt;
+    }
 
 }

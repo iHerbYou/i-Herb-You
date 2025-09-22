@@ -11,11 +11,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Getter
+@Setter
 @Entity
 public class Delivery {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id; // 배송 id
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -30,8 +31,8 @@ public class Delivery {
     @JoinColumn(name = "address_id", nullable = false)
     private UserAddress userAddress; // 주소id
 
-    @Column(length = 50, unique = true)
-    private Integer trackingNumber; // 송장번호
+    @Column(length = 40)
+    private String trackingNumber; // 송장번호
 
     @Column(length = 100)
     private String deliveryCompany; // 택배사
@@ -44,5 +45,15 @@ public class Delivery {
 
     @Column
     private LocalDateTime delCompleteAt; // 배송 완료일
+
+    public static Delivery create(Order order, Code code, String company, String trackingNumber) {
+        Delivery d = new Delivery();
+        d.order = order;
+        d.code = code;
+        d.deliveryCompany = company;
+        d.trackingNumber = trackingNumber;
+        d.delStartAt = LocalDateTime.now();
+        return d;
+    }
 
 }
