@@ -1,6 +1,6 @@
 package com.iherbyou.catalog.entity;
 
-import com.iherbyou.user.User;
+import com.iherbyou.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

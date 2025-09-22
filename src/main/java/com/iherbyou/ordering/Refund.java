@@ -1,6 +1,6 @@
 package com.iherbyou.ordering;
 
-import com.iherbyou.common.Code;
+import com.iherbyou.common.code.entity.Code;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class Refund {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,7 +40,7 @@ public class Refund {
     private BigDecimal refundPrice; // 환불 금액
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "refund_delivery_optioin_code_id", nullable = false)
+    @JoinColumn(name = "refund_delivery_option_code_id", nullable = false)
     private Code refundDeliveryOptionCode; // 수거 요청, 직접 발송 (환불 방법)
 
 }

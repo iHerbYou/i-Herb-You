@@ -1,7 +1,7 @@
 package com.iherbyou.ordering;
 
-import com.iherbyou.common.Code;
-import com.iherbyou.user.User;
+import com.iherbyou.common.code.entity.Code;
+import com.iherbyou.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,11 +14,13 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Getter
+@Setter
 @Entity
+@Table(name = "orders") // 예약어 회피
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -29,6 +31,7 @@ public class Order {
     @JoinColumn(name = "order_status_code_id", nullable = false)
     private Code orderStatusCode; // 주문 상태 코드 (예: 결제완료/배송중/취소 등) → Code 테이블 FK
 
+    @Builder.Default // Builder 사용할 때도 빈 리스트 유지
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderProduct> orderProducts = new ArrayList<>();
 
@@ -54,15 +57,19 @@ public class Order {
     @Column(nullable = false)
     private Integer totalPrice; // 최종 결제 금액
 
-    /**
-     * 소계+배송비-할인 재계산
-     */
+    // 소계 + 배송비 - 할인 재계산
     public void recalcTotal() {
         int sub = (subtotal == null ? 0 : subtotal);
         int fee = (deliveryFee == null ? 0 : deliveryFee);
-        int dc = (discount == null ? 0 : discount);
-        int total = sub + fee - dc;
-        this.totalPrice = Math.max(total, 0);
+        int dc  = (discount == null ? 0 : discount);
+        this.totalPrice = Math.max(sub + fee - dc, 0);
+    }
+
+    // 양방향 편의 메서드
+    public void addItem(OrderProduct op) {
+        if (op == null) return;
+        this.orderProducts.add(op);
+        op.setOrder(this);
     }
 
 }

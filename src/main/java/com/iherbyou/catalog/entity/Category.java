@@ -1,5 +1,6 @@
 package com.iherbyou.catalog.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,12 +18,13 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = 100, nullable = false)
     private String name; // 카테고리 이름
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
+    @JsonBackReference
     private Category parent; // 상위 카테고리
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
