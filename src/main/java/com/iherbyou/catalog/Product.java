@@ -5,8 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,6 +22,7 @@ public class Product {
     @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand; // 브랜드 id (FK, NOT NULL)
 
+    @Builder.Default
     @OneToMany(mappedBy = "product")
     private List<ProductCategory> productCategories = new ArrayList<>();
 
@@ -61,12 +61,37 @@ public class Product {
     @Column(nullable = false, columnDefinition = "SMALLINT UNSIGNED DEFAULT 6")
     private Integer maxQtyPerOrder; // 최대구매한도(기본 6)
 
-    @OneToMany(mappedBy = "product")
-    private List<ProductImg> productImgs = new ArrayList<>();
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private Set<ProductImg> productImgs = new HashSet<>();
 
-    @OneToMany(mappedBy = "product")
-    private List<ProductVariant> productVariants = new ArrayList<>();
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private Set<ProductVariant> productVariants = new HashSet<>();
 
-    @OneToMany(mappedBy = "product")
-    private List<Review> reviews = new ArrayList<>(); // 댓글 조회
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private Set<Review> reviews = new HashSet<>(); // 댓글 조회
+
+    // 새로 추가 - 정렬용 집계 컬럼
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private Integer sales;  // 판매량
+
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private Double avgRating;  // 평균 평점
+
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private Integer reviewCount;    // 리뷰 개수
+
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private Integer minPrice; // 상품 옵션 중 최저가
+
+    // 엔티티 내부에서 직접 minPrice 자동 갱신
+    @PrePersist
+    @PreUpdate
+    private void updateMinPrice() {
+        this.minPrice = productVariants.stream()
+                .map(ProductVariant::getSalePrice)
+                .filter(Objects::nonNull)
+                .min(Integer::compareTo)
+                .orElse(0);
+    }
+
 }
