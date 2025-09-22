@@ -1,4 +1,4 @@
-package com.iherbyou.catalog;
+package com.iherbyou.catalog.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

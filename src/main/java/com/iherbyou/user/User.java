@@ -1,7 +1,7 @@
 package com.iherbyou.user;
 
-import com.iherbyou.cart.Wishlist;
-import com.iherbyou.catalog.RestockSubscription;
+import com.iherbyou.cart.entity.Wishlist;
+import com.iherbyou.catalog.entity.RestockSubscription;
 import com.iherbyou.common.Code;
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,4 +1,4 @@
-package com.iherbyou.cart;
+package com.iherbyou.cart.entity;
 
 import com.iherbyou.user.User;
 import jakarta.persistence.*;

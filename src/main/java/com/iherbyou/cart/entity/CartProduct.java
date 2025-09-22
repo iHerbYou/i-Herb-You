@@ -1,6 +1,6 @@
-package com.iherbyou.cart;
+package com.iherbyou.cart.entity;
 
-import com.iherbyou.catalog.ProductVariant;
+import com.iherbyou.catalog.entity.ProductVariant;
 import jakarta.persistence.*;
 import lombok.*;
 
