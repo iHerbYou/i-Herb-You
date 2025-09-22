@@ -3,7 +3,7 @@ package com.iherbyou.community.service;
 import com.iherbyou.catalog.Product;
 import com.iherbyou.community.Review;
 import com.iherbyou.community.repository.ReviewRepository;
-import com.iherbyou.user.User;
+import com.iherbyou.user.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.data.domain.Page;
@@ -115,15 +115,17 @@ public class ReviewService {
 
     // 구매자 확인: 주문 상태가 COMPLETED인 항목이 있는지 간단히 체크
     private boolean isVerifiedPurchaser(Long userId, Long productId) {
-        Long cnt = em.createQuery(
-                        "select count(oi) from com.iherbyou.ordering.OrderItem oi " +
-                                "where oi.user.id = :uid and oi.product.id = :pid and oi.status = :st",
-                        Long.class)
-                .setParameter("uid", userId)
-                .setParameter("pid", productId)
-                .setParameter("st", STATUS_COMPLETED)
-                .getSingleResult();
-        return cnt != null && cnt > 0;
+        //TODO
+//        Long cnt = em.createQuery(
+//                        "select count(oi) from com.iherbyou.ordering.OrderProduct oi " +
+//                                "where oi.user.id = :uid and oi.product.id = :pid and oi.status = :st",
+//                        Long.class)
+//                .setParameter("uid", userId)
+//                .setParameter("pid", productId)
+//                .setParameter("st", STATUS_COMPLETED)
+//                .getSingleResult();
+//        return cnt != null && cnt > 0;
+        return true;
     }
 }
 

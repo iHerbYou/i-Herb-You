@@ -8,11 +8,12 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Getter
+@Setter
 @Entity
 public class OrderProduct {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id; // 주문 상세 고유 ID
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

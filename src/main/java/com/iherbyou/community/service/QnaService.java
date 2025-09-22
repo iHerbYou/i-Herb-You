@@ -5,7 +5,7 @@ import com.iherbyou.community.QnaAnswer;
 import com.iherbyou.community.QnaQuestion;
 import com.iherbyou.community.repository.QnaAnswerRepository;
 import com.iherbyou.community.repository.QnaQuestionRepository;
-import com.iherbyou.user.User;
+import com.iherbyou.user.entity.User    ;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.data.domain.Page;

@@ -1,6 +1,7 @@
 package com.iherbyou.community.service;
 
-import com.iherbyou.common.Code;
+import com.iherbyou.user.entity.User;
+import com.iherbyou.common.code.entity.Code;
 import com.iherbyou.community.Review;
 import com.iherbyou.community.ReviewReport;
 import com.iherbyou.community.repository.ReviewReportRepository;
@@ -35,7 +36,7 @@ public class ReviewReportService {
 
         Review review = em.find(Review.class, reviewId);
         if (review == null) throw new IllegalArgumentException("리뷰가 없습니다.");
-        if (em.find(com.iherbyou.user.User.class, userId) == null) {
+        if (em.find(com.iherbyou.user.entity.User.class, userId) == null) {
             throw new IllegalArgumentException("사용자가 없습니다.");
         }
 
@@ -46,7 +47,7 @@ public class ReviewReportService {
         if (received == null) throw new IllegalArgumentException("상태 코드를 찾을 수 없습니다.");
 
         ReviewReport rr = ReviewReport.builder()
-                .user(em.getReference(com.iherbyou.user.User.class, userId))
+                .user(em.getReference(com.iherbyou.user.entity.User.class, userId))
                 .review(review)
                 .reasonCode(reason)
                 .statusCode(received)
@@ -68,7 +69,7 @@ public class ReviewReportService {
 
     // 상태변경(관리자)
     @Transactional
-    public void changeStatus(Long adminId, boolean isAdmin, Long reportId, Long newStatusCodeId) {
+    public void changeStatus(Long adminId, boolean isAdmin, Long reportId, Integer newStatusCodeId) {
         if (!isAdmin) throw new IllegalStateException("권한이 없습니다.");
 
         reportRepo.findById(reportId)

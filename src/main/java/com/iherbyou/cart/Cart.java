@@ -3,6 +3,7 @@ package com.iherbyou.cart;
 import com.iherbyou.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Check;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Getter
+@Check(constraints = "sub_total >= 0 AND total_amount >= sub_total")
 @Entity
 public class Cart {
 
@@ -28,10 +30,10 @@ public class Cart {
     @Column(length = 64, unique = true)
     private String guestToken; // 비회원 식별용 토큰
 
-    @Column(nullable = false, columnDefinition = "INT DEFAULT 0 CHECK (subtotal >= 0)")
+    @Column(nullable = false)
     private Integer subTotal; // 소계 금액
 
-    @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0 CHECK (total_amount >= subtotal)")
+    @Column(nullable = false)
     private Integer totalAmount; // 총 금액
 
     @CreationTimestamp

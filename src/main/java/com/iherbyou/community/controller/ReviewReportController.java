@@ -39,7 +39,7 @@ public class ReviewReportController {
     @PatchMapping("/{id}/status")
     public void changeStatus(@PathVariable Long id, @RequestParam Long adminId,
                              @RequestParam(defaultValue = "false") boolean isAdmin,
-                             @RequestParam Long statusCodeId) {
+                             @RequestParam Integer statusCodeId) {
         reportService.changeStatus(adminId, isAdmin, id, statusCodeId);
     }
 }
