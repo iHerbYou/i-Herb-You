@@ -1,7 +1,7 @@
 package com.iherbyou.ordering;
 
-import com.iherbyou.common.Code;
-import com.iherbyou.user.UserAddress;
+import com.iherbyou.common.code.entity.Code;
+import com.iherbyou.user.entity.UserAddress;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,7 +31,7 @@ public class Delivery {
     @JoinColumn(name = "address_id", nullable = false)
     private UserAddress userAddress; // 주소id
 
-    @Column(length = 40)
+    @Column
     private String trackingNumber; // 송장번호
 
     @Column(length = 100)

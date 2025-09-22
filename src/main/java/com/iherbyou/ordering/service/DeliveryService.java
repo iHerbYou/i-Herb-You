@@ -21,6 +21,7 @@ public class DeliveryService {
     private final CodeFinder codeFinder; // 추가
 
     public Delivery registerTracking(Long orderId, String deliveryCompany, String trackingNumber) {
+
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("order not found"));
 

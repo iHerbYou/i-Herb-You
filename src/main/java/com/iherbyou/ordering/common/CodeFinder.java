@@ -1,6 +1,6 @@
 package com.iherbyou.ordering.common;
 
-import com.iherbyou.common.Code;
+import com.iherbyou.common.code.entity.Code;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

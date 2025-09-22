@@ -6,7 +6,7 @@ import com.iherbyou.ordering.OrderProduct;
 import com.iherbyou.ordering.common.CodeFinder;
 import com.iherbyou.ordering.dto.OrderCreateDto;
 import com.iherbyou.ordering.repository.OrderRepository;
-import com.iherbyou.user.User;
+import com.iherbyou.user.entity.User;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

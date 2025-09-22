@@ -37,8 +37,8 @@ public class PaymentController {
                 .paymentId(payment.getId())
                 .orderId(payment.getOrder().getId())
                 .paymentPrice(payment.getPaymentPrice())
-                .paymentStatusKey(payment.getPaymentStatusCode() != null ? payment.getPaymentStatusCode().getCodeKey() : null)
-                .paymentMethodKey(payment.getPaymentMethodCode() != null ? payment.getPaymentMethodCode().getCodeKey() : null)
+                .paymentStatusKey(payment.getPaymentStatusCode() != null ? payment.getPaymentStatusCode().getValue() : null)
+                .paymentMethodKey(payment.getPaymentMethodCode() != null ? payment.getPaymentMethodCode().getValue() : null)
                 .requestedAt(payment.getRequestedAt())
                 .paidAt(payment.getPaidAt())
                 .build();

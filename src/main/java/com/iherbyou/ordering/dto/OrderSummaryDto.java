@@ -17,6 +17,6 @@ public class OrderSummaryDto {
     private Integer discount;
     private Integer totalPrice;
 
-    private String orderStatusKey;
+    private Integer orderStatusKey;
 
 }

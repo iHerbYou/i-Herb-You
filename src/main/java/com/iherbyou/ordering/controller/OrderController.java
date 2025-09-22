@@ -32,7 +32,7 @@ public class OrderController {
                 .deliveryFee(order.getDeliveryFee())
                 .discount(order.getDiscount())
                 .totalPrice(order.getTotalPrice())
-                .orderStatusKey(order.getOrderStatusCode().getCodeKey())
+                .orderStatusKey(order.getOrderStatusCode().getValue())
                 .build();
         return ResponseEntity.ok(res);
     }

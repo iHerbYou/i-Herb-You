@@ -11,7 +11,7 @@ import java.util.List;
 public class OrderDetailDto {
     private Long id;
 
-    private String orderStatusKey;
+    private Integer orderStatusKey;
     private Integer subtotal;
     private Integer deliveryFee;
     private Integer discount;

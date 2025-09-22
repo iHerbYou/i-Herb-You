@@ -48,7 +48,7 @@ public class OrderQueryService {
                 .deliveryFee(o.getDeliveryFee())
                 .discount(o.getDiscount())
                 .totalPrice(o.getTotalPrice())
-                .orderStatusKey(o.getOrderStatusCode().getCodeKey())
+                .orderStatusKey(o.getOrderStatusCode().getValue())
                 .build();
     }
 
@@ -59,7 +59,7 @@ public class OrderQueryService {
 
         return OrderDetailDto.builder()
                 .id(o.getId())
-                .orderStatusKey(o.getOrderStatusCode().getCodeKey())
+                .orderStatusKey(o.getOrderStatusCode().getValue())
                 .subtotal(o.getSubtotal())
                 .deliveryFee(o.getDeliveryFee())
                 .discount(o.getDiscount())

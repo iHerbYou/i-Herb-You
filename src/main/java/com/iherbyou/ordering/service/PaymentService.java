@@ -1,6 +1,6 @@
 package com.iherbyou.ordering.service;
 
-import com.iherbyou.common.Code;
+import com.iherbyou.common.code.entity.Code;
 import com.iherbyou.ordering.Order;
 import com.iherbyou.ordering.Payment;
 import com.iherbyou.ordering.common.CodeFinder;
@@ -31,7 +31,7 @@ public class PaymentService {
                 .orElseThrow(() -> new IllegalArgumentException("order not found"));
 
         Payment existing = paymentRepository.findByOrder_Id(orderId).orElse(null);
-        if (existing != null && "PAID".equals(existing.getPaymentStatusCode().getCodeKey())) {
+        if (existing != null && "PAID".equals(existing.getPaymentStatusCode().getValue())) {
             throw new IllegalStateException("payment already completed");
         }
 
@@ -53,7 +53,7 @@ public class PaymentService {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("payment not found"));
 
-        if ("PAID".equals(payment.getPaymentStatusCode().getCodeKey())) {
+        if ("PAID".equals(payment.getPaymentStatusCode().getValue())) {
             return payment;
         }
 

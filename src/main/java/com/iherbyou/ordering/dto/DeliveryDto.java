@@ -15,7 +15,7 @@ public class DeliveryDto {
     private String trackingNumber;
     private LocalDateTime delStartAt;
     private LocalDateTime delCompleteAt;
-    private String statusKey;
+    private Integer statusKey;
 
     public static DeliveryDto from(Delivery d) {
         return DeliveryDto.builder()
@@ -23,7 +23,7 @@ public class DeliveryDto {
                 .trackingNumber(d.getTrackingNumber())
                 .delStartAt(d.getDelStartAt())
                 .delCompleteAt(d.getDelCompleteAt())
-                .statusKey(d.getCode().getCodeKey())
+                .statusKey(d.getCode().getValue())
                 .build();
     }
 

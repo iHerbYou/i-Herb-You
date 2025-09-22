@@ -22,8 +22,7 @@ public class DeliveryController {
 
     // 송장 등록
     @PostMapping("/{orderId}/delivery")
-    public ResponseEntity<OrderDetailDto> register(@PathVariable Long orderId,
-                                                   @RequestBody DeliveryRegisterRequest req) {
+    public ResponseEntity<OrderDetailDto> register(@PathVariable Long orderId, @RequestBody DeliveryRegisterRequest req) {
 
         deliveryService.registerTracking(orderId, req.getDeliveryCompany(), req.getTrackingNumber());
 
@@ -42,7 +41,7 @@ public class DeliveryController {
 
         return OrderDetailDto.builder()
                 .id(o.getId())
-                .orderStatusKey(o.getOrderStatusCode().getCodeKey())
+                .orderStatusKey(o.getOrderStatusCode().getValue())
                 .subtotal(o.getSubtotal())
                 .deliveryFee(o.getDeliveryFee())
                 .discount(o.getDiscount())

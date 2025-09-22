@@ -13,8 +13,8 @@ public class PaymentResponseDto {
     private final Long paymentId;
     private final Long orderId;
     private final BigDecimal paymentPrice;
-    private final String paymentStatusKey;
-    private final String paymentMethodKey;
+    private final Integer paymentStatusKey;
+    private final Integer paymentMethodKey;
     private final LocalDateTime requestedAt;
     private final LocalDateTime paidAt;
 
