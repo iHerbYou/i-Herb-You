@@ -1,11 +1,11 @@
 package com.iherbyou.ordering.service;
 
 import com.iherbyou.common.code.entity.Code;
-import com.iherbyou.ordering.Payment;
-import com.iherbyou.ordering.Refund;
 import com.iherbyou.ordering.common.CodeFinder;
 import com.iherbyou.ordering.dto.RefundRequestDto;
 import com.iherbyou.ordering.dto.RefundResponseDto;
+import com.iherbyou.ordering.entity.Payment;
+import com.iherbyou.ordering.entity.Refund;
 import com.iherbyou.ordering.repository.PaymentRepository;
 import com.iherbyou.ordering.repository.RefundRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +36,7 @@ public class RefundService {
         validateAmount(amount, payment.getPaymentPrice());
 
         Code reason = codeFinder.get("REFUND_REASON", request.getReasonCodeKey());
+        Code deliveryOption = codeFinder.get("REFUND_DELIVERY_OPTION", request.getDeliveryOptionCodeKey());
         Code requestedStatus = codeFinder.get("REFUND_STATUS", "REQUESTED");
 
         Refund refund = Refund.builder()
@@ -43,6 +44,7 @@ public class RefundService {
                 .amount(amount)
                 .reasonCode(reason)
                 .statusCode(requestedStatus)
+                .deliveryOptionCode(deliveryOption)
                 .requestedAt(LocalDateTime.now())
                 .build();
 

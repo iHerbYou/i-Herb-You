@@ -1,6 +1,6 @@
 package com.iherbyou.ordering.repository;
 
-import com.iherbyou.ordering.OrderProduct;
+import com.iherbyou.ordering.entity.OrderProduct;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

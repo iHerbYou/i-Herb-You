@@ -1,6 +1,6 @@
 package com.iherbyou.user.entity;
 
-import com.iherbyou.ordering.Order;
+import com.iherbyou.ordering.entity.Order;
 import jakarta.persistence.*;
 import lombok.*;
 

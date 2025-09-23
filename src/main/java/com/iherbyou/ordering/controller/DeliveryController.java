@@ -1,8 +1,8 @@
 package com.iherbyou.ordering.controller;
 
-import com.iherbyou.catalog.ProductVariant;
-import com.iherbyou.ordering.Order;
-import com.iherbyou.ordering.OrderProduct;
+import com.iherbyou.catalog.entity.ProductVariant;
+import com.iherbyou.ordering.entity.Order;
+import com.iherbyou.ordering.entity.OrderProduct;
 import com.iherbyou.ordering.dto.*;
 import com.iherbyou.ordering.repository.OrderRepository;
 import com.iherbyou.ordering.service.DeliveryService;

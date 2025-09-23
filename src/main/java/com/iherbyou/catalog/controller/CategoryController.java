@@ -1,6 +1,6 @@
 package com.iherbyou.catalog.controller;
 
-import com.iherbyou.catalog.Category;
+import com.iherbyou.catalog.entity.Category;
 import com.iherbyou.catalog.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

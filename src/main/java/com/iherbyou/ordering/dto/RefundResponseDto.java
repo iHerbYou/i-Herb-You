@@ -1,6 +1,6 @@
 package com.iherbyou.ordering.dto;
 
-import com.iherbyou.ordering.Refund;
+import com.iherbyou.ordering.entity.Refund;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +17,7 @@ public class RefundResponseDto {
     private Long paymentId;
     private BigDecimal amount;
     private Integer statusKey;
+    private Integer deliveryOptionKey;
     private LocalDateTime requestedAt;
 
     public static RefundResponseDto from(Refund refund) {
@@ -25,6 +26,7 @@ public class RefundResponseDto {
                 .paymentId(refund.getPayment().getId())
                 .amount(refund.getAmount())
                 .statusKey(refund.getStatusCode() != null ? refund.getStatusCode().getValue() : null)
+                .deliveryOptionKey(refund.getDeliveryOptionCode() != null ? refund.getDeliveryOptionCode().getValue() : null)
                 .requestedAt(refund.getRequestedAt())
                 .build();
     }

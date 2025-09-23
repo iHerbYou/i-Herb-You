@@ -1,6 +1,6 @@
 package com.iherbyou.community.repository;
 
-import com.iherbyou.community.Review;
+import com.iherbyou.community.entity.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;

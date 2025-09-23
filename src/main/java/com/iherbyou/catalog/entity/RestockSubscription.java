@@ -1,4 +1,4 @@
-package com.iherbyou.catalog;
+package com.iherbyou.catalog.entity;
 
 import com.iherbyou.user.entity.User;
 import jakarta.persistence.*;

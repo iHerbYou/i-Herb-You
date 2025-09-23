@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public interface CodeRepository extends JpaRepository<Code, Long> {
     @Query("""
-        select c from Code c 
-        join c.codeGroup g 
-        where g.groupKey = :groupKey and c.value = :codeKey
+        select c from Code c
+        join c.codeGroup g
+        where g.groupKey = :groupKey and c.name = :codeKey
     """)
     Optional<Code> find(String groupKey, String codeKey);
 }

@@ -1,4 +1,4 @@
-package com.iherbyou.ordering;
+package com.iherbyou.ordering.entity;
 
 import com.iherbyou.common.code.entity.Code;
 import jakarta.persistence.*;
@@ -29,6 +29,10 @@ public class Refund {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reason_code_id", nullable = false)
     private Code reasonCode; // 환불 사유 코드
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "delivery_option_code_id", nullable = false)
+    private Code deliveryOptionCode; // 환불 배송/수거 방식 코드
 
     @Column(nullable = false)
     private BigDecimal amount; // 환불 금액

@@ -1,6 +1,6 @@
 package com.iherbyou.community.controller;
 
-import com.iherbyou.community.Review;
+import com.iherbyou.community.entity.Review;
 import com.iherbyou.community.service.ReviewService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

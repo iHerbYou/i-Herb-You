@@ -1,8 +1,8 @@
 package com.iherbyou.community.service;
 
-import com.iherbyou.catalog.Product;
-import com.iherbyou.community.QnaAnswer;
-import com.iherbyou.community.QnaQuestion;
+import com.iherbyou.catalog.entity.Product;
+import com.iherbyou.community.entity.QnaAnswer;
+import com.iherbyou.community.entity.QnaQuestion;
 import com.iherbyou.community.repository.QnaAnswerRepository;
 import com.iherbyou.community.repository.QnaQuestionRepository;
 import com.iherbyou.user.entity.User    ;

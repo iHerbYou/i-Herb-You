@@ -1,8 +1,8 @@
 package com.iherbyou.ordering.service;
 
 import com.iherbyou.common.code.entity.Code;
-import com.iherbyou.ordering.Delivery;
-import com.iherbyou.ordering.Order;
+import com.iherbyou.ordering.entity.Delivery;
+import com.iherbyou.ordering.entity.Order;
 import com.iherbyou.ordering.repository.DeliveryRepository;
 import com.iherbyou.ordering.repository.OrderRepository;
 import com.iherbyou.ordering.common.CodeFinder;
@@ -37,8 +37,8 @@ public class DeliveryService {
         Delivery delivery = deliveryRepository.findByOrder_Id(orderId).orElse(null);
 
         if (delivery == null) {
-            // 1) 상태코드: DELIVERY_STATUS.READY (송장 등록과 동시에 배송 준비중으로 취급)
-            Code ready = codeFinder.get("DELIVERY_STATUS", "READY");
+            // 1) 상태코드: DELIVERY_STATUS.PREPARING (송장 등록과 동시에 배송 준비중으로 취급)
+            Code ready = codeFinder.get("DELIVERY_STATUS", "PREPARING");
 
             // 2) 필수값 세팅
             delivery = Delivery.builder()

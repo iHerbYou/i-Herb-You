@@ -1,8 +1,8 @@
 package com.iherbyou.catalog.DTO;
 
-import com.iherbyou.catalog.Product;
-import com.iherbyou.catalog.ProductImg;
-import com.iherbyou.community.Review;
+import com.iherbyou.catalog.entity.Product;
+import com.iherbyou.catalog.entity.ProductImg;
+import com.iherbyou.community.entity.Review;
 import lombok.*;
 
 @NoArgsConstructor
@@ -11,7 +11,6 @@ import lombok.*;
 @Getter
 @Builder
 public class ProductListDTO {
-
 
     private Long id;
 

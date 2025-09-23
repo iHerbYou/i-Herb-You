@@ -1,6 +1,6 @@
 package com.iherbyou.ordering.repository;
 
-import com.iherbyou.ordering.Order;
+import com.iherbyou.ordering.entity.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;

@@ -15,5 +15,6 @@ public class RefundRequestDto {
 
     private BigDecimal amount;
     private String reasonCodeKey;
+    private String deliveryOptionCodeKey;
 
 }

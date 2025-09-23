@@ -1,26 +1,31 @@
-package com.iherbyou.cart;
+package com.iherbyou.catalog.entity;
 
-import com.iherbyou.catalog.Product;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Getter
 @Entity
-public class WishlistProduct { // WishList, Product의 중간 테이블
+public class ProductRank {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "wishlist_id", nullable = false)
-    private Wishlist wishlist;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
+    @Column
+    private Integer recentSales; // 최근 판매량
+
+    @UpdateTimestamp
+    @Column
+    private LocalDateTime updatedAt;
 
 }
