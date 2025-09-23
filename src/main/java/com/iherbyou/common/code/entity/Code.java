@@ -25,10 +25,10 @@ public class Code {
     private CodeGroup codeGroup; // 코드 그룹 ID (FK)
 
     @Column(nullable = false)
-    private Integer value; // 내부 식별 키: 100, 101, 102
+    private Integer value; //  100, 101, 102
 
     @Column(length = 100, nullable = false)
-    private String name; // 화면 표기명: "사용자", "관리자", "활성", "비활성"
+    private String displayName; // 화면 표기명: "사용자", "관리자", "활성", "비활성"
 
     @Column
     private String description; // 설명, 툴팁
@@ -63,7 +63,7 @@ public class Code {
 
     // 코드명 변경
     public void updateName(String codeName) {
-        this.name = codeName;
+        this.displayName = codeName;
     }
 
     // 설명 변경
