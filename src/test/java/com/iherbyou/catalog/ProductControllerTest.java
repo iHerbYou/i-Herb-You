@@ -111,4 +111,38 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.content").isArray());
     }
 
+    @Test
+    void 상품_상세_조회() throws Exception {
+        // given: DB에 id=1 상품 더미데이터 있다고 가정
+        Long productId = 1L;
+
+        mockMvc.perform(get("/catalog/products/{id}", productId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+
+                // 기본 필드 확인
+                .andExpect(jsonPath("$.id").value(productId))
+                .andExpect(jsonPath("$.name").exists())
+                .andExpect(jsonPath("$.brand.name").exists())
+
+                // 카테고리 (breadcrumb)
+                .andExpect(jsonPath("$.breadcrumbs").isArray())
+
+                // 집계 데이터
+                .andExpect(jsonPath("$.avgRating").exists())
+                .andExpect(jsonPath("$.reviewCount").exists())
+                .andExpect(jsonPath("$.sales").exists())
+
+                // 옵션(variants)
+                .andExpect(jsonPath("$.variants").isArray())
+                .andExpect(jsonPath("$.variants[0].salePrice").exists())
+
+                // 이미지
+                .andExpect(jsonPath("$.images").isArray())
+
+                // 상품 상세 info
+                .andExpect(jsonPath("$.info.description").exists())
+                .andExpect(jsonPath("$.info.ingredients").exists());
+    }
+
 }
