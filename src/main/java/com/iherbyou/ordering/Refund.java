@@ -23,24 +23,28 @@ public class Refund {
     private Payment payment;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "refund_code_id", nullable = false)
-    private Code refundCode; // 환불 상태 나타내는 코드 (환불 요청, 승인, 거절, 진행중, 완료)
-
-    @Column
-    private LocalDateTime refundDate; // 환불 일자
+    @JoinColumn(name = "status_code_id", nullable = false)
+    private Code statusCode; // 환불 상태 코드 (REQUESTED 등)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "refund_reason_option_code_id", nullable = false)
-    private Code refundReasonOptionCode; // 환불 사유 옵션
+    @JoinColumn(name = "reason_code_id", nullable = false)
+    private Code reasonCode; // 환불 사유 코드
+
+    @Column(nullable = false)
+    private BigDecimal amount; // 환불 금액
+
+    @Column(nullable = false)
+    private LocalDateTime requestedAt; // 환불 요청 시각
 
     @Column
-    private String refundReasonText; // 환불 사유 글
+    private LocalDateTime completedAt; // 환불 완료 시각
 
-    @Column
-    private BigDecimal refundPrice; // 환불 금액
+    public void markStatus(Code status) {
+        this.statusCode = status;
+    }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "refund_delivery_option_code_id", nullable = false)
-    private Code refundDeliveryOptionCode; // 수거 요청, 직접 발송 (환불 방법)
-
+    public void markCompleted(Code status, LocalDateTime completedAt) {
+        this.statusCode = status;
+        this.completedAt = completedAt;
+    }
 }

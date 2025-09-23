@@ -1,6 +1,7 @@
 package com.iherbyou.ordering.service;
 
 import com.iherbyou.catalog.ProductVariant;
+import com.iherbyou.common.code.entity.Code;
 import com.iherbyou.ordering.Order;
 import com.iherbyou.ordering.OrderProduct;
 import com.iherbyou.ordering.common.CodeFinder;
@@ -27,7 +28,7 @@ public class OrderService {
     public Order createOrder(OrderCreateDto dto) {
         // 1) 필수 로딩
         User user = em.getReference(User.class, dto.getUserId());
-        var statusCreated = codeFinder.get("ORDER_STATUS", "CREATED");
+        Code statusCreated = codeFinder.get("ORDER_STATUS", "CREATED");
 
         // 2) 할인값 정리
         int discount = (dto.getDiscount() == null) ? 0 : Math.max(0, dto.getDiscount());
@@ -45,7 +46,7 @@ public class OrderService {
 
         // 4) 아이템 추가 + 소계 계산
         int subtotal = 0;
-        for (var it : dto.getItems()) {
+        for (OrderCreateDto.Item it : dto.getItems()) {
             ProductVariant sku = em.getReference(ProductVariant.class, it.getProductVariantId());
 
             // 운영에서는 클라 가격 대신 서버 가격(variant.getSalePrice())로 검증/계산 권장

@@ -1,5 +1,6 @@
 package com.iherbyou.ordering.service;
 
+import com.iherbyou.catalog.ProductVariant;
 import com.iherbyou.ordering.Order;
 import com.iherbyou.ordering.OrderProduct;
 import com.iherbyou.ordering.dto.OrderDetailDto;
@@ -76,8 +77,8 @@ public class OrderQueryService {
     }
 
     private OrderItemDto toItem(OrderProduct op) {
-        var pv = op.getProductVariant();
-        var pName = (pv != null && pv.getProduct() != null) ? pv.getProduct().getName() : null;
+        ProductVariant pv = op.getProductVariant();
+        String pName = (pv != null && pv.getProduct() != null) ? pv.getProduct().getName() : null;
 
         return OrderItemDto.builder()
                 .orderProductId(op.getId())

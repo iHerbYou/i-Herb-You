@@ -16,5 +16,4 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     // 특정 주문이 특정 결제상태인지 존재 여부 체크
     boolean existsByOrder_IdAndPaymentStatusCode_Id(Long orderId, Long paymentStatusCodeId);
-
 }
