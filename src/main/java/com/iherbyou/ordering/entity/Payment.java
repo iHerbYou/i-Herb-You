@@ -59,4 +59,16 @@ public class Payment {
         this.paidAt = paidAt;
     }
 
+    public void addRefund(Refund refund) {
+        if (refund == null) {
+            return;
+        }
+        if (!refunds.contains(refund)) {
+            refunds.add(refund);
+        }
+        if (refund.getPayment() != this) {
+            refund.attachPayment(this);
+        }
+    }
+
 }
