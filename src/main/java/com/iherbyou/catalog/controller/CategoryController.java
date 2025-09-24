@@ -12,16 +12,21 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/catalog/categories")
+@RequestMapping("/api/catalog/categories")
 @RequiredArgsConstructor
 public class CategoryController {
 
     private final CategoryService categoryService;
 
-    // 전체 카테고리 조회 (flat 리스트)
+    // 전체 카테고리 조회 (flat 리스트) - 관리/검색/필터링 용
     @GetMapping
     public ResponseEntity<List<Category>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
+    }
+
+    @GetMapping("/tree")    // 화면 표시용
+    public ResponseEntity<List<Category>> getCategoryTree() {
+        return ResponseEntity.ok(categoryService.getCategoryTree());
     }
 
     // 특정 카테고리 조회
@@ -34,11 +39,6 @@ public class CategoryController {
     @GetMapping("/{id}/subcategories")
     public ResponseEntity<List<Category>> getSubCategories(@PathVariable Long id) {
         return ResponseEntity.ok(categoryService.getSubCategories(id));
-    }
-
-    @GetMapping("/tree")
-    public ResponseEntity<List<Category>> getCategoryTree() {
-        return ResponseEntity.ok(categoryService.getCategoryTree());
     }
 
 }

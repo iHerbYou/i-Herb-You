@@ -1,7 +1,7 @@
 package com.iherbyou.catalog.controller;
 
-import com.iherbyou.catalog.DTO.ProductDetailDTO;
-import com.iherbyou.catalog.DTO.ProductListDTO;
+import com.iherbyou.catalog.dto.ProductDetailDto;
+import com.iherbyou.catalog.dto.ProductListDto;
 import com.iherbyou.catalog.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,8 +11,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @RestController
-@RequestMapping("/catalog/products")
+@RequestMapping("/api/catalog/products")
 @RequiredArgsConstructor
 public class ProductController {
 
@@ -20,19 +23,22 @@ public class ProductController {
 
     // 상품 목록 조회 API
     @GetMapping
-    public ResponseEntity<Page<ProductListDTO>> getProducts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "24") int size,
+    public ResponseEntity<Page<ProductListDto>> getProducts(
+            @RequestParam(defaultValue = "1") int page,     // 기본 페이지 = 1
+            @RequestParam(defaultValue = "24") int size,    // 한 페이지 24개
             @RequestParam(required = false) Boolean excludeSoldOut,
             @RequestParam(required = false) Integer minPrice,
             @RequestParam(required = false) Integer maxPrice,
             @RequestParam(defaultValue = "id") String sort,
             @RequestParam(defaultValue = "desc") String direction) {
 
+        // 정렬 direction 변환
         Sort.Direction sortDirection = Sort.Direction.fromString(direction);
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, mapSortField(sort)));
+        // 받은 sort값 실제 db명으로 매핑
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(sortDirection, mapSortField(sort)));
 
-        Page<ProductListDTO> products = productService.getProducts(pageable, excludeSoldOut, minPrice, maxPrice);
+        // 페이징 + 필터 옵션 서비스로 전달
+        Page<ProductListDto> products = productService.getProducts(pageable, excludeSoldOut, minPrice, maxPrice);
 
         return ResponseEntity.ok(products);
     }
@@ -48,9 +54,16 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDetailDTO> getProductDetail(@PathVariable Long id) {
-        ProductDetailDTO dto = productService.getProductDetail(id);
+    public ResponseEntity<ProductDetailDto> getProductDetail(@PathVariable Long id) {
+        ProductDetailDto dto = productService.getProductDetail(id);
 
         return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/{id}/variants")
+    public ResponseEntity<List<ProductDetailDto.VariantDTO>> getProductVariants(@PathVariable Long id) {
+        List<ProductDetailDto.VariantDTO> variants = productService.getProductVariants(id);
+
+        return ResponseEntity.ok(variants);
     }
 }
