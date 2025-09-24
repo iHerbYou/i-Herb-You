@@ -25,6 +25,9 @@ public class SecurityConfig {
 
                 // 요청별 인가 설정
                 .authorizeHttpRequests(auth -> auth
+
+                        // 스웨거 테스트 경로 허용
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         // 루트 경로 접근 허용
                         .requestMatchers("/", "/index.html").permitAll()
                         // 회원가입/로그인 관련은 모든 사용자 접근 허용
