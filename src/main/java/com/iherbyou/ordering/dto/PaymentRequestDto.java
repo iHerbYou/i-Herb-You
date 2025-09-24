@@ -1,5 +1,6 @@
 package com.iherbyou.ordering.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @NoArgsConstructor
@@ -8,6 +9,7 @@ import lombok.*;
 @Getter
 public class PaymentRequestDto {
 
-    private String methodCodeKey;
+    @NotNull
+    private Integer methodCodeValue; // 41번 그룹(PAYMENT_METHOD)의 코드 값
 
 }

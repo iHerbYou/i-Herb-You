@@ -1,5 +1,6 @@
 package com.iherbyou.ordering.controller;
 
+import com.iherbyou.catalog.entity.ProductVariant;
 import com.iherbyou.ordering.entity.Order;
 import com.iherbyou.ordering.entity.OrderProduct;
 import com.iherbyou.ordering.dto.*;
@@ -24,7 +25,7 @@ public class DeliveryController {
     @PostMapping("/{orderId}/delivery")
     public ResponseEntity<OrderDetailDto> register(@PathVariable Long orderId, @RequestBody DeliveryRegisterRequest req) {
 
-        deliveryService.registerTracking(orderId, req.getDeliveryCompany(), req.getTrackingNumber());
+        deliveryService.registerTracking(orderId, req);
 
         // 등록 직후 상세 재조회 -> OrderDetailDto로 반환
         Order o = orderRepository.findWithDetailsById(orderId)
@@ -57,8 +58,8 @@ public class DeliveryController {
     }
 
     private OrderItemDto toItem(OrderProduct op) {
-        var pv = op.getProductVariant();
-        var pName = (pv != null && pv.getProduct() != null) ? pv.getProduct().getName() : null;
+        ProductVariant pv = op.getProductVariant();
+        String pName = (pv != null && pv.getProduct() != null) ? pv.getProduct().getName() : null;
 
         return OrderItemDto.builder()
                 .orderProductId(op.getId())
