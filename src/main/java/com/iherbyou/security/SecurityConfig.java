@@ -25,8 +25,10 @@ public class SecurityConfig {
 
                 // 요청별 인가 설정
                 .authorizeHttpRequests(auth -> auth
+                        // 루트 경로 접근 허용
+                        .requestMatchers("/", "/index.html").permitAll()
                         // 회원가입/로그인 관련은 모든 사용자 접근 허용
-                        .requestMatchers("/api/user/signup", "/api/user/login").permitAll()
+                        .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
                         // 코드 조회 API는 모든 사용자 접근 허용 (일단)
                         .requestMatchers("/api/codes/**").permitAll()
                         // 정적 리소스 허용
