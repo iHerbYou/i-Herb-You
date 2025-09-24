@@ -16,7 +16,7 @@ spring:
   jpa:
     defer-datasource-initialization: true  # JPA 테이블 생성 후 데이터 삽입
     hibernate:
-      ddl-auto: create   # 개발 단계: update (운영시 validate 또는 none 권장)
+      ddl-auto: update   # 개발 단계: update (운영시 validate 또는 none 권장)
     properties:
       hibernate:
         format_sql: true
