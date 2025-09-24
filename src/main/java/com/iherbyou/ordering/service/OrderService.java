@@ -2,9 +2,9 @@ package com.iherbyou.ordering.service;
 
 import com.iherbyou.catalog.entity.ProductVariant;
 import com.iherbyou.common.code.entity.Code;
+import com.iherbyou.common.code.service.CodeService;
 import com.iherbyou.ordering.entity.Order;
 import com.iherbyou.ordering.entity.OrderProduct;
-import com.iherbyou.ordering.common.CodeFinder;
 import com.iherbyou.ordering.dto.OrderCreateDto;
 import com.iherbyou.ordering.repository.OrderRepository;
 import com.iherbyou.user.entity.User;
@@ -21,14 +21,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final CodeFinder codeFinder;
-    private final EntityManager em; // 임시(getReference) — 추후 전용 Repo로 교체해도 됨
+    private final CodeService codeService;
+    private final EntityManager em; // 임시(getReference) — 추후 전용 Repo로 교체 가능
 
     // 주문 생성 (장바구니 -> 주문 버튼)
     public Order createOrder(OrderCreateDto dto) {
         // 1) 필수 로딩
         User user = em.getReference(User.class, dto.getUserId());
-        Code statusCreated = codeFinder.get("ORDER_STATUS", "PENDING");
+        Code statusCreated = requireCode(30, 301, "ORDER_STATUS:PENDING"); // 30=ORDER_STATUS, 301=PENDING
 
         // 2) 할인값 정리
         int discount = (dto.getDiscount() == null) ? 0 : Math.max(0, dto.getDiscount());
@@ -74,7 +74,7 @@ public class OrderService {
         // 6) 금액 확정 및 합계 재계산
         order.setSubtotal(subtotal);
         order.setDeliveryFee(deliveryFee);
-        order.recalcTotal(); // subtotal + deliveryFee - discount -> totalPrice
+        order.recalcTotal(); // subtotal + deliveryFee - discount
 
         // 7) 저장 (orderProducts는 cascade=ALL로 함께 저장)
         return orderRepository.save(order);
@@ -97,4 +97,11 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("order not found"));
     }
 
+    private Code requireCode(int groupValue, int codeValue, String context) {
+        Code code = codeService.getCode(groupValue, codeValue);
+        if (code == null) {
+            throw new IllegalStateException("code not found: " + context);
+        }
+        return code;
+    }
 }

@@ -1,7 +1,7 @@
 package com.iherbyou.ordering.service;
 
 import com.iherbyou.common.code.entity.Code;
-import com.iherbyou.ordering.common.CodeFinder;
+import com.iherbyou.common.code.service.CodeService;
 import com.iherbyou.ordering.dto.RefundRequestDto;
 import com.iherbyou.ordering.dto.RefundResponseDto;
 import com.iherbyou.ordering.entity.Payment;
@@ -20,11 +20,11 @@ import java.util.Objects;
 @Transactional
 public class RefundService {
 
-    private static final String PAYMENT_STATUS_PAID = "PAID";
+    private static final int PAYMENT_STATUS_PAID = 403; // 40=PAYMENT_STATUS, 403=PAID
 
     private final PaymentRepository paymentRepository;
     private final RefundRepository refundRepository;
-    private final CodeFinder codeFinder;
+    private final CodeService codeService;
 
     public RefundResponseDto requestRefund(Long paymentId, RefundRequestDto request) {
         if (request == null) {
@@ -44,9 +44,9 @@ public class RefundService {
 
         validateAmount(amount, payment.getPaymentPrice(), alreadyRefunded);
 
-        Code reason = codeFinder.get("REFUND_REASON", request.getReasonCodeKey());
-        Code deliveryOption = codeFinder.get("REFUND_DELIVERY_OPTION", request.getDeliveryOptionCodeKey());
-        Code requestedStatus = codeFinder.get("REFUND_STATUS", "REQUESTED");
+        Code reason = requireCode(61, request.getReasonCodeValue(), "REFUND_REASON:" + request.getReasonCodeValue()); // 61=REFUND_REASON
+        Code deliveryOption = requireCode(62, request.getDeliveryOptionCodeValue(), "REFUND_DELIVERY_OPTION:" + request.getDeliveryOptionCodeValue()); // 62=REFUND_DELIVERY_OPTION
+        Code requestedStatus = requireCode(60, 601, "REFUND_STATUS:REQUESTED"); // 60=REFUND_STATUS, 601=REQUESTED
 
         Refund refund = Refund.builder()
                 .payment(payment)
@@ -77,8 +77,16 @@ public class RefundService {
 
     private void ensurePaymentIsRefundable(Payment payment) {
         if (payment.getPaymentStatusCode() == null
-                || !PAYMENT_STATUS_PAID.equals(payment.getPaymentStatusCode().getName())) {
+                || PAYMENT_STATUS_PAID != payment.getPaymentStatusCode().getValue()) {
             throw new IllegalStateException("payment is not settled");
         }
+    }
+
+    private Code requireCode(int groupValue, int codeValue, String context) {
+        Code code = codeService.getCode(groupValue, codeValue);
+        if (code == null) {
+            throw new IllegalStateException("code not found: " + context);
+        }
+        return code;
     }
 }

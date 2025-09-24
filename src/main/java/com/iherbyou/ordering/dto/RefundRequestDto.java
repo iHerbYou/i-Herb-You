@@ -1,7 +1,6 @@
 package com.iherbyou.ordering.dto;
 
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,10 +19,10 @@ public class RefundRequestDto {
     @DecimalMin(value = "0.0", inclusive = false)
     private BigDecimal amount;
 
-    @NotBlank
-    private String reasonCodeKey;
+    @NotNull
+    private Integer reasonCodeValue; // 61번 그룹(REFUND_REASON)의 코드 값
 
-    @NotBlank
-    private String deliveryOptionCodeKey;
+    @NotNull
+    private Integer deliveryOptionCodeValue; // 62번 그룹(REFUND_DELIVERY_OPTION)의 코드 값
 
 }

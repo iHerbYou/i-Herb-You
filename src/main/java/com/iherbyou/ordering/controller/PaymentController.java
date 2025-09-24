@@ -22,7 +22,7 @@ public class PaymentController {
     @PostMapping("/orders/{orderId}/payments")
     public ResponseEntity<PaymentResponseDto> requestPayment(@PathVariable Long orderId,
                                                              @RequestBody PaymentRequestDto request) {
-        Payment payment = paymentService.requestPayment(orderId, request.getMethodCodeKey());
+        Payment payment = paymentService.requestPayment(orderId, request.getMethodCodeValue());
         return ResponseEntity.ok(toDto(payment));
     }
 

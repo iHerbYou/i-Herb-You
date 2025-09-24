@@ -1,11 +1,11 @@
 package com.iherbyou.ordering.service;
 
 import com.iherbyou.common.code.entity.Code;
+import com.iherbyou.common.code.service.CodeService;
 import com.iherbyou.ordering.entity.Delivery;
 import com.iherbyou.ordering.entity.Order;
 import com.iherbyou.ordering.repository.DeliveryRepository;
 import com.iherbyou.ordering.repository.OrderRepository;
-import com.iherbyou.ordering.common.CodeFinder;
 import com.iherbyou.ordering.dto.DeliveryRegisterRequest;
 import com.iherbyou.user.entity.UserAddress;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class DeliveryService {
 
     private final OrderRepository orderRepository;
     private final DeliveryRepository deliveryRepository;
-    private final CodeFinder codeFinder; // 추가
+    private final CodeService codeService;
 
     public Delivery registerTracking(Long orderId, DeliveryRegisterRequest request) {
 
@@ -38,7 +38,7 @@ public class DeliveryService {
 
         if (delivery == null) {
             // 1) 상태코드: DELIVERY_STATUS.PREPARING (송장 등록과 동시에 배송 준비중으로 취급)
-            Code ready = codeFinder.get("DELIVERY_STATUS", "PREPARING");
+            Code ready = requireCode(20, 201, "DELIVERY_STATUS:PREPARING"); // 20=DELIVERY_STATUS, 201=PREPARING
 
             // 2) 필수값 세팅
             delivery = Delivery.builder()
@@ -74,4 +74,11 @@ public class DeliveryService {
         return deliveryRepository.save(delivery);
     }
 
+    private Code requireCode(int groupValue, int codeValue, String context) {
+        Code code = codeService.getCode(groupValue, codeValue);
+        if (code == null) {
+            throw new IllegalStateException("code not found: " + context);
+        }
+        return code;
+    }
 }
