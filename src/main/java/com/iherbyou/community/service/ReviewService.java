@@ -15,7 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReviewService {
 
     private static final int MAX_TEXT_LEN = 1000;
-    private static final String STATUS_COMPLETED = "COMPLETED"; // TODO: 실제 enum/코드로 교체
+    private static final String ORDER_STATUS_DELIVERED = "DELIVERED"; // 코드그룹: ORDER_STATUS(30)
+    // todo 실제 코드 사용 -> 수정
+
+    // ✅ feature flag: 기본은 false (개발에서는 통과), 운영에서 true 주면 차단 모드
+    private static final boolean VERIFY_PURCHASE_ENABLED =
+            Boolean.parseBoolean(System.getProperty("REVIEWS_VERIFY_PURCHASE", "false"));
 
     private final ReviewRepository reviewRepo;
 
@@ -58,7 +63,7 @@ public class ReviewService {
         return reviewRepo.save(review);
     }
 
-    // 상품별 목록 (rating 필터 제거)
+    // 상품별 목록
     @Transactional(readOnly = true)
     public Page<Review> listByProduct(Long productId, Pageable pageable) {
         return reviewRepo.findByProduct_Id(productId, pageable);
@@ -70,7 +75,7 @@ public class ReviewService {
         return reviewRepo.findByUser_Id(userId, pageable);
     }
 
-    // 리뷰 내용 수정 (본인만)
+    // 리뷰 내용 수정
     @Transactional
     public void updateReviewText(Long userId, Long reviewId, String newText) {
         String body = sanitizeOptionalText(newText, MAX_TEXT_LEN);
@@ -78,7 +83,7 @@ public class ReviewService {
         if (updated == 0) throw new IllegalStateException("권한이 없거나 존재하지 않습니다.");
     }
 
-    // 소프트 삭제 (본인만)
+    // 소프트 삭제
     @Transactional
     public void softDelete(Long userId, Long reviewId) {
         Review r = reviewRepo.findByIdAndUser_Id(reviewId, userId)
@@ -112,8 +117,25 @@ public class ReviewService {
         return v;
     }
 
-    // 구매자 확인: 주문 상태가 COMPLETED인 항목이 있는지 간단히 체크 (TODO)
+    // 구매자 검증 (구매자만 리뷰 작성 가능 옵션)
+// 현재는 VERIFY_PURCHASE_ENABLED=false → 항상 true 반환 (검증 생략)
+// 추후 수정 시:
+//  1) 주문 서비스/레포지토리 연동
+//  2) userId + productId 기준으로 주문 상태(OrderStatus)가 "DELIVERED"/"COMPLETED" 인지 확인
+//  3) 해당 주문 건이 존재할 경우 true, 없으면 false 반환
     private boolean isVerifiedPurchaser(Long userId, Long productId) {
-        return true;
+        if (!VERIFY_PURCHASE_ENABLED) {
+            return true; // 검증 비활성화 시: 개발/로컬 편의상 항상 허용
+        }
+
+        // TODO: 주문 도메인 연동 후 실제 검증 로직으로 교체
+        // ex) return orderRepo.existsByUser_IdAndProduct_IdAndStatus(userId, productId, ORDER_STATUS_DELIVERED);
+
+        // 운영에서 구매 검증 ON인데 실제 구현이 없을 경우 → 안전하게 막음
+        throw new IllegalStateException(
+                "구매자 검증 기능이 아직 연결되지 않았습니다. (ORDER_STATUS=" + ORDER_STATUS_DELIVERED + ")"
+        );
     }
 }
+
+

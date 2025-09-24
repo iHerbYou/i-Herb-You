@@ -55,22 +55,6 @@ public class ReviewController {
         return ResponseEntity.ok(body);
     }
 
-    // 내가 쓴 리뷰
-    @GetMapping("/my")
-    public ResponseEntity<Page<ReviewProduct>> myReviews(
-            @RequestHeader("X-USER-ID") Long userId,
-            Pageable pageable
-    ) {
-        Page<Review> page = reviewService.listMyReviews(userId, pageable);
-        Page<ReviewProduct> body = page.map(r -> new ReviewProduct(
-                r.getId(),
-                r.getRating(),
-                r.getText(),
-                r.getUser().getName(),
-                r.getCreatedAt().format(ISO)
-        ));
-        return ResponseEntity.ok(body);
-    }
 
     // 리뷰 통계 요약 (총개수/평균/별점분포)
     @GetMapping("/summary")
@@ -84,3 +68,4 @@ public class ReviewController {
         return ResponseEntity.ok(new ReviewSummary(total, avg, counts));
     }
 }
+

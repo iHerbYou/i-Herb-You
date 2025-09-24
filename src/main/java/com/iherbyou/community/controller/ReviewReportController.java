@@ -40,25 +40,5 @@ public class ReviewReportController {
         );
         return ResponseEntity.ok(res);
     }
-
-    // 내가 신고한 내역 (마이페이지)
-    // Header: X-USER-ID
-    // Response: Page<ReviewReportProduct>
-    // 리뷰 피드백 해당 페이지 없음? → /my 명시
-    @GetMapping("/my")
-    public ResponseEntity<Page<ReviewReportProduct>> myReports(
-            @RequestHeader("X-USER-ID") Long userId,
-            Pageable pageable
-    ) {
-        Page<ReviewReport> page = reportService.listByReporter(userId, pageable);
-        Page<ReviewReportProduct> body = page.map(rr -> new ReviewReportProduct(
-                rr.getId(),
-                rr.getReview().getId(),
-                rr.getReasonCode().getId(),
-                // rr.getStatusCode().getValue(),        // Code 스펙 반영 전
-                rr.getStatusCode().getId().toString(),   // 임시 대체
-                rr.getCreatedAt() == null ? null : rr.getCreatedAt().format(ISO)
-        ));
-        return ResponseEntity.ok(body);
-    }
 }
+
