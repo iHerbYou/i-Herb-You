@@ -1,5 +1,7 @@
 package com.iherbyou.user.service;
 
+import com.iherbyou.common.code.entity.Code;
+import com.iherbyou.common.code.service.CodeService;
 import com.iherbyou.exception.user.*;
 import com.iherbyou.user.dto.LoginRequestDto;
 import com.iherbyou.user.dto.LoginResponseDto;
@@ -9,6 +11,7 @@ import com.iherbyou.user.entity.User;
 import com.iherbyou.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final CodeService codeService;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 회원가입 (SignUp)
@@ -37,16 +42,34 @@ public class UserService {
             throw new DuplicatePhoneNumberException("이미 사용 중인 전화번호입니다:" + request.getPhoneNumber());
         }
 
-        // User 엔티티 생성 (TODO: roleCode, statusCode는 일단 null 처리 → 추후 기본값 세팅 로직 추가 가능)
+        // 기본 사용자 권한 조회 (그룹 70, 코드 701 = USER) -> DB에 필수 기준 데이터가 있는지 확인하는 안전장치
+        Code defaultUserRole = codeService.getDefaultUserRole();
+        if (defaultUserRole == null) {
+            throw new IllegalStateException("기본 사용자 권한을 찾을 수 없습니다");
+        }
+
+        // 기본 사용자 상태 조회 (그룹 71, 코드 712 = ACTIVE) -> DB에 필수 기준 데이터가 있는지 확인하는 안전장치
+        Code defaultUserStatus = codeService.getDefaultActiveStatus();
+        if (defaultUserStatus == null) {
+            throw new IllegalStateException("기본 사용자 상태를 찾을 수 없습니다");
+        }
+
+        // User 엔티티 생성
         User user = User.builder()
                 .email(request.getEmail())
-                .password(request.getPassword()) // TODO: 나중에 암호화
+                .password(passwordEncoder.encode(request.getPassword()))
                 .name(request.getName())
                 .phoneNumber(request.getPhoneNumber())
+                .roleCode(defaultUserRole)
+                .statusCode(defaultUserStatus)
                 .build();
 
         // 저장
         User savedUser = userRepository.save(user);
+
+        log.info("회원가입 성공: {} (ID: {}) - 권한: {}, 상태: {}",
+                savedUser.getEmail(), savedUser.getId(),
+                savedUser.getRoleName(), savedUser.getStatusName());
 
         // 반환
         return SignUpResponseDto.builder()
@@ -59,26 +82,25 @@ public class UserService {
      * 로그인 (Login)
      */
     public LoginResponseDto login(LoginRequestDto request) {
+        log.info("로그인 시도: {}", request.getEmail());
 
-        // 사용자 조회
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UserNotFoundException("가입되지 않은 회원입니다"));
+        // 활성 사용자만 조회
+        User user = userRepository.findActiveUserByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없거나 비활성 상태입니다"));
 
-        // Active 상태 확인
-        if (!user.isActive()) {
-            throw new InactiveUserException("비활성 사용자입니다");
-        }
-
-        // password 검증
-        if (user.getPassword().equals(request.getPassword())) {
+        // 암호화된 비밀번호 검증
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            log.warn("로그인 실패 - 비밀번호 불일치: {}", request.getEmail());
             throw new InvalidPasswordException("비밀번호가 올바르지 않습니다");
         }
 
         // 로그인 성공
+        log.info("로그인 성공: {} (ID: {})", user.getEmail(), user.getId());
         return LoginResponseDto.builder()
                 .email(user.getEmail())
                 .name(user.getName())
                 .message("로그인 성공")
                 .build();
     }
+
 }

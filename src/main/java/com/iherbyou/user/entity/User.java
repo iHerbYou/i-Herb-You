@@ -51,7 +51,7 @@ public class User {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_code_id")
-    private Code statusCode; // 회원 상태 (1: 활성화, 2: 비활성화, 3: 탈퇴)
+    private Code statusCode; // 회원 상태 (1: ACTIVE, 2: 비활성화, 3: 탈퇴)
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserAddress> addresses = new ArrayList<>(); // 마이페이지에서 주소 목록 주기로했으니 추가함
@@ -102,23 +102,23 @@ public class User {
 
     // 활성 사용자인지 확인 TODO: Code 엔티티에 필요한 get Method 만들기
     public boolean isActive() {
-        return this.statusCode != null && "활성".equals(this.statusCode.getName());
+        return this.statusCode != null && "ACTIVE".equals(this.statusCode.getDisplayName());
     }
 
     // 관리자인지 확인
     public boolean isAdmin() {
-        return this.roleCode != null && "관리자".equals(this.roleCode.getName());
+        return this.roleCode != null && "ADMIN".equals(this.roleCode.getDisplayName());
     }
 
     /**
      * 편의 메서드들 TODO: Code 엔티티에 필요한 get Method 만들기
      */
     public String getRoleName() {
-        return this.roleCode != null ? this.roleCode.getName() : "알 수 없음";
+        return this.roleCode != null ? this.roleCode.getDisplayName() : "알 수 없음";
     }
 
     public String getStatusName() {
-        return this.statusCode != null ? this.statusCode.getName() : "알 수 없음";
+        return this.statusCode != null ? this.statusCode.getDisplayName() : "알 수 없음";
     }
 
     public Integer getRoleCode() {

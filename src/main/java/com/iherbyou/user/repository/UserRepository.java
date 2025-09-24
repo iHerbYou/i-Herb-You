@@ -24,20 +24,20 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // 중복 핸드폰 번호 확인
     boolean existsByPhoneNumber(String phoneNumber);
 
-    // ACTIVE(활성) 사용자만 조회
-    @Query("SELECT u FROM  User u WHERE u.statusCode.name = 'ACTIVE'")
+    // ACTIVE(활성) 사용자만 조회 - displayName이 'ACTIVE'인 상태코드를 가진 사용자들
+    @Query("SELECT u FROM User u WHERE u.statusCode.displayName = 'ACTIVE'")
     List<User> findActiveUsers();
 
     // 특정 권한 사용자들 조회
     @Query("SELECT u FROM User u WHERE u.roleCode.value = :roleValue")
     List<User> findByUserRoleCode(@Param("roleValue") Integer roleValue);
 
-    // 활성 사용자 중 email로 찾기
-    @Query("SELECT u FROM  User u WHERE u.roleCode.name = 'ACTIVE' AND u.email = :email")
+    // 활성 사용자 중 email로 찾기 - statusCode를 확인
+    @Query("SELECT u FROM User u WHERE u.statusCode.displayName = 'ACTIVE' AND u.email = :email")
     Optional<User> findActiveUserByEmail(@Param("email") String email);
 
-    // 관리자 목록 조회
-    @Query("SELECT u FROM  User u WHERE u.roleCode.name = 'ADMIN' AND u.statusCode.name = 'ACTIVE'")
+    // 관리자 목록 조회 - roleCode의 displayName에 'ADMIN'이 포함된 활성 사용자들
+    @Query("SELECT u FROM User u WHERE u.roleCode.displayName LIKE '%ADMIN%' AND u.statusCode.displayName = 'ACTIVE'")
     List<User> findActiveAdmins();
 
     // 이름으로 사용자 검색 (부분 일치)
