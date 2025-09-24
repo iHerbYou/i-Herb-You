@@ -25,19 +25,19 @@ public class Code {
     private CodeGroup codeGroup; // 코드 그룹 ID (FK)
 
     @Column(nullable = false)
-    private Integer value; // 내부 식별 키: 100, 101, 102
+    private Integer value; //  100, 101, 102
 
     @Column(length = 100, nullable = false)
-    private String name; // 화면 표기명: "사용자", "관리자", "활성", "비활성"
+    private String displayName; // 화면 표기명: "사용자", "관리자", "활성", "비활성"
 
     @Column
     private String description; // 설명, 툴팁
 
-    @Column(columnDefinition = "INT DEFAULT 0", nullable = false)
-    private Integer sortOrder; // 정렬 순서
-
     @Column(columnDefinition = "TINYINT(1) DEFAULT 1", nullable = false)
     private Boolean isActive = true; // 사용 여부
+
+    @Column(columnDefinition = "INT DEFAULT 0", nullable = false)
+    private Integer sortOrder; // 정렬 순서
 
     @Column
     private LocalDateTime validFrom; // 유효 시작
@@ -63,7 +63,7 @@ public class Code {
 
     // 코드명 변경
     public void updateName(String codeName) {
-        this.name = codeName;
+        this.displayName = codeName;
     }
 
     // 설명 변경
@@ -74,6 +74,21 @@ public class Code {
     // 정렬 순서 변경
     public void changeSortOrder(Integer sortOrder) {
         this.sortOrder = sortOrder;
+    }
+
+    /**
+     * User 엔티티 호환성을 위한 편의 메서드들
+     */
+    // 코드가 유효한지 확인 (유효 기간 + 활성 상태)
+    public boolean isValidNow() {
+        if (!this.isActive) {
+            return false;
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        boolean withinValidPeriod = (validFrom == null || !now.isBefore(validFrom)) &&
+                (validTo == null || !now.isAfter(validTo));
+        return withinValidPeriod;
     }
 
 }

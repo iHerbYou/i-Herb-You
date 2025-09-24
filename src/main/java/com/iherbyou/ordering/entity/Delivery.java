@@ -46,14 +46,4 @@ public class Delivery {
     @Column
     private LocalDateTime delCompleteAt; // 배송 완료일
 
-    public static Delivery create(Order order, Code code, String company, String trackingNumber) {
-        Delivery d = new Delivery();
-        d.order = order;
-        d.code = code;
-        d.deliveryCompany = company;
-        d.trackingNumber = trackingNumber;
-        d.delStartAt = LocalDateTime.now();
-        return d;
-    }
-
 }
