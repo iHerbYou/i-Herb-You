@@ -1,9 +1,9 @@
 package com.iherbyou.ordering.service;
 
 import com.iherbyou.common.code.entity.Code;
+import com.iherbyou.ordering.common.CodeFinder;
 import com.iherbyou.ordering.entity.Order;
 import com.iherbyou.ordering.entity.Payment;
-import com.iherbyou.ordering.common.CodeFinder;
 import com.iherbyou.ordering.repository.OrderRepository;
 import com.iherbyou.ordering.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 @Transactional
 public class PaymentService {
 
+    private static final String PAYMENT_STATUS_PAID = "PAID";
+
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
     private final CodeFinder codeFinder;
@@ -31,7 +33,7 @@ public class PaymentService {
                 .orElseThrow(() -> new IllegalArgumentException("order not found"));
 
         Payment existing = paymentRepository.findByOrder_Id(orderId).orElse(null);
-        if (existing != null && "PAID".equals(existing.getPaymentStatusCode().getValue())) {
+        if (existing != null && PAYMENT_STATUS_PAID.equals(existing.getPaymentStatusCode().getName())) {
             throw new IllegalStateException("payment already completed");
         }
 
@@ -53,11 +55,12 @@ public class PaymentService {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("payment not found"));
 
-        if ("PAID".equals(payment.getPaymentStatusCode().getValue())) {
+        if (payment.getPaymentStatusCode() != null
+                && PAYMENT_STATUS_PAID.equals(payment.getPaymentStatusCode().getName())) {
             return payment;
         }
 
-        Code paidStatus = codeFinder.get("PAYMENT_STATUS", "PAID");
+        Code paidStatus = codeFinder.get("PAYMENT_STATUS", PAYMENT_STATUS_PAID);
         payment.markPaid(paidStatus, LocalDateTime.now());
 
         Code orderPaidStatus = codeFinder.get("ORDER_STATUS", "PAID");

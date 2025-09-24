@@ -3,6 +3,8 @@ package com.iherbyou.ordering.entity;
 import com.iherbyou.common.code.entity.Code;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 public class Refund {
 
@@ -37,7 +40,8 @@ public class Refund {
     @Column(nullable = false)
     private BigDecimal amount; // 환불 금액
 
-    @Column(nullable = false)
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
     private LocalDateTime requestedAt; // 환불 요청 시각
 
     @Column
@@ -50,5 +54,9 @@ public class Refund {
     public void markCompleted(Code status, LocalDateTime completedAt) {
         this.statusCode = status;
         this.completedAt = completedAt;
+    }
+
+    void attachPayment(Payment payment) {
+        this.payment = payment;
     }
 }
