@@ -56,7 +56,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserAddress> addresses = new ArrayList<>(); // 마이페이지에서 주소 목록 주기로했으니 추가함
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Wishlist wishlist;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -65,7 +65,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserCoupon> coupons = new ArrayList<>(); // 쿠폰 목록 조회
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Point point;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -111,7 +111,7 @@ public class User {
     }
 
     /**
-     * 편의 메서드들 TODO: Code 엔티티에 필요한 get Method 만들기
+     * 편의 메서드들 (필요시 추가 구현 가능)
      */
     public String getRoleName() {
         return this.roleCode != null ? this.roleCode.getDisplayName() : "알 수 없음";
