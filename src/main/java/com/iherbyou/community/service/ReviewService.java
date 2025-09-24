@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReviewService {
 
     private static final int MAX_TEXT_LEN = 1000;
-    private static final String STATUS_COMPLETED = "COMPLETED"; // enum이면 프로젝트 enum으로 교체
+    private static final String STATUS_COMPLETED = "COMPLETED"; // TODO: 실제 enum/코드로 교체
 
     private final ReviewRepository reviewRepo;
 
@@ -58,11 +58,10 @@ public class ReviewService {
         return reviewRepo.save(review);
     }
 
-    // 상품별 목록
+    // 상품별 목록 (rating 필터 제거)
     @Transactional(readOnly = true)
-    public Page<Review> listByProduct(Long productId, Integer rating, Pageable pageable) {
-        if (rating == null) return reviewRepo.findByProduct_Id(productId, pageable);
-        return reviewRepo.findByProduct_IdAndRating(productId, rating, pageable);
+    public Page<Review> listByProduct(Long productId, Pageable pageable) {
+        return reviewRepo.findByProduct_Id(productId, pageable);
     }
 
     // 내가 쓴 리뷰
@@ -113,37 +112,8 @@ public class ReviewService {
         return v;
     }
 
-    // 구매자 확인: 주문 상태가 COMPLETED인 항목이 있는지 간단히 체크
+    // 구매자 확인: 주문 상태가 COMPLETED인 항목이 있는지 간단히 체크 (TODO)
     private boolean isVerifiedPurchaser(Long userId, Long productId) {
-        //TODO
-//        Long cnt = em.createQuery(
-//                        "select count(oi) from com.iherbyou.ordering.entity.OrderProduct oi " +
-//                                "where oi.user.id = :uid and oi.product.id = :pid and oi.status = :st",
-//                        Long.class)
-//                .setParameter("uid", userId)
-//                .setParameter("pid", productId)
-//                .setParameter("st", STATUS_COMPLETED)
-//                .getSingleResult();
-//        return cnt != null && cnt > 0;
         return true;
     }
 }
-
- /* 주요 기능
- * - createReview(userId, productId, rating, text)
- *   : 구매자 확인 후 리뷰 1회만 등록(평점 1~5)
- * - listByProduct(productId, rating, pageable)
- *   : 상품별 리뷰 목록(필요하면 평점으로 필터)
- * - listMyReviews(userId, pageable)
- *   : 내가 쓴 리뷰 목록
- * - updateReviewText(userId, reviewId, newText)
- *   : 본인 리뷰만 내용 수정
- * - softDelete(userId, reviewId)
- *   : 본인 리뷰만 소프트 삭제
- * - countByProduct / averageRating / countByRating
- *   : 간단 집계
- *
- *   < 트랜잭션 >
- * - 쓰기 메서드: @Transactional (기본)
- * - 조회 메서드: @Transactional(readOnly = true)
- */

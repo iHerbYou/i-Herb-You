@@ -13,10 +13,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @EntityGraph(attributePaths = {"product","user"})
     Page<Review> findByProduct_Id(Long productId, Pageable pageable);
 
-    // 2) 상품 + 별점 필터 목록
-    @EntityGraph(attributePaths = {"product","user"})
-    Page<Review> findByProduct_IdAndRating(Long productId, Integer rating, Pageable pageable);
-
     // 3) 사용자-상품 리뷰 존재 여부 (재작성 방지/보조 검증)
     boolean existsByUser_IdAndProduct_Id(Long userId, Long productId);
 
