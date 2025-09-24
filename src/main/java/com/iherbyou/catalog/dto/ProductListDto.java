@@ -43,7 +43,7 @@ public class ProductListDto {
                 .orElse(null);
 
         // 별점 평균 -> 임시 게산
-        // TODO - 리뷰 작성 시 평균 평점 계산해 갱신 필요
+        // 리뷰 작성 시 평균 평점 계산해 갱신 필요
         Double avgRating = product.getReviews().stream()
                 .mapToInt(Review::getRating)
                 .average()
