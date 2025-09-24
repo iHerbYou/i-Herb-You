@@ -2,10 +2,10 @@ package com.iherbyou.catalog.service;
 
 import com.iherbyou.catalog.DTO.ProductDetailDTO;
 import com.iherbyou.catalog.DTO.ProductListDTO;
-import com.iherbyou.catalog.Product;
-import com.iherbyou.catalog.ProductImg;
-import com.iherbyou.catalog.ProductVariant;
-import com.iherbyou.catalog.Stock;
+import com.iherbyou.catalog.entity.Product;
+import com.iherbyou.catalog.entity.ProductImg;
+import com.iherbyou.catalog.entity.ProductVariant;
+import com.iherbyou.catalog.entity.Stock;
 import com.iherbyou.catalog.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Join;

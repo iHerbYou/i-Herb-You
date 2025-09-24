@@ -20,6 +20,13 @@ spring:
     ansi:
       enabled: always
 
+springdoc:
+  api-docs:
+    enabled: true
+  packages-to-scan: com.iherbyou           # 루트 패키지로 넓게
+  paths-to-match: /**                      # 전체 허용
+
+
 logging:
   level:
     org.hibernate.SQL: debug

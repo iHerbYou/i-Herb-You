@@ -1,6 +1,6 @@
 package com.iherbyou.catalog.service;
 
-import com.iherbyou.catalog.Category;
+import com.iherbyou.catalog.entity.Category;
 import com.iherbyou.catalog.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
