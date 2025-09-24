@@ -41,4 +41,7 @@ public interface CodeRepository extends JpaRepository<Code, Long> {
             "AND (c.validTo IS NULL OR c.validTo >= CURRENT_TIMESTAMP)")
     Optional<Code> findActiveById(@Param("id") Long id);
 
+    // displayName으로 검색
+    List<Code> findByDisplayNameContainingIgnoreCase(String displayName);
+
 }

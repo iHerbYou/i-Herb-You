@@ -33,11 +33,11 @@ public class Code {
     @Column
     private String description; // 설명, 툴팁
 
-    @Column(columnDefinition = "INT DEFAULT 0", nullable = false)
-    private Integer sortOrder; // 정렬 순서
-
     @Column(columnDefinition = "TINYINT(1) DEFAULT 1", nullable = false)
     private Boolean isActive = true; // 사용 여부
+
+    @Column(columnDefinition = "INT DEFAULT 0", nullable = false)
+    private Integer sortOrder; // 정렬 순서
 
     @Column
     private LocalDateTime validFrom; // 유효 시작
@@ -74,6 +74,21 @@ public class Code {
     // 정렬 순서 변경
     public void changeSortOrder(Integer sortOrder) {
         this.sortOrder = sortOrder;
+    }
+
+    /**
+     * User 엔티티 호환성을 위한 편의 메서드들
+     */
+    // 코드가 유효한지 확인 (유효 기간 + 활성 상태)
+    public boolean isValidNow() {
+        if (!this.isActive) {
+            return false;
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        boolean withinValidPeriod = (validFrom == null || !now.isBefore(validFrom)) &&
+                (validTo == null || !now.isAfter(validTo));
+        return withinValidPeriod;
     }
 
 }
