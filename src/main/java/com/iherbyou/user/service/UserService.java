@@ -27,7 +27,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil; // JWT Utility 추가
 
-    @Value("${jwt.expiration:86400000") // JWT 만료 시간 (기본 24시간)
+    @Value("${jwt.expiration:86400000}") // JWT 만료 시간 (기본 24시간)
     private Long jwtExpirationMs;
 
     /**
