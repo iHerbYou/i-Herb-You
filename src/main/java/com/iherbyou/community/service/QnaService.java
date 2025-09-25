@@ -124,28 +124,4 @@ public class QnaService {
         if (v.length() > max) throw new IllegalArgumentException("길이가 너무 깁니다.");
         return v;
     }
-
-
-
 }
-
-/* 주요 기능
- * - createQuestion(userId, productId, title, content)
- *   : 상품/사용자 확인 후 질문 등록(제목/내용 필수, 길이 제한, 기본 상태값 설정)
- * - listByProduct(productId, statusCodeId, pageable)
- *   : 상품별 질문 목록(상태값으로 필터 가능)
- * - listMyQuestions(userId, pageable)
- *   : 내가 쓴 질문 목록
- * - createAnswer(actorId, questionId, content, isSellerOrAdmin)
- *   : 관리자/셀러 권한 확인 후 답변 등록(내용 필수, 길이 제한)
- * - listAnswers(questionId)
- *   : 질문에 달린 답변 목록(오래된 순)
- * - deleteAnswer(actorId, answerId, isAdmin)
- *   : 답변 작성자 본인 또는 관리자만 삭제
- * - countAnswers(questionId)
- *   : 답변 개수
- *
- *   < 트랜잭션 >
- * - 쓰기 메서드: @Transactional
- * - 조회 메서드: @Transactional(readOnly = true)
- */

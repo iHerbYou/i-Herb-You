@@ -18,7 +18,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import org.springframework.security.config.Customizer;
+
 import java.util.List;
+
 
 @RequiredArgsConstructor
 @Configuration
@@ -46,20 +49,21 @@ public class SecurityConfig {
                 // CSRF 비활성화 (JWT 사용하므로)
                 .csrf(AbstractHttpConfigurer::disable)
 
-                // CORS 설정
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
                 // 세션 사용하지 않음 (JWT 사용하므로 STATELESS)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // CORS 사용
+                .cors(Customizer.withDefaults())
+                // CSRF 설정 (일단 비활성화 - API 테스트를 위해)
+                .csrf(csrf -> csrf.disable())
 
-                // 요청별 인가 설정
+                // 엔드포인트 권한 (요청별 인가 설정)
                 .authorizeHttpRequests(auth -> auth
                         // 공개 접근 허용 (인증 불필요)
-                        .requestMatchers("/", "/index.html").permitAll()
+                        .requestMatchers("/actuator/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll() // 스웨거 테스트 경로 허용
+                        .requestMatchers("/", "/index.html").permitAll() // 루트 경로 접근 허용
                         .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
                         .requestMatchers("/api/codes/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
 
                         // 그 외 모든 요청은 인증 필요
@@ -80,21 +84,22 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // CORS 설정 -> frontend 통신용
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-
-        // 개발 환경용 설정 (운영에서는 더 제한적으로 설정)
-        configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L); // preflight 요청 캐시 시간
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "http://localhost:5174",
+                "https://www.iherbyou.store"
+        ));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
+        config.setExposedHeaders(List.of("Location"));
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
-
 }
