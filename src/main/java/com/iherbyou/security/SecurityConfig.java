@@ -1,32 +1,57 @@
 package com.iherbyou.security;
 
+import com.iherbyou.security.filter.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import org.springframework.security.config.Customizer;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import org.springframework.security.config.Customizer;
+
 import java.util.List;
 
+
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    //private final CustomUserDetailsService customUserDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // DaoAuthenticationProvider x - Spring Boot가 자동으로 설정함
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                // CSRF 비활성화 (JWT 사용하므로)
+                .csrf(AbstractHttpConfigurer::disable)
+
+                // 세션 사용하지 않음 (JWT 사용하므로 STATELESS)
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // CORS 사용
                 .cors(Customizer.withDefaults())
                 // CSRF 설정 (일단 비활성화 - API 테스트를 위해)
@@ -34,25 +59,27 @@ public class SecurityConfig {
 
                 // 엔드포인트 권한 (요청별 인가 설정)
                 .authorizeHttpRequests(auth -> auth
-                        // 스웨거 테스트 경로 허용
-                        .requestMatchers("/actuator/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        // 루트 경로 접근 허용
-                        .requestMatchers("/", "/index.html").permitAll()
-                        // 회원가입/로그인 관련은 모든 사용자 접근 허용
+                        // 공개 접근 허용 (인증 불필요)
+                        .requestMatchers("/actuator/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll() // 스웨거 테스트 경로 허용
+                        .requestMatchers("/", "/index.html").permitAll() // 루트 경로 접근 허용
                         .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
-                        // 코드 조회 API는 모든 사용자 접근 허용 (일단)
                         .requestMatchers("/api/codes/**").permitAll()
-                        // 정적 리소스 허용
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-                        // 나머지는 인증 필요
+
+                        // 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
 
-                // 폼 로그인 비활성화 (REST API 사용)
-                .formLogin(form -> form.disable())
+                // 인증 제공자는 Spring Boot가 자동으로 설정 (CustomUserDetailsService + PasswordEncoder)
+
+                // JWT 필터를 UsernamePasswordAuthenticationFilter 이전에 추가
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
+                // 폼 로그인 비활성화 (JWT 사용)
+                .formLogin(AbstractHttpConfigurer::disable)
 
                 // HTTP Basic 인증 비활성화
-                .httpBasic(basic -> basic.disable());
+                .httpBasic(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
