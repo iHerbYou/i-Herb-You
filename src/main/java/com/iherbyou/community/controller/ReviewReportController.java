@@ -31,7 +31,6 @@ public class ReviewReportController {
                 saved.getId(),
                 saved.getReview().getId(),
                 saved.getReasonCode().getId(),
-                // TODO: value/label로 교체 예정
                 saved.getStatusCode().getId().toString(),
                 saved.getCreatedAt() == null ? null : saved.getCreatedAt().format(ISO)
         );
