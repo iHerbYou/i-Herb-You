@@ -3,11 +3,9 @@ package com.iherbyou.user.service;
 import com.iherbyou.common.code.entity.Code;
 import com.iherbyou.common.code.service.CodeService;
 import com.iherbyou.exception.user.*;
+import com.iherbyou.security.auth.UserPrincipal;
 import com.iherbyou.security.jwt.JwtUtil;
-import com.iherbyou.user.dto.LoginRequestDto;
-import com.iherbyou.user.dto.LoginResponseDto;
-import com.iherbyou.user.dto.SignUpRequestDto;
-import com.iherbyou.user.dto.SignUpResponseDto;
+import com.iherbyou.user.dto.*;
 import com.iherbyou.user.entity.User;
 import com.iherbyou.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -114,6 +112,16 @@ public class UserService {
                 .expiresIn(jwtExpirationMs / 1000) // 초 단위로 변환
                 .message("로그인 성공")
                 .build();
+    }
+
+    /**
+     * 로그아웃 (Logout)
+     */
+    public LogoutResponseDto logout(UserPrincipal userPrincipal) {
+        log.info("logout request: {} (id: {}", userPrincipal.getEmail(), userPrincipal.getId());
+        // 서버에서는 별도 처리 없이 응답만 반환 -> client 에서 토큰을 제거해야함
+        log.info("로그아웃 완료: {}", userPrincipal.getEmail());
+        return LogoutResponseDto.success();
     }
 
 }
