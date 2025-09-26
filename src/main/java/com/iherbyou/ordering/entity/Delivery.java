@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class Delivery {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 배송 id
 
     @OneToOne(fetch = FetchType.LAZY)

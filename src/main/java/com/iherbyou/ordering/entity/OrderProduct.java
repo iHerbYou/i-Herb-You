@@ -13,7 +13,7 @@ import lombok.*;
 public class OrderProduct {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 주문 상세 고유 ID
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
