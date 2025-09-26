@@ -2,11 +2,7 @@ package com.iherbyou.ordering.entity;
 
 import com.iherbyou.ordering.code.OrderStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -14,10 +10,10 @@ import java.time.LocalDateTime;
 /**
  * 주문 상태 변경 이력. 멱등 키 기반으로 중복 전이를 차단하기 위한 outbox 유사 테이블.
  */
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
+@Getter
 @Entity
 @Table(name = "order_status_history",
         uniqueConstraints = {
@@ -29,7 +25,7 @@ import java.time.LocalDateTime;
 public class OrderStatusHistory {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
