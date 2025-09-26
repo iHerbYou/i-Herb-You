@@ -6,13 +6,22 @@ import com.iherbyou.ordering.entity.OrderProduct;
 import com.iherbyou.ordering.dto.*;
 import com.iherbyou.ordering.repository.OrderRepository;
 import com.iherbyou.ordering.service.DeliveryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 import java.util.List;
 
+// 배송 관련 API 컨트롤러 (송장 등록과 배송 상태 변경 담당)
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
@@ -21,11 +30,13 @@ public class DeliveryController {
     private final DeliveryService deliveryService;
     private final OrderRepository orderRepository;
 
-    // 송장 등록
+    // 사용자가 주문에 대한 송장을 등록할 때 호출되는 API (배송지 결정, 주문 상태 -> PACKING 단계로 전환)
     @PostMapping("/{orderId}/delivery")
-    public ResponseEntity<OrderDetailDto> register(@PathVariable Long orderId, @RequestBody DeliveryRegisterRequest req) {
+    public ResponseEntity<OrderDetailDto> register(@AuthenticationPrincipal(expression = "id") Long userId,
+                                                   @PathVariable Long orderId,
+                                                   @Valid @RequestBody DeliveryRegisterRequest req) {
 
-        deliveryService.registerTracking(orderId, req);
+        deliveryService.registerTracking(userId, orderId, req);
 
         // 등록 직후 상세 재조회 -> OrderDetailDto로 반환
         Order o = orderRepository.findWithDetailsById(orderId)
@@ -70,6 +81,16 @@ public class DeliveryController {
                 .unitPrice(op.getUnitPriceAtOrder())
                 .subtotal(op.getSubtotal())
                 .build();
+    }
+
+    // 관리자용 배송 상태 변경 API (물류 단계에 따라 주문 상태를 SHIPPED/COMPLETED 등으로 승격)
+    @PatchMapping("/{orderId}/delivery/status")
+    @PreAuthorize("hasRole('ADMIN_MASTER')")
+    public ResponseEntity<DeliveryDto> updateStatus(@PathVariable Long orderId,
+                                                    @RequestBody @Valid DeliveryStatusUpdateRequest req) {
+        return ResponseEntity.ok(DeliveryDto.from(
+                deliveryService.changeStatus(orderId, req.getStatusCodeValue(), req.getMemo(), req.getCompleteAt())
+        ));
     }
 
 }

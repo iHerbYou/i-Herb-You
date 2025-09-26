@@ -2,13 +2,16 @@ package com.iherbyou.ordering.service;
 
 import com.iherbyou.common.code.entity.Code;
 import com.iherbyou.common.code.service.CodeService;
+import com.iherbyou.ordering.code.OrderStatus;
+import com.iherbyou.ordering.dto.DeliveryRegisterRequest;
 import com.iherbyou.ordering.entity.Delivery;
 import com.iherbyou.ordering.entity.Order;
 import com.iherbyou.ordering.repository.DeliveryRepository;
 import com.iherbyou.ordering.repository.OrderRepository;
-import com.iherbyou.ordering.dto.DeliveryRegisterRequest;
 import com.iherbyou.user.entity.UserAddress;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,16 +20,24 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class DeliveryService {
 
     private final OrderRepository orderRepository;
     private final DeliveryRepository deliveryRepository;
     private final CodeService codeService;
+    private final OrderService orderService;
 
-    public Delivery registerTracking(Long orderId, DeliveryRegisterRequest request) {
+    public Delivery registerTracking(Long userId, Long orderId, DeliveryRegisterRequest request) {
+        if (userId == null) {
+            throw new IllegalArgumentException("userId is required for delivery action");
+        }
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("order not found"));
+
+        ensureOrderOwner(order, userId);
+        ensureOrderAllowsTracking(order);
 
         String deliveryCompany = request.getDeliveryCompany();
         String trackingNumber = request.getTrackingNumber();
@@ -71,7 +82,32 @@ public class DeliveryService {
 
         order.setDelivery(delivery);
 
-        return deliveryRepository.save(delivery);
+        Delivery saved = deliveryRepository.save(delivery);
+
+        // 멱등 키: 동일한 송장 등록 요청이 들어와도 한 번만 상태 전환되도록 orderId + tracking 조합
+        String correlationId = "DELIVERY_TRACKING:" + orderId + ":" +
+                (trackingNumber != null && !trackingNumber.isBlank() ? trackingNumber : now.toString());
+        orderService.updateStatus(orderId, OrderStatus.PACKING, "DELIVERY_TRACKING_REGISTERED", "user:" + userId, correlationId);
+        log.info("[DeliveryTrackingRegistered] orderId={} deliveryId={} company={} tracking={} actor=user:{}",
+                orderId, saved.getId(), deliveryCompany, trackingNumber, userId);
+
+        return saved;
+    }
+
+    private void ensureOrderOwner(Order order, Long userId) {
+        if (order.getUser() == null || !order.getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("access denied for order " + order.getId());
+        }
+    }
+
+    private void ensureOrderAllowsTracking(Order order) {
+        if (order.getOrderStatusCode() == null) {
+            throw new IllegalStateException("order status is not set");
+        }
+        OrderStatus status = OrderStatus.fromCodeValue(order.getOrderStatusCode().getValue());
+        if (status != OrderStatus.PAID && status != OrderStatus.PACKING) {
+            throw new IllegalStateException("order status does not allow delivery registration: " + status);
+        }
     }
 
     private Code requireCode(int groupValue, int codeValue, String context) {
@@ -80,5 +116,51 @@ public class DeliveryService {
             throw new IllegalStateException("code not found: " + context);
         }
         return code;
+    }
+
+    public Delivery changeStatus(Long orderId, Integer statusValue, String memo, LocalDateTime completeAt) {
+        if (statusValue == null) {
+            throw new IllegalArgumentException("status value is required");
+        }
+
+        Delivery delivery = deliveryRepository.findByOrder_Id(orderId)
+                .orElseThrow(() -> new IllegalStateException("delivery not found for order: " + orderId));
+
+        Code newStatus = requireCode(20, statusValue, "DELIVERY_STATUS:" + statusValue);
+
+        delivery.setCode(newStatus);
+        delivery.setDelMemo(memo);
+
+        LocalDateTime appliedCompleteAt = completeAt;
+        if (appliedCompleteAt == null && statusValue == 203) { // DELIVERED
+            appliedCompleteAt = LocalDateTime.now();
+        }
+
+        if (statusValue == 201 || statusValue == 202) {
+            // 진행 중 단계에서는 완료일을 비워 두어 UI 혼란을 줄임
+            delivery.setDelCompleteAt(null);
+        } else {
+            delivery.setDelCompleteAt(appliedCompleteAt);
+        }
+
+        Delivery saved = deliveryRepository.save(delivery);
+
+        // 주문 상태 전환: 배송 단계에 따라 결정
+        if (statusValue == 201) { // PREPARING
+            // 멱등 키: 배송 준비 단계 업데이트 중복 방지
+            String correlationId = "DELIVERY_STATUS:" + orderId + ":201";
+            orderService.updateStatus(orderId, OrderStatus.PACKING, "DELIVERY_STATUS_UPDATED", "system", correlationId);
+        } else if (statusValue == 202) { // SHIPPING
+            // 멱등 키: 배송중 전환 중복 방지
+            String correlationId = "DELIVERY_STATUS:" + orderId + ":202";
+            orderService.updateStatus(orderId, OrderStatus.SHIPPED, "DELIVERY_STATUS_UPDATED", "system", correlationId);
+        } else if (statusValue == 203) { // DELIVERED
+            // 멱등 키: 배송 완료 전환 중복 방지
+            String correlationId = "DELIVERY_STATUS:" + orderId + ":203";
+            orderService.updateStatus(orderId, OrderStatus.COMPLETED, "DELIVERY_STATUS_UPDATED", "system", correlationId);
+        }
+
+        log.info("[DeliveryStatusUpdated] orderId={} deliveryId={} statusValue={} actor=system", orderId, delivery.getId(), statusValue);
+        return saved;
     }
 }

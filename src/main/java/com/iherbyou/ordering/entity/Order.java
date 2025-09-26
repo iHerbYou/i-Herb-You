@@ -23,6 +23,10 @@ public class Order {
     @GeneratedValue
     private Long id;
 
+    @Version
+    @Column(nullable = false)
+    private Long version; // 낙관 락 버전: 동시 상태 전이 경합 차단
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false) // 회원 id (FK, NOT NULL)
     private User user;
