@@ -15,7 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReviewService {
 
     private static final int MAX_TEXT_LEN = 1000;
-    private static final String STATUS_COMPLETED = "COMPLETED"; // enum이면 프로젝트 enum으로 교체
+    private static final String ORDER_STATUS_DELIVERED = "DELIVERED"; // 코드그룹: ORDER_STATUS(30)
+    // todo 실제 코드 사용 -> 수정
+
+    // ✅ feature flag: 기본은 false (개발에서는 통과), 운영에서 true 주면 차단 모드
+    private static final boolean VERIFY_PURCHASE_ENABLED =
+            Boolean.parseBoolean(System.getProperty("REVIEWS_VERIFY_PURCHASE", "false"));
 
     private final ReviewRepository reviewRepo;
 
@@ -60,9 +65,8 @@ public class ReviewService {
 
     // 상품별 목록
     @Transactional(readOnly = true)
-    public Page<Review> listByProduct(Long productId, Integer rating, Pageable pageable) {
-        if (rating == null) return reviewRepo.findByProduct_Id(productId, pageable);
-        return reviewRepo.findByProduct_IdAndRating(productId, rating, pageable);
+    public Page<Review> listByProduct(Long productId, Pageable pageable) {
+        return reviewRepo.findByProduct_Id(productId, pageable);
     }
 
     // 내가 쓴 리뷰
@@ -71,7 +75,7 @@ public class ReviewService {
         return reviewRepo.findByUser_Id(userId, pageable);
     }
 
-    // 리뷰 내용 수정 (본인만)
+    // 리뷰 내용 수정
     @Transactional
     public void updateReviewText(Long userId, Long reviewId, String newText) {
         String body = sanitizeOptionalText(newText, MAX_TEXT_LEN);
@@ -79,7 +83,7 @@ public class ReviewService {
         if (updated == 0) throw new IllegalStateException("권한이 없거나 존재하지 않습니다.");
     }
 
-    // 소프트 삭제 (본인만)
+    // 소프트 삭제
     @Transactional
     public void softDelete(Long userId, Long reviewId) {
         Review r = reviewRepo.findByIdAndUser_Id(reviewId, userId)
@@ -113,37 +117,25 @@ public class ReviewService {
         return v;
     }
 
-    // 구매자 확인: 주문 상태가 COMPLETED인 항목이 있는지 간단히 체크
+    // 구매자 검증 (구매자만 리뷰 작성 가능 옵션)
+// 현재는 VERIFY_PURCHASE_ENABLED=false → 항상 true 반환 (검증 생략)
+// 추후 수정 시:
+//  1) 주문 서비스/레포지토리 연동
+//  2) userId + productId 기준으로 주문 상태(OrderStatus)가 "DELIVERED"/"COMPLETED" 인지 확인
+//  3) 해당 주문 건이 존재할 경우 true, 없으면 false 반환
     private boolean isVerifiedPurchaser(Long userId, Long productId) {
-        //TODO
-//        Long cnt = em.createQuery(
-//                        "select count(oi) from com.iherbyou.ordering.entity.OrderProduct oi " +
-//                                "where oi.user.id = :uid and oi.product.id = :pid and oi.status = :st",
-//                        Long.class)
-//                .setParameter("uid", userId)
-//                .setParameter("pid", productId)
-//                .setParameter("st", STATUS_COMPLETED)
-//                .getSingleResult();
-//        return cnt != null && cnt > 0;
-        return true;
+        if (!VERIFY_PURCHASE_ENABLED) {
+            return true; // 검증 비활성화 시: 개발/로컬 편의상 항상 허용
+        }
+
+        // TODO: 주문 도메인 연동 후 실제 검증 로직으로 교체
+        // ex) return orderRepo.existsByUser_IdAndProduct_IdAndStatus(userId, productId, ORDER_STATUS_DELIVERED);
+
+        // 운영에서 구매 검증 ON인데 실제 구현이 없을 경우 → 안전하게 막음
+        throw new IllegalStateException(
+                "구매자 검증 기능이 아직 연결되지 않았습니다. (ORDER_STATUS=" + ORDER_STATUS_DELIVERED + ")"
+        );
     }
 }
 
- /* 주요 기능
- * - createReview(userId, productId, rating, text)
- *   : 구매자 확인 후 리뷰 1회만 등록(평점 1~5)
- * - listByProduct(productId, rating, pageable)
- *   : 상품별 리뷰 목록(필요하면 평점으로 필터)
- * - listMyReviews(userId, pageable)
- *   : 내가 쓴 리뷰 목록
- * - updateReviewText(userId, reviewId, newText)
- *   : 본인 리뷰만 내용 수정
- * - softDelete(userId, reviewId)
- *   : 본인 리뷰만 소프트 삭제
- * - countByProduct / averageRating / countByRating
- *   : 간단 집계
- *
- *   < 트랜잭션 >
- * - 쓰기 메서드: @Transactional (기본)
- * - 조회 메서드: @Transactional(readOnly = true)
- */
+

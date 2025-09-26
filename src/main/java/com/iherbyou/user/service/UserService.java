@@ -3,14 +3,14 @@ package com.iherbyou.user.service;
 import com.iherbyou.common.code.entity.Code;
 import com.iherbyou.common.code.service.CodeService;
 import com.iherbyou.exception.user.*;
-import com.iherbyou.user.dto.LoginRequestDto;
-import com.iherbyou.user.dto.LoginResponseDto;
-import com.iherbyou.user.dto.SignUpRequestDto;
-import com.iherbyou.user.dto.SignUpResponseDto;
+import com.iherbyou.security.auth.UserPrincipal;
+import com.iherbyou.security.jwt.JwtUtil;
+import com.iherbyou.user.dto.*;
 import com.iherbyou.user.entity.User;
 import com.iherbyou.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +23,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final CodeService codeService;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil; // JWT Utility 추가
+
+    @Value("${jwt.expiration:86400000}") // JWT 만료 시간 (기본 24시간)
+    private Long jwtExpirationMs;
 
     /**
      * 회원가입 (SignUp)
@@ -79,7 +83,7 @@ public class UserService {
     }
 
     /**
-     * 로그인 (Login)
+     * 로그인 (Login) - JWT 토큰 생성해서 반환
      */
     public LoginResponseDto login(LoginRequestDto request) {
         log.info("로그인 시도: {}", request.getEmail());
@@ -94,13 +98,30 @@ public class UserService {
             throw new InvalidPasswordException("비밀번호가 올바르지 않습니다");
         }
 
+        // JWT 토큰 생성
+        String accessToken = jwtUtil.generateToken(user.getEmail());
+
         // 로그인 성공
-        log.info("로그인 성공: {} (ID: {})", user.getEmail(), user.getId());
+        log.info("로그인 성공: {} (id: {}) - jwt token 생성 완료", user.getEmail(), user.getId());
+
         return LoginResponseDto.builder()
                 .email(user.getEmail())
                 .name(user.getName())
+                .accessToken(accessToken)
+                .tokenType("Bearer")
+                .expiresIn(jwtExpirationMs / 1000) // 초 단위로 변환
                 .message("로그인 성공")
                 .build();
+    }
+
+    /**
+     * 로그아웃 (Logout)
+     */
+    public LogoutResponseDto logout(UserPrincipal userPrincipal) {
+        log.info("logout request: {} (id: {}", userPrincipal.getEmail(), userPrincipal.getId());
+        // 서버에서는 별도 처리 없이 응답만 반환 -> client 에서 토큰을 제거해야함
+        log.info("로그아웃 완료: {}", userPrincipal.getEmail());
+        return LogoutResponseDto.success();
     }
 
 }

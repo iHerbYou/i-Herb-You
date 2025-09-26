@@ -61,11 +61,6 @@ public class ReviewReportService {
         return reportRepo.findByReview_Id(reviewId, pageable);
     }
 
-    @Transactional(readOnly = true)
-    public Page<ReviewReport> listByReporter(Long userId, Pageable pageable) {
-        return reportRepo.findByUser_Id(userId, pageable);
-    }
-
     // 상태변경(관리자)
     @Transactional
     public void changeStatus(Long adminId, boolean isAdmin, Long reportId, Integer newStatusCodeId) {
@@ -86,20 +81,3 @@ public class ReviewReportService {
         return reportRepo.countByReview_Id(reviewId);
     }
 }
-
- /* 주요 기능
- * - createReport(userId, reviewId, reasonCodeId)
- *   : 중복 신고 방지 후 신고 접수(사유/초기 상태 설정)
- * - listByReview(reviewId, pageable)
- *   : 특정 리뷰에 대한 신고 목록
- * - listByReporter(userId, pageable)
- *   : 내가 제출한 신고 목록
- * - changeStatus(adminId, isAdmin, reportId, newStatusCodeId)
- *   : 관리자 권한으로 신고 상태 변경
- * - countByReview(reviewId)
- *   : 리뷰별 신고 건수
- *
-         * 트랜잭션
- * - 쓰기/상태변경: @Transactional
- * - 조회: @Transactional(readOnly = true)
- */
