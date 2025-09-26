@@ -92,14 +92,13 @@ public class QnaController {
         return ResponseEntity.ok(body);
     }
 
-    // 답변 등록: 201 + Location
+    // 답변 등록: 201 + Location (isAdmin 헤더 제거)
     @PostMapping("/answers")
     public ResponseEntity<QnaAnswerProduct> createAnswer(
             @RequestHeader("X-USER-ID") Long actorId,
-            @RequestHeader(name = "X-IS-ADMIN", defaultValue = "false") boolean isAdmin,
             @RequestBody QnaAnswerCreateRequest req
     ) {
-        QnaAnswer saved = qnaService.createAnswer(actorId, req.questionId(), req.content(), isAdmin);
+        QnaAnswer saved = qnaService.createAnswer(actorId, req.questionId(), req.content());
         QnaAnswerProduct res = new QnaAnswerProduct(
                 saved.getId(),
                 saved.getUser().getId(),
@@ -109,14 +108,13 @@ public class QnaController {
         return ResponseEntity.created(URI.create("/api/qna/answers/" + saved.getId())).body(res);
     }
 
-    // 답변 삭제: 204
-    @DeleteMapping("/answers/{id}")
+    // 답변 삭제: 204 (isAdmin 헤더 제거)
+    @DeleteMapping("/answers/{answerId}")
     public ResponseEntity<Void> deleteAnswer(
             @RequestHeader("X-USER-ID") Long actorId,
-            @RequestHeader(name = "X-IS-ADMIN", defaultValue = "false") boolean isAdmin,
-            @PathVariable Long id
+            @PathVariable Long answerId
     ) {
-        qnaService.deleteAnswer(actorId, id, isAdmin);
+        qnaService.deleteAnswer(actorId, answerId);
         return ResponseEntity.noContent().build();
     }
 }

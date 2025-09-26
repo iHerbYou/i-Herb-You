@@ -1,11 +1,12 @@
 package com.iherbyou.community.service;
 
 import com.iherbyou.catalog.entity.Product;
+import com.iherbyou.common.code.service.CodeService;
 import com.iherbyou.community.entity.QnaAnswer;
 import com.iherbyou.community.entity.QnaQuestion;
 import com.iherbyou.community.repository.QnaAnswerRepository;
 import com.iherbyou.community.repository.QnaQuestionRepository;
-import com.iherbyou.user.entity.User    ;
+import com.iherbyou.user.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.data.domain.Page;
@@ -19,21 +20,26 @@ import java.util.List;
 @Service
 public class QnaService {
 
-    private static final int DEFAULT_STATUS = 101;
+    private static final int DEFAULT_STATUS = 101;   // WAITING
+    private static final int ANSWERED_STATUS = 102;  // ANSWERED
     private static final int MAX_CONTENT_LEN = 2000;
 
     private final QnaQuestionRepository questionRepo;
     private final QnaAnswerRepository answerRepo;
+    private final CodeService codeService; // ✅ 서버에서 권한 판별용
 
     @PersistenceContext
     private EntityManager em;
 
-    public QnaService(QnaQuestionRepository questionRepo, QnaAnswerRepository answerRepo) {
+    public QnaService(QnaQuestionRepository questionRepo,
+                      QnaAnswerRepository answerRepo,
+                      CodeService codeService) {
         this.questionRepo = questionRepo;
         this.answerRepo = answerRepo;
+        this.codeService = codeService;
     }
 
-    // 상품 존재 확인, 제목/내용 검증, 상태 기본값
+    // 질문 생성
     @Transactional
     public QnaQuestion createQuestion(Long userId, Long productId, String title, String content) {
         Product product = em.find(Product.class, productId);
@@ -57,48 +63,71 @@ public class QnaService {
         return questionRepo.save(q);
     }
 
-    // 공개/상태 필터
+    // 상품별 목록 (statusValue 필터 가능)
     @Transactional(readOnly = true)
-    public Page<QnaQuestion> listByProduct(Long productId, Integer statusCodeId, Pageable pageable) {
-        if (statusCodeId == null) {
+    public Page<QnaQuestion> listByProduct(Long productId, Integer statusValue, Pageable pageable) {
+        if (statusValue == null) {
             return questionRepo.findByProduct_Id(productId, pageable);
         }
-        return questionRepo.findByProduct_IdAndStatusCodeId(productId, statusCodeId, pageable);
+        return questionRepo.findByProduct_IdAndStatusCodeId(productId, statusValue, pageable);
     }
 
-    // 마이페이지
+    // 내 질문 목록
     @Transactional(readOnly = true)
     public Page<QnaQuestion> listMyQuestions(Long userId, Pageable pageable) {
         return questionRepo.findByUser_Id(userId, pageable);
     }
 
-    // (답변) 권한 체크(관리자). 질문 존재/상태 확인
+    // 답변 생성 (서버에서 관리자 판별)
     @Transactional
-    public QnaAnswer createAnswer(Long actorId, Long questionId, String content, boolean isSellerOrAdmin) {
-        if (!isSellerOrAdmin) throw new IllegalStateException("권한이 없습니다.");
-
+    public QnaAnswer createAnswer(Long actorId, Long questionId, String content) {
         QnaQuestion q = questionRepo.findById(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("질문을 찾을 수 없습니다."));
 
-        User actor = em.find(User.class, actorId);
-        if (actor == null) throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+        // ✅ User/Code 엔티티 변경 없이 role value만 JPQL로 바로 조회
+        Integer roleValue = em.createQuery(
+                        "select rc.value from User u join u.roleCode rc where u.id = :uid", Integer.class)
+                .setParameter("uid", actorId)
+                .getSingleResult();
+
+        boolean isAdmin = codeService.isAdminRole(roleValue); // 70그룹의 ADMIN_* 판별
+        if (!isAdmin) throw new IllegalStateException("권한이 없습니다.");
 
         String c = requireText(content, MAX_CONTENT_LEN, "답변 내용이 비었습니다.");
 
-        QnaAnswer a = QnaAnswer.builder()
-                .qnaQuestion(q)
-                .user(actor)
-                .content(c)
-                .build();
+        QnaAnswer saved = answerRepo.save(
+                QnaAnswer.builder()
+                        .qnaQuestion(q)
+                        .user(em.getReference(User.class, actorId))
+                        .content(c)
+                        .build()
+        );
 
-        QnaAnswer saved = answerRepo.save(a);
-
-        // 상태를 ANSWERED(102) 전환
-        questionRepo.updateStatus(q.getId(), 102);
+        // 상태를 ANSWERED(102)로 전환
+        int updated = questionRepo.updateStatus(q.getId(), ANSWERED_STATUS);
+        if (updated == 0) throw new IllegalStateException("질문 상태 갱신에 실패했습니다.");
 
         return saved;
     }
 
+    // 답변 삭제 (작성자 or 관리자)
+    @Transactional
+    public void deleteAnswer(Long actorId, Long answerId) {
+        QnaAnswer a = answerRepo.findById(answerId)
+                .orElseThrow(() -> new IllegalArgumentException("답변을 찾을 수 없습니다."));
+
+        boolean owner = a.getUser().getId().equals(actorId);
+
+        Integer roleValue = em.createQuery(
+                        "select rc.value from User u join u.roleCode rc where u.id = :uid", Integer.class)
+                .setParameter("uid", actorId)
+                .getSingleResult();
+        boolean isAdmin = codeService.isAdminRole(roleValue);
+
+        if (!owner && !isAdmin) throw new IllegalStateException("권한이 없습니다.");
+
+        answerRepo.delete(a);
+    }
 
     // 정렬
     @Transactional(readOnly = true)
@@ -106,29 +135,17 @@ public class QnaService {
         return answerRepo.findByQnaQuestion_IdOrderByCreatedAtAsc(questionId);
     }
 
-    // 답변자 관리자 권한(updateAnswer)
-    @Transactional
-    public void deleteAnswer(Long actorId, Long answerId, boolean isAdmin) {
-        QnaAnswer a = answerRepo.findById(answerId)
-                .orElseThrow(() -> new IllegalArgumentException("답변을 찾을 수 없습니다."));
-
-        boolean owner = a.getUser().getId().equals(actorId);
-        if (!owner && !isAdmin) throw new IllegalStateException("권한이 없습니다.");
-
-        answerRepo.delete(a);
-    }
-
-    // countAnswer
+    // count
     @Transactional(readOnly = true)
     public long countAnswers(Long questionId) {
         return answerRepo.countByQnaQuestion_Id(questionId);
     }
+
     private static String requireText(String src, int max, String emptyMsg) {
         if (src == null) throw new IllegalArgumentException(emptyMsg);
-        String v = src.strip();            // trim 대신 strip: 유니코드 공백 포함
+        String v = src.strip();
         if (v.isEmpty()) throw new IllegalArgumentException(emptyMsg);
         if (v.length() > max) throw new IllegalArgumentException("길이가 너무 깁니다.");
         return v;
     }
 }
-
