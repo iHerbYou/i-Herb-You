@@ -74,7 +74,7 @@ public class Product {
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer sales;  // 판매량
 
-    @Column(nullable = false)
+    @Column
     private Double avgRating;  // 평균 평점
 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")

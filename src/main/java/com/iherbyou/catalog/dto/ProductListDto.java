@@ -14,7 +14,7 @@ import java.util.Objects;
 @Setter
 @Getter
 @Builder
-public class ProductListDto {
+public class ProductListDto {   // 목록에 노출되는 상품 정보 dto
 
     private Long id;
 
@@ -41,6 +41,13 @@ public class ProductListDto {
                 .map(ProductImg::getImageUrl)
                 .findFirst()
                 .orElse(null);
+
+        // 옵션 중 최저가 기준 가격
+        int minPrice = product.getProductVariants().stream()
+                .map(ProductVariant::getSalePrice)
+                .filter(Objects::nonNull)
+                .min(Integer::compareTo)
+                .orElse(0);
 
         // 별점 평균 -> 임시 게산
         // 리뷰 작성 시 평균 평점 계산해 갱신 필요

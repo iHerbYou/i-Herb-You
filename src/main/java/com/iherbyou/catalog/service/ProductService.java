@@ -3,10 +3,11 @@ package com.iherbyou.catalog.service;
 import com.iherbyou.catalog.dto.ProductDetailDto;
 import com.iherbyou.catalog.dto.ProductListDto;
 import com.iherbyou.catalog.entity.Product;
-import com.iherbyou.catalog.entity.ProductImg;
 import com.iherbyou.catalog.entity.ProductVariant;
 import com.iherbyou.catalog.entity.Stock;
 import com.iherbyou.catalog.repository.ProductRepository;
+import com.iherbyou.exception.catalog.InvalidParameterException;
+import com.iherbyou.exception.catalog.ProductNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
@@ -32,6 +33,10 @@ public class ProductService {
                                             Integer minPrice,
                                             Integer maxPrice) {
 
+        if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
+            throw new InvalidParameterException("minPrice은 maxPrice보다 클 수 없습니다.");
+        }
+
         Specification<Product> spec = (root, query, cb) -> cb.conjunction();
 
         // 가격 범위 필터
@@ -48,6 +53,11 @@ public class ProductService {
                 Join<Product, ProductVariant> variantJoin = root.join("productVariants", JoinType.INNER);
                 return cb.lessThanOrEqualTo(variantJoin.get("salePrice"), maxPrice);
             });
+        }
+
+        // minPrice > maxPrice 검사
+        if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
+            throw new InvalidParameterException("minPrice은 maxPrice보다 클 수 없습니다.");
         }
 
         // 품절 상품 제외
@@ -136,9 +146,9 @@ public class ProductService {
     @Transactional(readOnly = true)
     public List<ProductDetailDto.VariantDTO> getProductVariants(Long productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ProductNotFoundException(productId));
 
-        return  product.getProductVariants().stream()
+        return product.getProductVariants().stream()
                 .map(v -> ProductDetailDto.VariantDTO.builder()
                         .id(v.getId())
                         .variantName(v.getVariantName())

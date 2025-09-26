@@ -37,7 +37,10 @@ public class SecurityConfig {
                         // 정적 리소스 허용
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
                         // 나머지는 인증 필요
-                        .anyRequest().authenticated()
+//                        .anyRequest().authenticated()
+                        // TODO - 테스트 끝나고 제거
+                        .anyRequest().permitAll()
+
                 )
 
                 // 폼 로그인 비활성화 (REST API 사용)

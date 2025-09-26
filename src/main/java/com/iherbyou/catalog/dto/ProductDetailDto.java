@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 @Getter
 @Builder
-public class ProductDetailDto {
+public class ProductDetailDto {     // 상품 상세정보 dto
 
     private Long id;
     private String name;
