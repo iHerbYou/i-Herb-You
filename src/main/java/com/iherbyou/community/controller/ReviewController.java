@@ -1,67 +1,101 @@
 package com.iherbyou.community.controller;
 
+import com.iherbyou.community.dto.ReviewCreateRequest;
+import com.iherbyou.community.dto.ReviewProduct;
+import com.iherbyou.community.dto.ReviewSummary;
 import com.iherbyou.community.entity.Review;
 import com.iherbyou.community.service.ReviewService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Set;
+
 @RestController
-@RequestMapping("/reviews")
+@RequestMapping("/api/reviews")
+@RequiredArgsConstructor
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-    public ReviewController(ReviewService reviewService) {
-        this.reviewService = reviewService;
-    }
+    // Swagger/프론트 실수 방지: 허용 정렬 필드 화이트리스트
+    private static final Set<String> ALLOWED_SORTS = Set.of("createdAt", "id", "rating");
 
-    // 리뷰 등록
+    /**
+     * 리뷰 등록
+     * Header: X-USER-ID
+     * Body: ReviewCreateRequest { productId, rating, text }
+     * Response: ReviewProduct
+     */
     @PostMapping
-    public Review createReview(@RequestParam Long userId, @RequestParam Long productId,
-                               @RequestParam Integer rating, @RequestParam(required = false) String text) {
-        return reviewService.createReview(userId, productId, rating, text);
+    public ResponseEntity<ReviewProduct> createReview(
+            @RequestHeader("X-USER-ID") Long userId,
+            @RequestBody ReviewCreateRequest req
+    ) {
+        Review saved = reviewService.createReview(userId, req.productId(), req.rating(), req.text());
+        ReviewProduct res = new ReviewProduct(
+                saved.getId(),
+                saved.getRating(),
+                saved.getText(),
+                saved.getUser().getName(),
+                saved.getCreatedAt().format(ISO)
+        );
+        return ResponseEntity.ok(res);
     }
 
-    // 상품별 리뷰 목록
+    /**
+     * 상품별 리뷰 목록
+     * Query: productId
+     * Pageable: 기본 createdAt desc (잘못된 sort가 오면 기본값으로 대체)
+     */
     @GetMapping
-    public Page<Review> listByProduct(@RequestParam Long productId, @RequestParam(required = false) Integer rating,
-                                      Pageable pageable) {
-        return reviewService.listByProduct(productId, rating, pageable);
+    public ResponseEntity<Page<ReviewProduct>> listByProduct(
+            @RequestParam Long productId,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        pageable = safePageable(pageable);
+        Page<Review> page = reviewService.listByProduct(productId, pageable);
+        Page<ReviewProduct> body = page.map(r -> new ReviewProduct(
+                r.getId(),
+                r.getRating(),
+                r.getText(),
+                r.getUser().getName(),
+                r.getCreatedAt().format(ISO)
+        ));
+        return ResponseEntity.ok(body);
     }
 
-    // 내가 쓴 리뷰
-    @GetMapping("/my")
-    public Page<Review> myReviews(@RequestParam Long userId, Pageable pageable) {
-        return reviewService.listMyReviews(userId, pageable);
+    /**
+     * 리뷰 통계 요약 (총개수/평균/별점분포)
+     * Query: productId
+     * Response: ReviewSummary { total, average, counts[1~5] }
+     */
+    @GetMapping("/summary")
+    public ResponseEntity<ReviewSummary> summary(@RequestParam Long productId) {
+        long total = reviewService.countByProduct(productId);
+        double avg = reviewService.averageRating(productId);
+        long[] counts = new long[5];
+        for (int i = 1; i <= 5; i++) {
+            counts[i - 1] = reviewService.countByRating(productId, i);
+        }
+        return ResponseEntity.ok(new ReviewSummary(total, avg, counts));
     }
 
-    // 리뷰 내용 수정
-    @PatchMapping("/{id}")
-    public void updateReviewText(@PathVariable Long id, @RequestParam Long userId,
-                                 @RequestParam String newText) {
-        reviewService.updateReviewText(userId, id, newText);
-    }
+    // ===== 내부 유틸: 허용된 정렬 필드만 반영해 안전한 Pageable로 변환 =====
+    private Pageable safePageable(Pageable pageable) {
+        List<Sort.Order> filtered = pageable.getSort().stream()
+                .filter(o -> ALLOWED_SORTS.contains(o.getProperty()))
+                .toList();
 
-    // 리뷰 삭제
-    @DeleteMapping("/{id}")
-    public void deleteReview(@PathVariable Long id, @RequestParam Long userId) {
-        reviewService.softDelete(userId, id);
-    }
+        Sort sort = filtered.isEmpty()
+                ? Sort.by(Sort.Direction.DESC, "createdAt")
+                : Sort.by(filtered);
 
-    // 집계
-    @GetMapping("/count")
-    public long countByProduct(@RequestParam Long productId) {
-        return reviewService.countByProduct(productId);
-    }
-
-    @GetMapping("/avg")
-    public Double averageRating(@RequestParam Long productId) {
-        return reviewService.averageRating(productId);
-    }
-
-    @GetMapping("/rating-count")
-    public long countByRating(@RequestParam Long productId, @RequestParam int rating) {
-        return reviewService.countByRating(productId, rating);
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
     }
 }
