@@ -18,6 +18,7 @@ import java.util.List;
 public class Payment {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 결제 id (주문 id와 동일하게 사용)
 
     @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
