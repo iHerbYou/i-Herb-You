@@ -91,8 +91,14 @@ public class QnaService {
                 .content(c)
                 .build();
 
-        return answerRepo.save(a);
+        QnaAnswer saved = answerRepo.save(a);
+
+        // 상태를 ANSWERED(102) 전환
+        questionRepo.updateStatus(q.getId(), 102);
+
+        return saved;
     }
+
 
     // 정렬
     @Transactional(readOnly = true)
@@ -125,3 +131,4 @@ public class QnaService {
         return v;
     }
 }
+

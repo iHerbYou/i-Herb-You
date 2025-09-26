@@ -10,8 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 
 @RestController
 @RequestMapping("/api/qna")
@@ -21,41 +21,37 @@ public class QnaController {
     private final QnaService qnaService;
     private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-    // 질문 등록
-    // Header: X-USER-ID (로그인 사용자 ID)
-    // Body: QnaQuestionCreateRequest { productId, title, content }
-    // Response: QnaQuestionProduct (생성된 질문 요약. answers는 빈 리스트/카운트 0)
-    // 리뷰: 엔티티 직접 노출 X, DTO로 최소 필드만 반환
+    // 질문 등록: 201 + Location, answers 제외
     @PostMapping("/questions")
-    public ResponseEntity<QnaQuestionProduct> createQuestion(
+    public ResponseEntity<QnaQuestionCreated> createQuestion(
             @RequestHeader("X-USER-ID") Long userId,
             @RequestBody QnaQuestionCreateRequest req
     ) {
         QnaQuestion saved = qnaService.createQuestion(userId, req.productId(), req.title(), req.content());
-        QnaQuestionProduct res = new QnaQuestionProduct(
+
+        QnaQuestionCreated body = new QnaQuestionCreated(
                 saved.getId(),
                 saved.getProduct().getId(),
                 saved.getUser().getId(),
                 saved.getTitle(),
                 saved.getContent(),
                 saved.getCreatedAt().format(ISO),
-                Collections.emptyList(), // 생성 직후에는 답변 없음
-                0
+                "질문이 등록되었습니다."
         );
-        return ResponseEntity.ok(res);
+
+        URI location = URI.create("/api/qna/questions/" + saved.getId());
+        return ResponseEntity.created(location).body(body);
     }
 
-    // 상품별 질문 + (해당 질문의) 답변 목록
-    // Query: productId (필수), statusCodeId(선택: 노출 정책), pageable
-    // Response: Page<QnaQuestionProduct> (각 질문에 answers 포함, answerCount 포함)
-    // 리뷰: 질문/답변 API 따로? -> 한 번에 내려주도록 통합
+    // 상품별 질문 목록: statusValue(=101/102/103) 필터
     @GetMapping("/questions")
     public ResponseEntity<Page<QnaQuestionProduct>> listByProduct(
             @RequestParam Long productId,
-            @RequestParam(required = false) Integer statusCodeId,
+            @RequestParam(required = false, name = "statusValue") Integer statusValue,
             Pageable pageable
     ) {
-        Page<QnaQuestion> page = qnaService.listByProduct(productId, statusCodeId, pageable);
+        Page<QnaQuestion> page = qnaService.listByProduct(productId, statusValue, pageable);
+
         Page<QnaQuestionProduct> body = page.map(q -> new QnaQuestionProduct(
                 q.getId(),
                 q.getProduct().getId(),
@@ -63,7 +59,7 @@ public class QnaController {
                 q.getTitle(),
                 q.getContent(),
                 q.getCreatedAt().format(ISO),
-                q.getQnaAnswers().stream() // 필요 시 .limit(2)로 프리뷰만 내려도 됨(응답 축소)
+                q.getQnaAnswers().stream()
                         .map(a -> new QnaAnswerProduct(
                                 a.getId(),
                                 a.getUser().getId(),
@@ -76,10 +72,7 @@ public class QnaController {
         return ResponseEntity.ok(body);
     }
 
-    // 내가 쓴 질문 목록
-    // Header: X-USER-ID
-    // Response: Page<QnaQuestionProduct>
-    // 답 축소: 내 질문 목록에서는 answers를 내려주지 않음
+    // 내가 쓴 질문 목록: answers=null로 축소
     @GetMapping("/my")
     public ResponseEntity<Page<QnaQuestionProduct>> myQuestions(
             @RequestHeader("X-USER-ID") Long userId,
@@ -93,17 +86,13 @@ public class QnaController {
                 q.getTitle(),
                 q.getContent(),
                 q.getCreatedAt().format(ISO),
-                null, // 목록 응답 축소: answers 미포함
+                null,
                 0
         ));
         return ResponseEntity.ok(body);
     }
 
-    // 답변 등록 (관리자권한 필요)
-    // Header: X-USER-ID, X-IS-ADMIN (true여야 등록 가능)
-    // Body: QnaAnswerCreateRequest { questionId, content }
-    // Response: QnaAnswerProduct (생성된 답변 요약)
-    // 리뷰: actorId 파라미터 제거 -> Header 통일
+    // 답변 등록: 201 + Location
     @PostMapping("/answers")
     public ResponseEntity<QnaAnswerProduct> createAnswer(
             @RequestHeader("X-USER-ID") Long actorId,
@@ -117,13 +106,10 @@ public class QnaController {
                 saved.getContent(),
                 saved.getCreatedAt().format(ISO)
         );
-        return ResponseEntity.ok(res);
+        return ResponseEntity.created(URI.create("/api/qna/answers/" + saved.getId())).body(res);
     }
 
-    // 답변 삭제 (작성자 본인 또는 관리자)
-    // Header: X-USER-ID, X-IS-ADMIN
-    // Path: /answers/{id}
-    // Response: 204 No Content
+    // 답변 삭제: 204
     @DeleteMapping("/answers/{id}")
     public ResponseEntity<Void> deleteAnswer(
             @RequestHeader("X-USER-ID") Long actorId,
