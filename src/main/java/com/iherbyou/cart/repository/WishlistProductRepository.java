@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface WishlistProductRepository extends JpaRepository<WishlistProduct, Long> {
@@ -16,13 +15,12 @@ public interface WishlistProductRepository extends JpaRepository<WishlistProduct
      * - cursor가 있으면 createdAt < cursor 조건으로 이어서 가져옴
      */
     @Query("""
-        select wp from WishlistProduct wp
-        join fetch wp.product p
-        where wp.wishlist.id = :wishlistId
-          and (:cursor is null or wp.createdAt < :cursor)
-        order by wp.createdAt desc, wp.id desc
-    """)
-    List<WishlistProduct> findPage(Long wishlistId, LocalDateTime cursor, Pageable pageable);
+                select wp from WishlistProduct wp
+                join fetch wp.product p
+                where wp.wishlist.id = :wishlistId
+                order by wp.createdAt desc, wp.id desc
+            """)
+    List<WishlistProduct> findPage(Long wishlistId, Pageable pageable);
 
     /**
      * 특정 위시리스트에 해당 상품이 이미 존재하는지 확인
@@ -32,10 +30,12 @@ public interface WishlistProductRepository extends JpaRepository<WishlistProduct
     /**
      * 단건 삭제 (내 위시리스트 소유권 검증 포함)
      */
-    int deleteByIdAndWishlistId(Long id, Long wishlistId);
+    int deleteByIdAndWishlistId(Long itemId, Long wishlistId);
 
     /**
      * 여러 건 삭제 (벌크 삭제)
      */
-    int deleteAllByIdInAndWishlistId(List<Long> ids, Long wishlistId);
+    int deleteAllByWishlistId(Long wishlistId);
+
+    long countByWishlistId(Long wishlistId);
 }
