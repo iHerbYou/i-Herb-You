@@ -99,7 +99,8 @@ public class UserService {
         }
 
         // JWT 토큰 생성
-        String accessToken = jwtUtil.generateToken(user.getEmail());
+        String accessToken = jwtUtil.generateAccessToken(user.getEmail());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
 
         // 로그인 성공
         log.info("로그인 성공: {} (id: {}) - jwt token 생성 완료", user.getEmail(), user.getId());
@@ -109,7 +110,8 @@ public class UserService {
                 .name(user.getName())
                 .accessToken(accessToken)
                 .tokenType("Bearer")
-                .expiresIn(jwtExpirationMs / 1000) // 초 단위로 변환
+                .accessTokenExpirationIn(jwtUtil.getAccessTokenExpirationInSeconds()) // 초 단위로 변환
+                .refreshTokenExpirationIn(jwtUtil.getRefreshTokenExpirationInSeconds())
                 .message("로그인 성공")
                 .build();
     }
