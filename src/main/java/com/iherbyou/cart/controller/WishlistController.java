@@ -1,10 +1,12 @@
 package com.iherbyou.cart.controller;
 
 import com.iherbyou.cart.dto.AddWishlistItemResponse;
-import com.iherbyou.cart.dto.BulkDeleteResponse;
+import com.iherbyou.cart.dto.DeleteItemsResponse;
+import com.iherbyou.cart.dto.DeleteItemsRequest;
 import com.iherbyou.cart.dto.WishlistPageResponse;
 import com.iherbyou.cart.service.WishlistService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,21 +44,28 @@ public class WishlistController {
     }
 
     // ---------------------------
-    // 3) 아이템 단건 삭제
+    // 3) 아이템 삭제 (단건/복수) - Request Body 사용
+    //    - DELETE /api/wishlist/items
+    //    - Body 예시:
+    //      {
+    //        "userId": 1,
+    //        "itemIds": [10, 11]
+    //      }
     // ---------------------------
-    @DeleteMapping(value = "/{itemId}", params = "userId")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long itemId, @RequestParam Long userId) {
-        wishlistService.removeItem(userId, itemId);
-    }
-
-    // ---------------------------
-    // 4) 아이템 전체 삭제
-    // ---------------------------
-    @DeleteMapping(value = "/items", params = "userId")
-    public BulkDeleteResponse deleteAll(@RequestParam Long userId) {
-        int count = wishlistService.bulkRemoveAll(userId);
-        return BulkDeleteResponse.builder().deletedCount(count).build();
+    @DeleteMapping(value = "/items")
+    public DeleteItemsResponse deleteItems(@RequestBody @Valid DeleteItemsRequest req) {
+        if (req == null || req.getUserId() == null || req.getItemIds() == null || req.getItemIds().isEmpty()) {
+            throw new IllegalArgumentException("userId와 itemIds는 필수입니다.");
+        }
+        int deletedCount = 0;
+        for (Long itemId : req.getItemIds()) {
+            wishlistService.removeItem(req.getUserId(), itemId);
+            deletedCount++;
+        }
+        return DeleteItemsResponse.builder()
+                .deletedCount(deletedCount)
+                .message("위시리스트에서 제거되었습니다.")
+                .build();
     }
 
 }

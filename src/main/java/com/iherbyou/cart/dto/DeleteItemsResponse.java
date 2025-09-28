@@ -6,7 +6,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-// 위시 여러 개 삭제
-public class BulkDeleteResponse {
+public class DeleteItemsResponse {
     private int deletedCount;
+    private String message;
 }
