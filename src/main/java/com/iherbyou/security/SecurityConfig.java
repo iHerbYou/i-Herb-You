@@ -65,6 +65,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
                         .requestMatchers("/api/codes/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/api/auth/refresh").permitAll() // 토큰 갱신 API
 
                         // 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
