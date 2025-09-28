@@ -10,6 +10,7 @@ spring:
   sql:
     init:
       data-locations:
+        - classpath:banner-data.sql
         - classpath:code-data.sql
         - classpath:category-data.sql
         - classpath:product-dummy.sql

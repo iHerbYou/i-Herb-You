@@ -1,4 +1,4 @@
-package com.iherbyou.common;
+package com.iherbyou.banner.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,4 +20,6 @@ public class Banner {
     @Column
     private String imageUrl; // 이미지 url
 
+    @Column(unique = true)
+    private Integer sortOrder;
 }
