@@ -1,5 +1,6 @@
 package com.iherbyou.exception;
 
+import com.iherbyou.exception.catalog.*;
 import com.iherbyou.exception.user.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +50,50 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleInvalidPassword(InvalidPasswordException e) {
         return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage());
     }
+
+
+    // ===================== 카테고리 / 상품 관련 예외 =====================
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleCategoryNotFound(CategoryNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("code", "CATEGORY_NOT_FOUND", "error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(CategoryUnauthorizedException.class)
+    public ResponseEntity<Map<String, Object>> handleUnauthorized(CategoryUnauthorizedException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("code", "UNAUTHORIZED", "error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidParentIdException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidParentId(InvalidParentIdException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("code", "INVALID_PARENT_ID", "error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(CategoryForbiddenException.class)
+    public ResponseEntity<Map<String, Object>> handleForbidden(CategoryForbiddenException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("code", "FORBIDDEN", "error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidParameterException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidParameter(InvalidParameterException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("code", "INVALID_PARAMETER");
+        body.put("error", ex.getMessage());
+        return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleProductNotFound(ProductNotFoundException e) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("code", "NOT_FOUND");
+        errorResponse.put("error", "존재하지 않는 상품입니다.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
 
     // ===================== 그 외 모든 예외 =====================
     @ExceptionHandler(Exception.class)
