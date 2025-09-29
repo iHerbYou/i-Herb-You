@@ -18,8 +18,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import org.springframework.security.config.Customizer;
-
 import java.util.List;
 
 
@@ -49,28 +47,26 @@ public class SecurityConfig {
                 // CSRF 비활성화 (JWT 사용하므로)
                 .csrf(AbstractHttpConfigurer::disable)
 
+                // CORS 설정 (명시적으로 Bean 참조)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
                 // 세션 사용하지 않음 (JWT 사용하므로 STATELESS)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // CORS 사용
-                .cors(Customizer.withDefaults())
-                // CSRF 설정 (일단 비활성화 - API 테스트를 위해)
-                .csrf(csrf -> csrf.disable())
 
                 // 엔드포인트 권한 (요청별 인가 설정)
                 .authorizeHttpRequests(auth -> auth
                         // 공개 접근 허용 (인증 불필요)
-                        .requestMatchers("/actuator/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll() // 스웨거 테스트 경로 허용
-                        .requestMatchers("/", "/index.html").permitAll() // 루트 경로 접근 허용
+                        .requestMatchers("/actuator/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/", "/index.html").permitAll()
                         .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
+                        .requestMatchers("/api/auth/refresh").permitAll()
                         .requestMatchers("/api/codes/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
 
                         // 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
-
-                // 인증 제공자는 Spring Boot가 자동으로 설정 (CustomUserDetailsService + PasswordEncoder)
 
                 // JWT 필터를 UsernamePasswordAuthenticationFilter 이전에 추가
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

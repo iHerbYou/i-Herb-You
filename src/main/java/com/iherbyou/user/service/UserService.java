@@ -10,7 +10,6 @@ import com.iherbyou.user.entity.User;
 import com.iherbyou.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,9 +23,6 @@ public class UserService {
     private final CodeService codeService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil; // JWT Utility 추가
-
-    @Value("${jwt.expiration:86400000}") // JWT 만료 시간 (기본 24시간)
-    private Long jwtExpirationMs;
 
     /**
      * 회원가입 (SignUp)
@@ -85,6 +81,7 @@ public class UserService {
     /**
      * 로그인 (Login) - JWT 토큰 생성해서 반환
      */
+    @Transactional(readOnly = true)
     public LoginResponseDto login(LoginRequestDto request) {
         log.info("로그인 시도: {}", request.getEmail());
 
@@ -99,7 +96,8 @@ public class UserService {
         }
 
         // JWT 토큰 생성
-        String accessToken = jwtUtil.generateToken(user.getEmail());
+        String accessToken = jwtUtil.generateAccessToken(user.getEmail());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
 
         // 로그인 성공
         log.info("로그인 성공: {} (id: {}) - jwt token 생성 완료", user.getEmail(), user.getId());
@@ -108,8 +106,10 @@ public class UserService {
                 .email(user.getEmail())
                 .name(user.getName())
                 .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .tokenType("Bearer")
-                .expiresIn(jwtExpirationMs / 1000) // 초 단위로 변환
+                .accessTokenExpiresIn(jwtUtil.getAccessTokenExpirationInSeconds()) // 초 단위로 변환
+                .refreshTokenExpiresIn(jwtUtil.getRefreshTokenExpirationInSeconds())
                 .message("로그인 성공")
                 .build();
     }
@@ -122,6 +122,84 @@ public class UserService {
         // 서버에서는 별도 처리 없이 응답만 반환 -> client 에서 토큰을 제거해야함
         log.info("로그아웃 완료: {}", userPrincipal.getEmail());
         return LogoutResponseDto.success();
+    }
+
+    /**
+     * 토큰 갱신 (Refresh token 으로 새로운 Access Token 발급)
+     */
+    @Transactional(readOnly = true)
+    public RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto request) {
+        String refreshToken = request.getRefreshToken();
+        log.info("토큰 갱신 요청 - Refresh Token: {}...", refreshToken.substring(0, 20));
+
+        // refresh token 유효성 검증
+        if (!jwtUtil.validateRefreshToken(refreshToken)) {
+            log.warn("토큰 갱신 실패 - 유효하지 않은 Refresh Token");
+            throw new InvalidTokenException("유호하지 않은 Refresh Token입니다.");
+        }
+
+        // Refresh Token에서 사용자 이메일 추출
+        String userEmail = jwtUtil.getEmailFromToken(refreshToken);
+
+        // 활성 사용자 확인
+        User user = userRepository.findActiveUserByEmail(userEmail)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없거나 비활성 상태입니다."));
+
+        // 새로운 토큰들 생성, 반환
+        String newAccessToken = jwtUtil.generateAccessToken(user.getEmail());
+        String newRefreshToken = jwtUtil.generateRefreshToken(user.getEmail());
+
+        return RefreshTokenResponseDto.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .tokenType("Bearer")
+                .accessTokenExpiresIn(jwtUtil.getAccessTokenExpirationInSeconds())
+                .refreshTokenExpiresIn(jwtUtil.getRefreshTokenExpirationInSeconds())
+                .message("토큰 갱신 성공")
+                .build();
+    }
+
+    /**
+     * 현재 로그인한 사용자 정보 조회
+     */
+    @Transactional(readOnly = true)
+    public UserInfoResponseDto getCurrentUser(UserPrincipal userPrincipal) {
+        log.info("사용자 정보 조회: {}", userPrincipal.getEmail());
+
+        // DB에서 최신 사용자 정보 조회
+        User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        return UserInfoResponseDto.from(user);
+    }
+
+    /**
+     * 비밀번호 변경 (Change Password)
+     */
+    @Transactional
+    public ChangePasswordResponseDto changePassword(ChangePasswordRequestDto request, UserPrincipal userPrincipal) {
+        log.info("비밀번호 변경 시도: {}", userPrincipal.getEmail());
+
+        // 사용자 조회
+        User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        // 사용자의 비밀번호 확인
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            log.warn("비밀번호 변경 실패 - 현재 비밀번호 불일치: {}", userPrincipal.getEmail());
+            throw new InvalidPasswordException("비밀번호가 틀렸습니다.");
+        }
+
+        // 현재 비밀번호와 새 비밀번호가 일치하는지 확인
+        if (request.getCurrentPassword().equals(request.getNewPassword())) {
+            throw new IllegalArgumentException("새 비밀번호는 현재 비밀번호와 달라야합니다.");
+        }
+
+        // 비밀번호 변경
+        user.changePassword(passwordEncoder.encode(request.getNewPassword()));
+        log.info("비밀번호 변경 성공: {}", userPrincipal.getEmail());
+
+        return ChangePasswordResponseDto.success();
     }
 
 }

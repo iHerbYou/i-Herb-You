@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 1. 요청 헤더에서 JWT 토큰 추출
             String jwt = getJwtFromRequest(request);
 
-            if (StringUtils.hasText(jwt) && jwtUtil.validateToken(jwt)) {
+            if (StringUtils.hasText(jwt) && jwtUtil.validateAccessToken(jwt)) {
                 // 2. 토큰에서 사용자 이메일 추출
                 String email = jwtUtil.getEmailFromToken(jwt);
 
