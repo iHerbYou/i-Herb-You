@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class WishlistItemResponse {
     private Long itemId;
     private Long productId;
-    private String productName;      // 스냅샷(옵션)
-    private String thumbnailUrl;     // 스냅샷(옵션)
-    private LocalDateTime createdAt; // 엔티티에 생성시간 있다면
+    private String productName;
+    private String thumbnailUrl;
+    private LocalDateTime createdAt;
 }

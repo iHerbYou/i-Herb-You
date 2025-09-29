@@ -16,6 +16,5 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeleteItemsRequest {
-    private Long userId;
     private List<Long> itemIds;
 }
