@@ -60,9 +60,8 @@ public class ReviewController {
     public ResponseEntity<ReviewSummary> summary(@RequestParam Long productId) {
         long total = reviewService.countByProduct(productId);
         double avg = reviewService.averageRating(productId);
-        long[] counts = new long[5];
-        for (int i = 1; i <= 5; i++) counts[i - 1] = reviewService.countByRating(productId, i);
-        return ResponseEntity.ok(new ReviewSummary(total, avg, counts));
+
+        return ResponseEntity.ok(new ReviewSummary(total, avg));
     }
 
     private Pageable safePageable(Pageable pageable) {
