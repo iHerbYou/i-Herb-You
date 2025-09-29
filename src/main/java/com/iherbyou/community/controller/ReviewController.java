@@ -61,7 +61,7 @@ public class ReviewController {
         long total = reviewService.countByProduct(productId);
         double avg = reviewService.averageRating(productId);
 
-        return ResponseEntity.ok(new ReviewSummary(total, avg, total));
+        return ResponseEntity.ok(new ReviewSummary(total, avg));
     }
 
     private Pageable safePageable(Pageable pageable) {
