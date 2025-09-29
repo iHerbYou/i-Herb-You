@@ -19,7 +19,7 @@ public class JwtUtil {
     @Value("${jwt.access-token.expiration:1800000}") // 30분
     private Long accessTokenExpiration;
 
-    @Value("${jwt.refresh-token.expiration}") // 24시간
+    @Value("${jwt.refresh-token.expiration:86400000}") // 24시간
     private Long refreshTokenExpiration;
 
     // JWT 서명을 위한 SecretKey 생성

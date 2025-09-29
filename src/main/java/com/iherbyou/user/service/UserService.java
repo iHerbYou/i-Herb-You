@@ -105,9 +105,10 @@ public class UserService {
                 .email(user.getEmail())
                 .name(user.getName())
                 .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .tokenType("Bearer")
-                .accessTokenExpirationIn(jwtUtil.getAccessTokenExpirationInSeconds()) // 초 단위로 변환
-                .refreshTokenExpirationIn(jwtUtil.getRefreshTokenExpirationInSeconds())
+                .accessTokenExpiresIn(jwtUtil.getAccessTokenExpirationInSeconds()) // 초 단위로 변환
+                .refreshTokenExpiresIn(jwtUtil.getRefreshTokenExpirationInSeconds())
                 .message("로그인 성공")
                 .build();
     }

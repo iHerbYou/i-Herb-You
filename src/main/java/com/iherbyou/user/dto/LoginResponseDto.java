@@ -14,8 +14,8 @@ public class LoginResponseDto { //TODO
     private String accessToken; // JWT Access Token
     private String refreshToken; // JWT Refresh Token
     private String tokenType; // Bearer
-    private Long accessTokenExpirationIn; // Access Token 만료 시간 (초)
-    private Long refreshTokenExpirationIn;  // Refresh Token 만료 시간 (초)
+    private Long accessTokenExpiresIn; // Access Token 만료 시간 (초)
+    private Long refreshTokenExpiresIn;  // Refresh Token 만료 시간 (초)
     private String message;
 
 }
