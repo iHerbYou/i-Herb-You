@@ -81,6 +81,7 @@ public class UserService {
     /**
      * 로그인 (Login) - JWT 토큰 생성해서 반환
      */
+    @Transactional(readOnly = true)
     public LoginResponseDto login(LoginRequestDto request) {
         log.info("로그인 시도: {}", request.getEmail());
 
@@ -161,6 +162,7 @@ public class UserService {
     /**
      * 현재 로그인한 사용자 정보 조회
      */
+    @Transactional(readOnly = true)
     public UserInfoResponseDto getCurrentUser(UserPrincipal userPrincipal) {
         log.info("사용자 정보 조회: {}", userPrincipal.getEmail());
 
@@ -169,6 +171,40 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
 
         return UserInfoResponseDto.from(user);
+    }
+
+    /**
+     * 비밀번호 변경 (Change Password)
+     */
+    @Transactional
+    public ChangePasswordResponseDto changePassword(ChangePasswordRequestDto request, UserPrincipal userPrincipal) {
+        log.info("비밀번호 변경 시도: {}", userPrincipal.getEmail());
+
+        // 새 비밀번호와 확인 비밀번호 일치
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("새 비밀번호와 확인 비밀번호가 일치하지 않습니다");
+        }
+
+        // 사용자 조회
+        User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        // 사용자의 비밀번호 확인
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            log.warn("비밀번호 변경 실패 - 현재 비밀번호 불일치: {}", userPrincipal.getEmail());
+            throw new InvalidPasswordException("비밀번호가 틀렸습니다.");
+        }
+
+        // 현재 비밀번호와 새 비밀번호가 일치하는지 확인
+        if (request.getCurrentPassword().equals(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("새 비밀번호는 현재 비밀번호와 달라야합니다.");
+        }
+
+        // 비밀번호 변경
+        user.changePassword(passwordEncoder.encode(request.getNewPassword()));
+        log.info("비밀번호 변경 성공: {}", userPrincipal.getEmail());
+
+        return ChangePasswordResponseDto.success();
     }
 
 }

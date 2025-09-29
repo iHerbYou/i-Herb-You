@@ -45,4 +45,13 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    // 비밀번호 변경
+    @PutMapping("/password")
+    public ResponseEntity<ChangePasswordResponseDto> changePassword(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @Valid @RequestBody ChangePasswordRequestDto request) {
+        ChangePasswordResponseDto response = userService.changePassword(request, userPrincipal);
+        return ResponseEntity.ok(response);
+    }
+
 }
