@@ -172,4 +172,24 @@ public class ProductService {
         return products.map(ProductListDto::fromEntity);
     }
 
+    // 최근 출시된 상품 가져옴
+    @Transactional(readOnly = true)
+    public List<ProductListDto> findNewProducts(int size) {
+        Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "saleStartDate"));
+
+        Page<Product> products = productRepository.findAllOrderBySaleStartDateDesc(pageable);
+
+        return products.map(ProductListDto::fromEntity).getContent();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductListDto> findTopRatedProducts(int size) {
+        Pageable pageable = PageRequest.of(0, size,
+                Sort.by(Sort.Order.desc("avgRating"), Sort.Order.desc("sales")));
+
+        Page<Product> products = productRepository.findAllOrderByAvgRatingDesc(pageable);
+
+        return products.map(ProductListDto::fromEntity).getContent();
+    }
+
 }

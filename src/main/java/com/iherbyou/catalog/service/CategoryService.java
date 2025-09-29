@@ -56,11 +56,18 @@ public class CategoryService {
     }
 
     // 부모 카테고리의 모든 하위 카테고리 가져오기
-    public List<Category> getSubCategories(Long parentId) {
+    public List<CategoryFlatDto> getSubCategories(Long parentId) {
         if (!categoryRepository.existsById(parentId)) {
             throw new InvalidParentIdException(parentId);
         }
-        return categoryRepository.findByParentId(parentId);
+        return categoryRepository.findByParentId(parentId).stream()
+                .map(c -> new CategoryFlatDto(
+                        c.getId(),
+                        c.getName(),
+                        c.getParent() != null ? c.getParent().getId() : null,
+                        getDepth(c)
+                ))
+                .toList();
     }
 
     // 카테고리 목록 트리형태로 가져오기
@@ -80,17 +87,30 @@ public class CategoryService {
             );
         }
 
-        // 부모-자식 연결
+        // 부모-자식 연결 (뎁스별로 다른 배열 사용)
         List<CategoryTreeDto> roots = new ArrayList<>();
         for (Category c : categories) {
             CategoryTreeDto dto = dtoMap.get(c.getId());
             Long parentId = dtoMap.get(c.getId()).getParentId();
+            
             if (parentId == null) {
+                // 루트 카테고리 (depth=1)
                 roots.add(dto);
             } else {
                 CategoryTreeDto parentDto = dtoMap.get(parentId);
                 if (parentDto != null) {
-                    parentDto.getChildren().add(dto);
+                    // 뎁스별로 다른 배열에 추가
+                    if (dto.getDepth() == 2) {
+                        // 2뎁스는 최상위의 children 배열에 추가
+                        if (parentDto.getChildren() != null) {
+                            parentDto.getChildren().add(dto);
+                        }
+                    } else if (dto.getDepth() == 3) {
+                        // 3뎁스는 2뎁스의 items 배열에 추가
+                        if (parentDto.getItems() != null) {
+                            parentDto.getItems().add(dto);
+                        }
+                    }
                 }
             }
         }

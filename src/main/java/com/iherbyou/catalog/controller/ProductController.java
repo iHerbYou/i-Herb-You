@@ -89,4 +89,20 @@ public class ProductController {
         return ResponseEntity.ok(bestsellers.getContent());
     }
 
+    // 메인 - 최근 출시된 상품 API
+    @GetMapping("/new")
+    public ResponseEntity<List<ProductListDto>> getNewProducts(
+            @RequestParam(defaultValue = "8") int size) {
+
+        return ResponseEntity.ok(productService.findNewProducts(size));
+    }
+
+    // 메인 - 별점 높은 상품 API
+    @GetMapping("/top-rated")
+    public ResponseEntity<List<ProductListDto>> getTopRatedProducts(
+            @RequestParam(defaultValue = "8") int size) {
+
+        return ResponseEntity.ok(productService.findTopRatedProducts(size));
+    }
+
 }

@@ -40,7 +40,7 @@ public class CategoryController {
 
     // 특정 카테고리의 하위 카테고리 조회
     @GetMapping("/{id}/subcategories")
-    public ResponseEntity<List<Category>> getSubCategories(@PathVariable Long id) {
+    public ResponseEntity<List<CategoryFlatDto>> getSubCategories(@PathVariable Long id) {
         return ResponseEntity.ok(categoryService.getSubCategories(id));
     }
 
