@@ -26,4 +26,16 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "WHERE pc.category.id = :categoryId")
     List<Product> findByCategoryId(@Param("categoryId") Long categoryId);
 
+    // 카테고리 기반 베스트셀러 조회
+    @Query("SELECT p " +
+            "FROM Product p " +
+            "JOIN p.productCategories pc " +
+            "WHERE pc.category.id = :categoryId " +
+            "ORDER BY p.sales DESC")
+    Page<Product> findByCategoryIdOrderBySalesDesc(@Param("categoryId") Long categoryId, Pageable pageable);
+
+    // 전체 베스트셀러 조회
+    @Query("SELECT p FROM Product p ORDER BY p.sales DESC")
+    Page<Product> findAllOrderBySalesDesc(Pageable pageable);
+
 }

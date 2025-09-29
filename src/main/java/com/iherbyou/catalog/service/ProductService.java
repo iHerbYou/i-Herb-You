@@ -3,6 +3,7 @@ package com.iherbyou.catalog.service;
 import com.iherbyou.catalog.dto.ProductDetailDto;
 import com.iherbyou.catalog.dto.ProductListDto;
 import com.iherbyou.catalog.entity.Product;
+import com.iherbyou.catalog.entity.ProductCategory;
 import com.iherbyou.catalog.entity.ProductVariant;
 import com.iherbyou.catalog.entity.Stock;
 import com.iherbyou.catalog.repository.ProductRepository;
@@ -13,13 +14,16 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +35,8 @@ public class ProductService {
     public Page<ProductListDto> getProducts(Pageable pageable,
                                             Boolean excludeSoldOut,
                                             Integer minPrice,
-                                            Integer maxPrice) {
+                                            Integer maxPrice,
+                                            Long categoryId) {
 
         if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
             throw new InvalidParameterException("minPrice은 maxPrice보다 클 수 없습니다.");
@@ -68,6 +73,15 @@ public class ProductService {
                 Join<Product, ProductVariant> variantJoin = root.join("productVariants", JoinType.INNER);
                 Join<ProductVariant, Stock> stockJoin = variantJoin.join("stock", JoinType.INNER);
                 return cb.greaterThan(stockJoin.get("amount"), 0);
+            });
+        }
+
+        // 카테고리 필터
+        if (categoryId != null) {
+            spec = spec.and((root, query, cb) -> {
+                query.distinct(true);
+                Join<Product, ProductCategory> pcJoin = root.join("productCategories", JoinType.INNER);
+                return cb.equal(pcJoin.get("category").get("id"), categoryId);
             });
         }
 
@@ -143,26 +157,19 @@ public class ProductService {
                 .build();
     }
 
-    @Transactional(readOnly = true)
-    public List<ProductDetailDto.VariantDTO> getProductVariants(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException(productId));
+    // 베스트셀러 상품 가져옴
+    public Page<ProductListDto> findBestsellers(Long categoryId, int size) {
+        Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "sales"));
 
-        return product.getProductVariants().stream()
-                .map(v -> ProductDetailDto.VariantDTO.builder()
-                        .id(v.getId())
-                        .variantName(v.getVariantName())
-                        .salePrice(v.getSalePrice())
-                        .stock(v.getStock() != null ? v.getStock().getAmount() : 0)
-                        .soldOut(v.getStock() == null || v.getStock().getAmount() <= 0)
-                        .upcCode(v.getUpcCode())
-                        .restockEta(v.getRestockEta())
-                        .restockSubscriptionEnabled(
-                                v.getRestockSubscriptions().stream()
-                                        .anyMatch(r -> Boolean.TRUE.equals(r.getIsActive()))
-                        )
-                        .build())
-                .toList();
+        Page<Product> products;
+
+        if (categoryId != null) {
+            products = productRepository.findByCategoryIdOrderBySalesDesc(categoryId, pageable);
+        } else {
+            products = productRepository.findAllOrderBySalesDesc(pageable);
+        }
+
+        return products.map(ProductListDto::fromEntity);
     }
 
 }

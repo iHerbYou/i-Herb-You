@@ -29,6 +29,7 @@ public class ProductController {
             @RequestParam(required = false) Boolean excludeSoldOut,
             @RequestParam(required = false) Integer minPrice,
             @RequestParam(required = false) Integer maxPrice,
+            @RequestParam(required = false) Long categoryId,
             @RequestParam(defaultValue = "id") String sort,
             @RequestParam(defaultValue = "desc") String direction) {
 
@@ -37,8 +38,7 @@ public class ProductController {
             throw new InvalidParameterException("page와 size는 1 이상의 값이어야 합니다.");
         }
 
-        // 정렬 direction 변환
-        // direction 유효성 검사
+        // direction 유효성 검사 및 변환
         Sort.Direction sortDirection;
         try {
             sortDirection = Sort.Direction.fromString(direction);
@@ -56,7 +56,7 @@ public class ProductController {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(sortDirection, sortField));
 
         // 페이징 + 필터 옵션 서비스로 전달
-        Page<ProductListDto> products = productService.getProducts(pageable, excludeSoldOut, minPrice, maxPrice);
+        Page<ProductListDto> products = productService.getProducts(pageable, excludeSoldOut, minPrice, maxPrice, categoryId);
 
         return ResponseEntity.ok(products);
     }
@@ -71,6 +71,7 @@ public class ProductController {
         };
     }
 
+    // 상품 상세 조회 API
     @GetMapping("/{id}")
     public ResponseEntity<ProductDetailDto> getProductDetail(@PathVariable Long id) {
         ProductDetailDto dto = productService.getProductDetail(id);
@@ -78,11 +79,14 @@ public class ProductController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/{id}/variants")
-    public ResponseEntity<List<ProductDetailDto.VariantDTO>> getProductVariants(@PathVariable Long id) {
-        List<ProductDetailDto.VariantDTO> variants = productService.getProductVariants(id);
+    // 메인 - 상품 베스트셀러 API
+    @GetMapping("/bestsellers")
+    public ResponseEntity<List<ProductListDto>> getBestsellers(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(defaultValue = "8") int size) {
 
-        return ResponseEntity.ok(variants);
+        Page<ProductListDto> bestsellers = productService.findBestsellers(categoryId, size);
+        return ResponseEntity.ok(bestsellers.getContent());
     }
 
 }
