@@ -3,5 +3,5 @@ package com.iherbyou.community.dto;
 public record ReviewSummary(
         long totalCount,
         double average,
-        long[] counts   // index 0~4 == 1~5점
+        long counts   // index 0~4 == 1~5점
 ) {}
