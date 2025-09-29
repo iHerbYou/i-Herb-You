@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -38,6 +35,13 @@ public class UserController {
     @PostMapping("/logout")
     public ResponseEntity<LogoutResponseDto> logout(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         LogoutResponseDto response = userService.logout(userPrincipal);
+        return ResponseEntity.ok(response);
+    }
+
+    // 현재 로그인한 사용자 정보 조회
+    @GetMapping("/me")
+    public ResponseEntity<UserInfoResponseDto> getCurrentUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        UserInfoResponseDto response = userService.getCurrentUser(userPrincipal);
         return ResponseEntity.ok(response);
     }
 

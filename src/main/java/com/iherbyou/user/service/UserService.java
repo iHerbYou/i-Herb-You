@@ -158,4 +158,17 @@ public class UserService {
                 .build();
     }
 
+    /**
+     * 현재 로그인한 사용자 정보 조회
+     */
+    public UserInfoResponseDto getCurrentUser(UserPrincipal userPrincipal) {
+        log.info("사용자 정보 조회: {}", userPrincipal.getEmail());
+
+        // DB에서 최신 사용자 정보 조회
+        User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        return UserInfoResponseDto.from(user);
+    }
+
 }
