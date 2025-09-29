@@ -25,6 +25,10 @@ public class GlobalExceptionHandler {
     }
 
     // ===================== 회원가입 / 로그인 관련 예외 =====================
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException e) {
+        return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
 
     @ExceptionHandler(DuplicateEmailException.class)
     public ResponseEntity<Map<String, Object>> handleDuplicateEmail(DuplicateEmailException e) {
@@ -100,4 +104,5 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleServerError(Exception e) {
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류 발생: " + e.getMessage());
     }
+
 }
