@@ -180,11 +180,6 @@ public class UserService {
     public ChangePasswordResponseDto changePassword(ChangePasswordRequestDto request, UserPrincipal userPrincipal) {
         log.info("비밀번호 변경 시도: {}", userPrincipal.getEmail());
 
-        // 새 비밀번호와 확인 비밀번호 일치
-        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            throw new IllegalArgumentException("새 비밀번호와 확인 비밀번호가 일치하지 않습니다");
-        }
-
         // 사용자 조회
         User user = userRepository.findById(userPrincipal.getId())
                 .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
@@ -196,7 +191,7 @@ public class UserService {
         }
 
         // 현재 비밀번호와 새 비밀번호가 일치하는지 확인
-        if (request.getCurrentPassword().equals(request.getConfirmPassword())) {
+        if (request.getCurrentPassword().equals(request.getNewPassword())) {
             throw new IllegalArgumentException("새 비밀번호는 현재 비밀번호와 달라야합니다.");
         }
 
