@@ -1,6 +1,7 @@
 package com.iherbyou.security;
 
 import com.iherbyou.security.filter.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -53,6 +54,15 @@ public class SecurityConfig {
                 // 세션 사용하지 않음 (JWT 사용하므로 STATELESS)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // 인증되지 않은 요청 처리
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                        })
+                )
 
                 // 엔드포인트 권한 (요청별 인가 설정)
                 .authorizeHttpRequests(auth -> auth

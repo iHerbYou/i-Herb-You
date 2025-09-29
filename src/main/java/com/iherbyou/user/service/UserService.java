@@ -135,7 +135,7 @@ public class UserService {
         // refresh token 유효성 검증
         if (!jwtUtil.validateRefreshToken(refreshToken)) {
             log.warn("토큰 갱신 실패 - 유효하지 않은 Refresh Token");
-            throw new InvalidTokenException("유호하지 않은 Refresh Token입니다.");
+            throw new InvalidTokenException("유효하지 않은 Refresh Token입니다.");
         }
 
         // Refresh Token에서 사용자 이메일 추출
