@@ -1,7 +1,10 @@
 package com.iherbyou.catalog.controller;
 
+import com.iherbyou.catalog.dto.CategoryFlatDto;
+import com.iherbyou.catalog.dto.ProductListDto;
 import com.iherbyou.catalog.entity.Category;
 import com.iherbyou.catalog.service.CategoryService;
+import com.iherbyou.catalog.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,21 +15,27 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/catalog/categories")
+@RequestMapping("/api/catalog/categories")
 @RequiredArgsConstructor
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final ProductService productService;
 
-    // 전체 카테고리 조회 (flat 리스트)
+    // 전체 카테고리 조회 (flat 리스트) - 관리/검색/필터링 용
     @GetMapping
-    public ResponseEntity<List<Category>> getAllCategories() {
-        return ResponseEntity.ok(categoryService.getAllCategories());
+    public ResponseEntity<List<CategoryFlatDto>> getAllCategoriesFlat() {
+        return ResponseEntity.ok(categoryService.getAllCategoriesFlat());
+    }
+
+    @GetMapping("/tree")    // 화면 표시용
+    public ResponseEntity<List<Category>> getCategoryTree() {
+        return ResponseEntity.ok(categoryService.getCategoryTree());
     }
 
     // 특정 카테고리 조회
     @GetMapping("/{id}")
-    public ResponseEntity<Category> getCategory(@PathVariable Long id) {
+    public ResponseEntity<CategoryFlatDto> getCategory(@PathVariable Long id) {
         return ResponseEntity.ok(categoryService.getCategory((id)));
     }
 
@@ -36,9 +45,10 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getSubCategories(id));
     }
 
-    @GetMapping("/tree")
-    public ResponseEntity<List<Category>> getCategoryTree() {
-        return ResponseEntity.ok(categoryService.getCategoryTree());
+    // 특정 카테고리의 상품 목록 조회
+    @GetMapping("/{id}/products")
+    public ResponseEntity<List<ProductListDto>> getProductsByCategory(@PathVariable Long id) {
+        return ResponseEntity.ok(categoryService.getProductsByCategory(id));
     }
 
 }
