@@ -9,7 +9,9 @@ spring:
 
   sql:
     init:
-      data-locations: classpath:code-data.sql
+      data-locations:
+        - classpath:code-data.sql
+        - classpath:category-data.sql
       #mode: never  # 임시로 비활성화
       mode: always
 
