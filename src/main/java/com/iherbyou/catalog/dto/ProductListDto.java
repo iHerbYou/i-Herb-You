@@ -71,9 +71,9 @@ public class ProductListDto {   // 목록에 노출되는 상품 정보 dto
                 .name(product.getName())
                 .brandName(product.getBrand().getName())
                 .thumbnailUrl(thumbnail)
-                .minPrice(product.getMinPrice())
-                .avgRating(product.getAvgRating())
-                .reviewCount(product.getReviewCount())
+                .minPrice(minPrice)  // 계산된 최저가 사용
+                .avgRating(avgRating)  // 계산된 평점 사용
+                .reviewCount(reviewCount)  // 계산된 리뷰수 사용
                 .sales(product.getSales())
                 .soldOut(soldOut)
                 .build();

@@ -1,10 +1,10 @@
 package com.iherbyou.catalog.controller;
 
 import com.iherbyou.catalog.dto.CategoryFlatDto;
+import com.iherbyou.catalog.dto.CategoryTreeDto;
 import com.iherbyou.catalog.dto.ProductListDto;
 import com.iherbyou.catalog.entity.Category;
 import com.iherbyou.catalog.service.CategoryService;
-import com.iherbyou.catalog.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,6 @@ import java.util.List;
 public class CategoryController {
 
     private final CategoryService categoryService;
-    private final ProductService productService;
 
     // 전체 카테고리 조회 (flat 리스트) - 관리/검색/필터링 용
     @GetMapping
@@ -29,7 +28,7 @@ public class CategoryController {
     }
 
     @GetMapping("/tree")    // 화면 표시용
-    public ResponseEntity<List<Category>> getCategoryTree() {
+    public ResponseEntity<List<CategoryTreeDto>> getCategoryTree() {
         return ResponseEntity.ok(categoryService.getCategoryTree());
     }
 
@@ -41,7 +40,7 @@ public class CategoryController {
 
     // 특정 카테고리의 하위 카테고리 조회
     @GetMapping("/{id}/subcategories")
-    public ResponseEntity<List<Category>> getSubCategories(@PathVariable Long id) {
+    public ResponseEntity<List<CategoryFlatDto>> getSubCategories(@PathVariable Long id) {
         return ResponseEntity.ok(categoryService.getSubCategories(id));
     }
 

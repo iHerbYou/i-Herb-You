@@ -30,42 +30,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            // 1. 요청 헤더에서 JWT 토큰 추출
             String jwt = getJwtFromRequest(request);
 
-            if (StringUtils.hasText(jwt) && jwtUtil.validateAccessToken(jwt)) {
-                // 2. 토큰에서 사용자 이메일 추출
-                String email = jwtUtil.getEmailFromToken(jwt);
+            if (StringUtils.hasText(jwt)) {
+                if (jwtUtil.validateAccessToken(jwt)) {
+                    // 유효한 토큰 - 인증 설정
+                    String email = jwtUtil.getEmailFromToken(jwt);
+                    UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
 
-                // 3. UserDetails 조회 (DB에서 사용자 정보 로드)
-                UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails, null, userDetails.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // 4. Authentication 객체 생성
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
-
-                // 5. 요청 세부 정보 설정
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                // 6. SecurityContext에 인증 정보 설정
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                log.debug("JWT 토큰으로 사용자 인증 완료: {} (URI: {})", email, request.getRequestURI());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    log.debug("JWT 토큰으로 사용자 인증 완료: {} (URI: {})", email, request.getRequestURI());
+                } else {
+                    // 만료되거나 유효하지 않은 토큰 - 명시적으로 SecurityContext 초기화
+                    log.debug("유효하지 않거나 만료된 토큰 (URI: {})", request.getRequestURI());
+                    SecurityContextHolder.clearContext();
+                }
             }
 
         } catch (Exception e) {
-            log.error("JWT 토큰 처리 중 오류 발생 (URI: {}): {}",
-                    request.getRequestURI(), e.getMessage());
-
-            // SecurityContext 초기화 (인증 실패)
+            log.error("JWT 토큰 처리 중 오류 발생 (URI: {}): {}", request.getRequestURI(), e.getMessage());
             SecurityContextHolder.clearContext();
         }
 
-        // 7. 다음 필터로 요청 전달
         filterChain.doFilter(request, response);
     }
 
