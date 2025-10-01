@@ -1,4 +1,4 @@
-package com.iherbyou.cart.dto;
+package com.iherbyou.wishlist.dto.response;
 
 import lombok.*;
 
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-// 위시 아이템 조회(목록, 단건 공통)
+// 위시리스트 아이템
 public class WishlistItemResponse {
     private Long itemId;
     private Long productId;

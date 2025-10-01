@@ -1,4 +1,4 @@
-package com.iherbyou.cart.dto;
+package com.iherbyou.wishlist.dto.response;
 
 import lombok.*;
 
@@ -9,7 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 // 위시리스트 조회
-public class WishlistPageResponse {
+public class WishlistResponse {
     private List<WishlistItemResponse> items;
     private int count;
 }

@@ -1,5 +1,6 @@
-package com.iherbyou.cart.dto;
+package com.iherbyou.wishlist.dto.request;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -16,5 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeleteItemsRequest {
+
+    @NotEmpty(message = "itemIds는 필수입니다.")
     private List<Long> itemIds;
 }

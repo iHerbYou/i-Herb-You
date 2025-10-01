@@ -73,6 +73,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/refresh").permitAll()
                         .requestMatchers("/api/codes/**").permitAll()
                         .requestMatchers("/api/catalog/**").permitAll()
+                        .requestMatchers("/api/wishlist/share/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
 
                         // 그 외 모든 요청은 인증 필요

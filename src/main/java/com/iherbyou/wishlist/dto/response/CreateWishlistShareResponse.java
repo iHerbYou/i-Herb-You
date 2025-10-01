@@ -1,4 +1,4 @@
-package com.iherbyou.cart.dto;
+package com.iherbyou.wishlist.dto.response;
 
 import lombok.*;
 
@@ -6,9 +6,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class CreateWishlistShareResponse {
-    private String shareId;
-    private String shortUrl;
+    private String shareId; // shareUrl의 뒷부분
+    private String shareUrl;
     private String expiresAt;
 }

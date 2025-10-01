@@ -1,9 +1,9 @@
-package com.iherbyou.cart.entity;
+package com.iherbyou.wishlist.entity;
 
 import com.iherbyou.catalog.entity.Product;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -11,12 +11,17 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Getter
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"wishlist_id", "product_id"})},
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"wishlist_id", "product_id"})
+        },
         indexes = {
-            @Index(name = "idx_wishlist_id", columnList = "wishlist_id"), @Index(name = "idx_product_id", columnList = "product_id")
-        })
+                @Index(name = "idx_wishlist_id", columnList = "wishlist_id"),
+                @Index(name = "idx_product_id", columnList = "product_id")
+        }
+)
 @Entity
-public class WishlistProduct { // WishList, Product의 중간 테이블
+public class WishlistProduct {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +35,7 @@ public class WishlistProduct { // WishList, Product의 중간 테이블
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @CreatedDate
+    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
 }
