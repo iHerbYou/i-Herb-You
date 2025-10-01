@@ -7,7 +7,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
@@ -15,5 +19,33 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     // N+1 문제 해결을 위한 EntityGraph 사용
     @EntityGraph(attributePaths = {"productVariants", "productVariants.stock", "productImgs", "reviews"})
     Page<Product> findAll(Specification<Product> spec, Pageable pageable);
+
+    // 카테고리 기반 상품 조회
+    @Query("SELECT pc.product " +
+            "FROM ProductCategory pc " +
+            "WHERE pc.category.id = :categoryId")
+    List<Product> findByCategoryId(@Param("categoryId") Long categoryId);
+
+    // 카테고리 기반 베스트셀러 조회
+    @Query("SELECT p " +
+            "FROM Product p " +
+            "JOIN p.productCategories pc " +
+            "WHERE pc.category.id = :categoryId " +
+            "ORDER BY p.sales DESC")
+    Page<Product> findByCategoryIdOrderBySalesDesc(@Param("categoryId") Long categoryId, Pageable pageable);
+
+    // 전체 베스트셀러 조회
+    @Query("SELECT p FROM Product p ORDER BY p.sales DESC")
+    Page<Product> findAllOrderBySalesDesc(Pageable pageable);
+
+    // 최근 출시된 상품 조회
+    @EntityGraph(attributePaths = {"brand", "productImgs", "reviews", "productVariants", "productVariants.stock"})
+    @Query("SELECT p FROM Product p ORDER BY p.saleStartDate DESC")
+    Page<Product> findAllOrderBySaleStartDateDesc(Pageable pageable);
+
+    // 높은 별점 순 (같으면 판매량 순) 조회
+    @EntityGraph(attributePaths = {"brand", "productImgs", "reviews", "productVariants", "productVariants.stock"})
+    @Query("SELECT p FROM Product p ORDER BY p.avgRating DESC, p.sales DESC")
+    Page<Product> findAllOrderByAvgRatingDesc(Pageable pageable);
 
 }

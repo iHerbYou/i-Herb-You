@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class PointHistory { // 포인트 이력 관리
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

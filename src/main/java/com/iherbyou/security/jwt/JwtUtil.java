@@ -16,72 +16,117 @@ public class JwtUtil {
     @Value("${jwt.secret:mySecretKeyForJWTTokenGenerationAndValidation1234567890}")
     private String jwtSecret;
 
-    @Value("${jwt.expiration:86400000}") // 24시간 (밀리초)
-    private Long jwtExpirationMs;
+    @Value("${jwt.access-token.expiration:1800000}") // 30분
+    private Long accessTokenExpiration;
+
+    @Value("${jwt.refresh-token.expiration:86400000}") // 24시간
+    private Long refreshTokenExpiration;
 
     // JWT 서명을 위한 SecretKey 생성
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    // JWT 토큰 생성 (email을 subject로 사용)
-    public String generateToken(String email) {
+    // Access Token 생성
+    public String generateAccessToken(String email) {
+        return generateToken(email, accessTokenExpiration, "access");
+    }
+
+    // Refresh Token 생성
+    public String generateRefreshToken(String email) {
+        return generateToken(email, refreshTokenExpiration, "refresh");
+    }
+
+    // 공통 토큰 생성 메서드
+    private String generateToken(String email, Long expirationMs, String tokenType) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
+        Date expiryDate = new Date((now.getTime() + expirationMs)); // 토큰 만료 날짜
 
         return Jwts.builder()
-                .subject(email) // 사용자 이메일을 subject로 설정
+                .subject(email)
+                .claim("type", tokenType) // 토큰 타입 구분
                 .issuedAt(now)
                 .expiration(expiryDate)
-                .signWith(getSigningKey()) // 알고리즘 자동 선택
+                .signWith(getSigningKey())
                 .compact();
     }
 
-    // JWT 토큰에서 이메일(사용자명) 추출
+    // 토큰에서 이메일 추출
     public String getEmailFromToken(String token) {
-        Claims claims = Jwts.parser() // 0.13.0에서는 parserBuilder → parser
-                .verifyWith(getSigningKey()) // 0.13.0 새로운 방식
-                .build()
-                .parseSignedClaims(token) // 0.13.0에서는 parseClaimsJws → parseSignedClaims
-                .getPayload(); // 0.13.0에서는 getBody → getPayload
-
+        Claims claims = getClaimsFromToken(token);
         return claims.getSubject();
     }
 
-    // JWT 토큰 유효성 검증
-    public boolean validateToken(String token) {
+    // 토큰 타입 확인
+    public String getTokenType(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return claims.get("type", String.class);
+    }
+
+    // 토큰에서 Claims 추출
+    private Claims getClaimsFromToken(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    // Access Token 유효성 검증
+    public boolean validateAccessToken(String token) {
+        return validateToken(token, "access");
+    }
+
+    // Refresh Token 유효성 검증
+    public boolean validateRefreshToken(String token) {
+        return validateToken(token, "refresh");
+    }
+
+    // 토큰 유효성 검증
+    public boolean validateToken(String token, String expectedType) {
         try {
-            Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(token);
+            Claims claims = getClaimsFromToken(token);
+            String tokenType = claims.get("type", String.class);
+
+            // 토큰 타입 확인
+            if (!expectedType.equals(tokenType)) {
+                log.error("Token type mismatch. Expected: {}, Actual: {}", expectedType, tokenType);
+                return false;
+            }
+
             return true;
-        } catch (SecurityException ex) {
-            log.error("Invalid JWT signature: {}", ex.getMessage());
-        } catch (MalformedJwtException ex) {
-            log.error("Invalid JWT token: {}", ex.getMessage());
-        } catch (ExpiredJwtException ex) {
-            log.error("Expired JWT token: {}", ex.getMessage());
-        } catch (UnsupportedJwtException ex) {
-            log.error("Unsupported JWT token: {}", ex.getMessage());
-        } catch (IllegalArgumentException ex) {
-            log.error("JWT claims string is empty: {}", ex.getMessage());
+        } catch (SecurityException e) {
+            log.error("Invalid JWT signature: {}", e.getMessage());
+        } catch (MalformedJwtException e) {
+            log.error("Invalid JWT token: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            log.error("Expired JWT token: {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            log.error("Unsupported JWT token: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.error("JWT claims string is empty: {}", e.getMessage());
         }
         return false;
     }
 
-    // JWT 토큰 만료 여부 확인
+    // 토큰 만료 여부 확인
     public boolean isTokenExpired(String token) {
         try {
-            Claims claims = Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-
+            Claims claims = getClaimsFromToken(token);
             return claims.getExpiration().before(new Date());
         } catch (Exception e) {
-            return true; // 파싱 오류 시 만료된 것으로 간주
+            return true;
         }
     }
+
+    // Access Token 만료 시간 반환 (초 단위)
+    public Long getAccessTokenExpirationInSeconds() {
+        return accessTokenExpiration / 1000;
+    }
+
+    // Refresh Token 만료 시간 반환 (초 단위)
+    public Long getRefreshTokenExpirationInSeconds() {
+        return refreshTokenExpiration / 1000;
+    }
+
 }
