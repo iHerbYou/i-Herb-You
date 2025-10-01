@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.time.format.DateTimeFormatter;
 
+// ⬇️ 추가
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.iherbyou.security.auth.UserPrincipal;
+
 @RestController
 @RequestMapping("/api/review-reports")
 @RequiredArgsConstructor
@@ -23,10 +27,11 @@ public class ReviewReportController {
     // 신고 접수: 201 + Location (요청은 reasonCodeId 사용 중)
     @PostMapping
     public ResponseEntity<ReviewReportProduct> report(
-            @RequestHeader("X-USER-ID") Long userId,
+            @AuthenticationPrincipal UserPrincipal me,   // ✅ 헤더 대신 인증 주입
             @RequestBody ReviewReportCreateRequest req
     ) {
-        ReviewReport saved = reportService.createReport(userId, req.reviewId(), req.reasonCodeId());
+        ReviewReport saved = reportService.createReport(me.getId(), req.reviewId(), req.reasonCodeId());
+
         ReviewReportProduct res = new ReviewReportProduct(
                 saved.getId(),
                 saved.getReview().getId(),
@@ -37,6 +42,7 @@ public class ReviewReportController {
         return ResponseEntity.created(URI.create("/api/review-reports/" + saved.getId())).body(res);
     }
 
+    // (공개) 리뷰별 신고 목록
     @GetMapping
     public ResponseEntity<Page<ReviewReport>> list(
             @RequestParam Long reviewId,

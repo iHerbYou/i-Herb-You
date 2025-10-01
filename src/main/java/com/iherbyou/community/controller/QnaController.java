@@ -8,10 +8,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;   // ✅
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.time.format.DateTimeFormatter;
+
+import com.iherbyou.security.auth.UserPrincipal;
 
 @RestController
 @RequestMapping("/api/qna")
@@ -24,10 +27,10 @@ public class QnaController {
     // 질문 등록: 201 + Location, answers 제외
     @PostMapping("/questions")
     public ResponseEntity<QnaQuestionCreated> createQuestion(
-            @RequestHeader("X-USER-ID") Long userId,
+            @AuthenticationPrincipal UserPrincipal me,
             @RequestBody QnaQuestionCreateRequest req
     ) {
-        QnaQuestion saved = qnaService.createQuestion(userId, req.productId(), req.title(), req.content());
+        QnaQuestion saved = qnaService.createQuestion(me.getId(), req.productId(), req.title(), req.content());
 
         QnaQuestionCreated body = new QnaQuestionCreated(
                 saved.getId(),
@@ -75,10 +78,10 @@ public class QnaController {
     // 내가 쓴 질문 목록: answers=null로 축소
     @GetMapping("/my")
     public ResponseEntity<Page<QnaQuestionProduct>> myQuestions(
-            @RequestHeader("X-USER-ID") Long userId,
+            @AuthenticationPrincipal UserPrincipal me,
             Pageable pageable
     ) {
-        Page<QnaQuestion> page = qnaService.listMyQuestions(userId, pageable);
+        Page<QnaQuestion> page = qnaService.listMyQuestions(me.getId(), pageable);
         Page<QnaQuestionProduct> body = page.map(q -> new QnaQuestionProduct(
                 q.getId(),
                 q.getProduct().getId(),
@@ -92,13 +95,13 @@ public class QnaController {
         return ResponseEntity.ok(body);
     }
 
-    // 답변 등록: 201 + Location (isAdmin 헤더 제거)
+    // 답변 등록: 201 + Location
     @PostMapping("/answers")
     public ResponseEntity<QnaAnswerProduct> createAnswer(
-            @RequestHeader("X-USER-ID") Long actorId,
+            @AuthenticationPrincipal UserPrincipal me,
             @RequestBody QnaAnswerCreateRequest req
     ) {
-        QnaAnswer saved = qnaService.createAnswer(actorId, req.questionId(), req.content());
+        QnaAnswer saved = qnaService.createAnswer(me.getId(), req.questionId(), req.content());
         QnaAnswerProduct res = new QnaAnswerProduct(
                 saved.getId(),
                 saved.getUser().getId(),
@@ -108,13 +111,13 @@ public class QnaController {
         return ResponseEntity.created(URI.create("/api/qna/answers/" + saved.getId())).body(res);
     }
 
-    // 답변 삭제: 204 (isAdmin 헤더 제거)
+    // 답변 삭제: 204
     @DeleteMapping("/answers/{answerId}")
     public ResponseEntity<Void> deleteAnswer(
-            @RequestHeader("X-USER-ID") Long actorId,
+            @AuthenticationPrincipal UserPrincipal me,
             @PathVariable Long answerId
     ) {
-        qnaService.deleteAnswer(actorId, answerId);
+        qnaService.deleteAnswer(me.getId(), answerId);
         return ResponseEntity.noContent().build();
     }
 }

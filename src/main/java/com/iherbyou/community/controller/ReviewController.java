@@ -3,10 +3,12 @@ package com.iherbyou.community.controller;
 import com.iherbyou.community.dto.*;
 import com.iherbyou.community.entity.Review;
 import com.iherbyou.community.service.ReviewService;
+import com.iherbyou.security.auth.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -27,10 +29,16 @@ public class ReviewController {
     // 리뷰 등록: 201 + Location
     @PostMapping
     public ResponseEntity<ReviewProduct> createReview(
-            @RequestHeader("X-USER-ID") Long userId,
+            @AuthenticationPrincipal UserPrincipal me,
             @RequestBody ReviewCreateRequest req
     ) {
-        Review saved = reviewService.createReview(userId, req.productId(), req.rating(), req.text());
+        Review saved = reviewService.createReview(
+                me.getId(),              // UserPrincipal에서 ID 추출
+                req.productId(),
+                req.rating(),
+                req.text()
+        );
+
         ReviewProduct res = new ReviewProduct(
                 saved.getId(),
                 saved.getRating(),
@@ -38,8 +46,11 @@ public class ReviewController {
                 saved.getUser().getName(),
                 saved.getCreatedAt().format(ISO)
         );
-        return ResponseEntity.created(URI.create("/api/reviews/" + saved.getId())).body(res);
+
+        return ResponseEntity.created(URI.create("/api/reviews/" + saved.getId()))
+                .body(res);
     }
+
 
     // 상품별 리뷰 목록
     @GetMapping
