@@ -108,7 +108,7 @@ public class WishlistService {
     // ========== Private Helper Methods ==========
 
     private Wishlist getOrCreateWishlist(Long userId) {
-        return wishlistRepository.findByUserId(userId)
+        return wishlistRepository.findByUserIdWithProducts(userId)
                 .orElseGet(() -> createNewWishlist(userId));
     }
 
