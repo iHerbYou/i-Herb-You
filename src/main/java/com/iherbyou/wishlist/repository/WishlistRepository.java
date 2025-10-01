@@ -13,18 +13,11 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
      * N+1 문제 방지를 위한 fetch join
      */
     @Query("""
-            SELECT DISTINCT w 
+            SELECT w 
             FROM Wishlist w 
             LEFT JOIN FETCH w.wishlistProducts wp 
             LEFT JOIN FETCH wp.product p
-            LEFT JOIN FETCH p.productImgs
             WHERE w.user.id = :userId
             """)
     Optional<Wishlist> findByUserIdWithProducts(Long userId);
-
-    /**
-     * userId로 위시리스트 조회 (상품 정보 없이)
-     */
-    @Query("SELECT w FROM Wishlist w WHERE w.user.id = :userId")
-    Optional<Wishlist> findByUserId(Long userId);
 }
