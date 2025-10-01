@@ -2,7 +2,8 @@ package com.iherbyou.wishlist.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 
@@ -11,6 +12,7 @@ import java.time.Instant;
  * 공유 링크 생성 시점의 위시리스트 스냅샷을 저장
  * 위시리스트가 변경되어도 공유되는 위시리스트는 변경되지 않음
  */
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -33,7 +35,7 @@ public class WishlistShare {
     @Column(nullable = false)
     private Long userId; // 공유를 생성한 사용자
 
-    @CreationTimestamp
+    @CreatedDate
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
