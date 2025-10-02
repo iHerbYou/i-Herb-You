@@ -33,7 +33,7 @@ public class ReviewController {
             @RequestBody ReviewCreateRequest req
     ) {
         Review saved = reviewService.createReview(
-                me.getId(),              // UserPrincipal에서 ID 추출
+                me.getId(),
                 req.productId(),
                 req.rating(),
                 req.text()

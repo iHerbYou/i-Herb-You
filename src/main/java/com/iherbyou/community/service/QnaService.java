@@ -26,7 +26,7 @@ public class QnaService {
 
     private final QnaQuestionRepository questionRepo;
     private final QnaAnswerRepository answerRepo;
-    private final CodeService codeService; // ✅ 서버에서 권한 판별용
+    private final CodeService codeService;
 
     @PersistenceContext
     private EntityManager em;
@@ -147,5 +147,13 @@ public class QnaService {
         if (v.isEmpty()) throw new IllegalArgumentException(emptyMsg);
         if (v.length() > max) throw new IllegalArgumentException("길이가 너무 깁니다.");
         return v;
+    }
+
+    // 질문 상태 변경 (관리자에서 호출)
+    @Transactional
+    public void changeQuestionStatus(Long questionId, Integer statusCodeValue) {
+        // value 자체를 statusCodeId로 쓰는 구조라면 그대로 사용
+        int updated = questionRepo.updateStatus(questionId, statusCodeValue);
+        if (updated == 0) throw new IllegalStateException("질문 상태 변경에 실패했습니다.");
     }
 }
