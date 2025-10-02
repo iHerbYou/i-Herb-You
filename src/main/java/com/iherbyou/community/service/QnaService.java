@@ -84,7 +84,7 @@ public class QnaService {
         QnaQuestion q = questionRepo.findById(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("질문을 찾을 수 없습니다."));
 
-        // ✅ User/Code 엔티티 변경 없이 role value만 JPQL로 바로 조회
+        //  User/Code 엔티티 변경 없이 role value만 JPQL로 바로 조회
         Integer roleValue = em.createQuery(
                         "select rc.value from User u join u.roleCode rc where u.id = :uid", Integer.class)
                 .setParameter("uid", actorId)
@@ -135,10 +135,11 @@ public class QnaService {
         return answerRepo.findByQnaQuestion_IdOrderByCreatedAtAsc(questionId);
     }
 
-    // count
-    @Transactional(readOnly = true)
-    public long countAnswers(Long questionId) {
-        return answerRepo.countByQnaQuestion_Id(questionId);
+    // 질문 상태 변경 (관리자에서 호출)
+    @Transactional
+    public void changeQuestionStatus(Long questionId, Integer statusCodeValue) {
+        int updated = questionRepo.updateStatus(questionId, statusCodeValue);
+        if (updated == 0) throw new IllegalStateException("질문 상태 변경에 실패했습니다.");
     }
 
     private static String requireText(String src, int max, String emptyMsg) {
@@ -149,11 +150,4 @@ public class QnaService {
         return v;
     }
 
-    // 질문 상태 변경 (관리자에서 호출)
-    @Transactional
-    public void changeQuestionStatus(Long questionId, Integer statusCodeValue) {
-        // value 자체를 statusCodeId로 쓰는 구조라면 그대로 사용
-        int updated = questionRepo.updateStatus(questionId, statusCodeValue);
-        if (updated == 0) throw new IllegalStateException("질문 상태 변경에 실패했습니다.");
-    }
 }
