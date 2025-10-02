@@ -2,6 +2,7 @@ package com.iherbyou.exception;
 
 import com.iherbyou.exception.catalog.*;
 import com.iherbyou.exception.user.*;
+import com.iherbyou.exception.wishlist.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -96,6 +97,28 @@ public class GlobalExceptionHandler {
         errorResponse.put("code", "NOT_FOUND");
         errorResponse.put("error", "존재하지 않는 상품입니다.");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+
+    // ===================== 위시리스트 관련 예외 =====================
+
+    @ExceptionHandler(WishlistException.class)
+    public ResponseEntity<Map<String, Object>> handleWishlistException(WishlistException e) {
+        HttpStatus status = determineHttpStatus(e.getCode());
+
+        return ResponseEntity.status(status)
+                .body(Map.of("code", e.getCode(), "error", e.getMessage()));
+    }
+
+    /**
+     * 위시리스트 예외 코드에 따른 HTTP 상태 코드 결정
+     */
+    private HttpStatus determineHttpStatus(String code) {
+        return switch (code) {
+            case "WISHLIST_NOT_FOUND", "WISHLIST_ITEM_NOT_FOUND" -> HttpStatus.NOT_FOUND;
+            case "WISHLIST_FULL" -> HttpStatus.BAD_REQUEST;
+            default -> HttpStatus.INTERNAL_SERVER_ERROR;
+        };
     }
 
 
