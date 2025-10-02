@@ -8,18 +8,23 @@ import lombok.*;
 @Builder
 @Getter
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_sort_order", columnList = "sortOrder"),
+        @Index(name = "idx_banner_name", columnList = "bannerName"),
+        @Index(name = "idx_image_url", columnList = "imageUrl")
+})
 public class Banner {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 광고 id
+    private Long id;
 
-    @Column(length = 50)
-    private String bannerName; // 광고명
+    @Column(length = 50, nullable = false)
+    private String bannerName;
 
-    @Column
-    private String imageUrl; // 이미지 url
+    @Column(nullable = false)
+    private String imageUrl;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private Integer sortOrder;
 }

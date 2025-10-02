@@ -14,5 +14,4 @@ public class AddBannerResponse {
     private String bannerName;
     private String imageUrl;
     private Integer sortOrder;
-    private String message;
 }
