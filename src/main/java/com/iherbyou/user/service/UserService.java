@@ -1,0 +1,205 @@
+package com.iherbyou.user.service;
+
+import com.iherbyou.common.code.entity.Code;
+import com.iherbyou.common.code.service.CodeService;
+import com.iherbyou.exception.user.*;
+import com.iherbyou.security.auth.UserPrincipal;
+import com.iherbyou.security.jwt.JwtUtil;
+import com.iherbyou.user.dto.*;
+import com.iherbyou.user.entity.User;
+import com.iherbyou.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Slf4j
+@RequiredArgsConstructor
+@Service
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final CodeService codeService;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil; // JWT Utility 추가
+
+    /**
+     * 회원가입 (SignUp)
+     */
+    @Transactional
+    public SignUpResponseDto signUp(SignUpRequestDto request) {
+        log.info("signUp requestDto: {}", request.getEmail());
+
+        // 중복 email 확인
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new DuplicateEmailException("이미 사용 중인 이메일입니다: " + request.getEmail());
+        }
+
+        // 전화번호 중복 확인 (전화번호가 있는 경우)
+        if (request.getPhoneNumber() != null && !request.getPhoneNumber().trim().isEmpty()
+                && userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+            throw new DuplicatePhoneNumberException("이미 사용 중인 전화번호입니다:" + request.getPhoneNumber());
+        }
+
+        // 기본 사용자 권한 조회 (그룹 70, 코드 701 = USER) -> DB에 필수 기준 데이터가 있는지 확인하는 안전장치
+        Code defaultUserRole = codeService.getDefaultUserRole();
+        if (defaultUserRole == null) {
+            throw new IllegalStateException("기본 사용자 권한을 찾을 수 없습니다");
+        }
+
+        // 기본 사용자 상태 조회 (그룹 71, 코드 712 = ACTIVE) -> DB에 필수 기준 데이터가 있는지 확인하는 안전장치
+        Code defaultUserStatus = codeService.getDefaultActiveStatus();
+        if (defaultUserStatus == null) {
+            throw new IllegalStateException("기본 사용자 상태를 찾을 수 없습니다");
+        }
+
+        // User 엔티티 생성
+        User user = User.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .name(request.getName())
+                .phoneNumber(request.getPhoneNumber())
+                .roleCode(defaultUserRole)
+                .statusCode(defaultUserStatus)
+                .build();
+
+        // 저장
+        User savedUser = userRepository.save(user);
+
+        log.info("회원가입 성공: {} (ID: {}) - 권한: {}, 상태: {}",
+                savedUser.getEmail(), savedUser.getId(),
+                savedUser.getRoleName(), savedUser.getStatusName());
+
+        // 반환
+        return SignUpResponseDto.builder()
+                .email(savedUser.getEmail())
+                .message("회원가입이 완료되었습니다. 로그인 해주세요.")
+                .build();
+    }
+
+    /**
+     * 로그인 (Login) - JWT 토큰 생성해서 반환
+     */
+    @Transactional(readOnly = true)
+    public LoginResponseDto login(LoginRequestDto request) {
+        log.info("로그인 시도: {}", request.getEmail());
+
+        // 활성 사용자만 조회
+        User user = userRepository.findActiveUserByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없거나 비활성 상태입니다"));
+
+        // 암호화된 비밀번호 검증
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            log.warn("로그인 실패 - 비밀번호 불일치: {}", request.getEmail());
+            throw new InvalidPasswordException("비밀번호가 올바르지 않습니다");
+        }
+
+        // JWT 토큰 생성
+        String accessToken = jwtUtil.generateAccessToken(user.getEmail());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
+
+        // 로그인 성공
+        log.info("로그인 성공: {} (id: {}) - jwt token 생성 완료", user.getEmail(), user.getId());
+
+        return LoginResponseDto.builder()
+                .email(user.getEmail())
+                .name(user.getName())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .accessTokenExpiresIn(jwtUtil.getAccessTokenExpirationInSeconds()) // 초 단위로 변환
+                .refreshTokenExpiresIn(jwtUtil.getRefreshTokenExpirationInSeconds())
+                .message("로그인 성공")
+                .build();
+    }
+
+    /**
+     * 로그아웃 (Logout)
+     */
+    public LogoutResponseDto logout(UserPrincipal userPrincipal) {
+        log.info("logout request: {} (id: {}", userPrincipal.getEmail(), userPrincipal.getId());
+        // 서버에서는 별도 처리 없이 응답만 반환 -> client 에서 토큰을 제거해야함
+        log.info("로그아웃 완료: {}", userPrincipal.getEmail());
+        return LogoutResponseDto.success();
+    }
+
+    /**
+     * 토큰 갱신 (Refresh token 으로 새로운 Access Token 발급)
+     */
+    @Transactional(readOnly = true)
+    public RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto request) {
+        String refreshToken = request.getRefreshToken();
+        log.info("토큰 갱신 요청 - Refresh Token: {}...", refreshToken.substring(0, 20));
+
+        // refresh token 유효성 검증
+        if (!jwtUtil.validateRefreshToken(refreshToken)) {
+            log.warn("토큰 갱신 실패 - 유효하지 않은 Refresh Token");
+            throw new InvalidTokenException("유효하지 않은 Refresh Token입니다.");
+        }
+
+        // Refresh Token에서 사용자 이메일 추출
+        String userEmail = jwtUtil.getEmailFromToken(refreshToken);
+
+        // 활성 사용자 확인
+        User user = userRepository.findActiveUserByEmail(userEmail)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없거나 비활성 상태입니다."));
+
+        // 새로운 토큰들 생성, 반환
+        String newAccessToken = jwtUtil.generateAccessToken(user.getEmail());
+        String newRefreshToken = jwtUtil.generateRefreshToken(user.getEmail());
+
+        return RefreshTokenResponseDto.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .tokenType("Bearer")
+                .accessTokenExpiresIn(jwtUtil.getAccessTokenExpirationInSeconds())
+                .refreshTokenExpiresIn(jwtUtil.getRefreshTokenExpirationInSeconds())
+                .message("토큰 갱신 성공")
+                .build();
+    }
+
+    /**
+     * 현재 로그인한 사용자 정보 조회
+     */
+    @Transactional(readOnly = true)
+    public UserInfoResponseDto getCurrentUser(UserPrincipal userPrincipal) {
+        log.info("사용자 정보 조회: {}", userPrincipal.getEmail());
+
+        // DB에서 최신 사용자 정보 조회
+        User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        return UserInfoResponseDto.from(user);
+    }
+
+    /**
+     * 비밀번호 변경 (Change Password)
+     */
+    @Transactional
+    public ChangePasswordResponseDto changePassword(ChangePasswordRequestDto request, UserPrincipal userPrincipal) {
+        log.info("비밀번호 변경 시도: {}", userPrincipal.getEmail());
+
+        // 사용자 조회
+        User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        // 사용자의 비밀번호 확인
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            log.warn("비밀번호 변경 실패 - 현재 비밀번호 불일치: {}", userPrincipal.getEmail());
+            throw new InvalidPasswordException("비밀번호가 틀렸습니다.");
+        }
+
+        // 현재 비밀번호와 새 비밀번호가 일치하는지 확인
+        if (request.getCurrentPassword().equals(request.getNewPassword())) {
+            throw new IllegalArgumentException("새 비밀번호는 현재 비밀번호와 달라야합니다.");
+        }
+
+        // 비밀번호 변경
+        user.changePassword(passwordEncoder.encode(request.getNewPassword()));
+        log.info("비밀번호 변경 성공: {}", userPrincipal.getEmail());
+
+        return ChangePasswordResponseDto.success();
+    }
+
+}

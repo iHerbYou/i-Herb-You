@@ -7,9 +7,19 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  sql:
+    init:
+      data-locations:
+        - classpath:code-data.sql
+        - classpath:category-data.sql
+        - classpath:product-dummy.sql
+      #mode: never  # 임시로 비활성화
+      mode: always
+
   jpa:
+    defer-datasource-initialization: true  # JPA 테이블 생성 후 데이터 삽입
     hibernate:
-      ddl-auto: update   # 개발 단계: update (운영시 validate 또는 none 권장)
+      ddl-auto: create  # 개발 단계: update (운영시 validate 또는 none 권장)
     properties:
       hibernate:
         format_sql: true
@@ -20,7 +30,20 @@ spring:
     ansi:
       enabled: always
 
+springdoc:
+  api-docs:
+    enabled: true
+  packages-to-scan: com.iherbyou           # 루트 패키지로 넓게
+  paths-to-match: /**                      # 전체 허용
+
 logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace   # Spring Boot 3.x에서 바인딩 값 로그 찍기
+
+jwt:
+  secret: your-very-secure-secret-key-here-make-it-long-and-random
+  access-token:
+    expiration: 1800000    # 30분 (30분 * 60초 * 1000ms)
+  refresh-token:
+    expiration: 86400000   # 24시간 (24시간 * 60분 * 60초 * 1000ms)
