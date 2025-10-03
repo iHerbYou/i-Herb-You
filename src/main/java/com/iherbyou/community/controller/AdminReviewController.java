@@ -7,12 +7,13 @@ import com.iherbyou.security.auth.UserPrincipal;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/admin/reviews")
@@ -25,17 +26,36 @@ public class AdminReviewController {
     @PersistenceContext
     private EntityManager em;
 
-    // 상품 기준 리뷰 목록 (관리자)
+    private static final Set<String> ALLOWED_SORTS = Set.of("createdAt", "id", "rating");
+
+    // 상품 기준 리뷰 목록 (관리자) - Pageable 제거
     @GetMapping
     public Page<Review> listByProduct(
             @AuthenticationPrincipal UserPrincipal me,
             @RequestParam Long productId,
-            Pageable pageable
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sort
     ) {
         ensureAdmin(me);
+        Pageable pageable = buildPageable(page, size, sort, ALLOWED_SORTS);
         return reviewService.listByProduct(productId, pageable);
     }
 
+    private Pageable buildPageable(int page, int size, String sortParam, Set<String> allowedSorts) {
+        int p = Math.max(0, page);
+        int s = Math.max(1, size);
+
+        String[] sp = sortParam.split(",", 2);
+        String prop = sp[0];
+        String dirStr = sp.length > 1 ? sp[1] : "desc";
+        Sort.Direction dir = "asc".equalsIgnoreCase(dirStr) ? Sort.Direction.ASC : Sort.Direction.DESC;
+
+        String safeProp = allowedSorts.contains(prop) ? prop : "createdAt";
+        return PageRequest.of(p, s, Sort.by(dir, safeProp));
+    }
+
+    // 관리자 권한 확인
     private void ensureAdmin(UserPrincipal me) {
         if (me != null && me.getAuthorities() != null) {
             boolean hasAdmin = me.getAuthorities().stream()

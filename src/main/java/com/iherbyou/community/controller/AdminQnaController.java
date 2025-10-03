@@ -9,8 +9,7 @@ import com.iherbyou.security.auth.UserPrincipal;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,7 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/admin/qna")
@@ -31,26 +30,22 @@ public class AdminQnaController {
     @PersistenceContext
     private EntityManager em;
 
-    // 상품별 질문 목록 (statusValue 필터 가능)
+    // 정렬 허용 컬럼(엔티티 필드명 기준)
+    private static final Set<String> ALLOWED_SORTS = Set.of("createdAt", "id", "statusCodeId");
+
+    // 상품별 질문 목록 (statusValue 필터 가능) - Pageable 제거
     @GetMapping("/questions")
     public Page<QnaQuestion> listQuestions(
             @AuthenticationPrincipal UserPrincipal me,
             @RequestParam Long productId,
             @RequestParam(required = false, name = "statusValue") Integer statusValue,
-            Pageable pageable
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sort
     ) {
         ensureAdmin(me);
+        Pageable pageable = buildPageable(page, size, sort, ALLOWED_SORTS);
         return qnaService.listByProduct(productId, statusValue, pageable);
-    }
-
-    // 특정 질문의 답변 목록
-    @GetMapping("/questions/{questionId}/answers")
-    public List<QnaAnswer> listAnswers(
-            @AuthenticationPrincipal UserPrincipal me,
-            @PathVariable Long questionId
-    ) {
-        ensureAdmin(me);
-        return qnaService.listAnswers(questionId);
     }
 
     // 답변 등록 (관리자)
@@ -75,7 +70,21 @@ public class AdminQnaController {
         return ResponseEntity.noContent().build();
     }
 
-    // === 내부 유틸: 관리자 권한 확인 (토큰 권한 → DB 폴백) ===
+    // ===== 공통: page/size/sort 처리 (화이트리스트 적용) =====
+    private Pageable buildPageable(int page, int size, String sortParam, Set<String> allowedSorts) {
+        int p = Math.max(0, page);
+        int s = Math.max(1, size);
+
+        String[] sp = sortParam.split(",", 2);
+        String prop = sp[0];
+        String dirStr = sp.length > 1 ? sp[1] : "desc";
+        Sort.Direction dir = "asc".equalsIgnoreCase(dirStr) ? Sort.Direction.ASC : Sort.Direction.DESC;
+
+        String safeProp = allowedSorts.contains(prop) ? prop : "createdAt";
+        return PageRequest.of(p, s, Sort.by(dir, safeProp));
+    }
+
+    // 관리자 권한 확인
     private void ensureAdmin(UserPrincipal me) {
         if (me != null && me.getAuthorities() != null) {
             boolean hasAdmin = me.getAuthorities().stream()

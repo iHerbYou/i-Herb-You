@@ -7,12 +7,13 @@ import com.iherbyou.security.auth.UserPrincipal;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/admin/review-reports")
@@ -25,18 +26,23 @@ public class AdminReviewReportController {
     @PersistenceContext
     private EntityManager em;
 
+    private static final Set<String> ALLOWED_SORTS = Set.of("createdAt", "id", "statusCode.id");
+
     // 특정 리뷰의 신고 목록 (관리자)
     @GetMapping
     public Page<ReviewReport> list(
             @AuthenticationPrincipal UserPrincipal me,
             @RequestParam Long reviewId,
-            Pageable pageable
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sort
     ) {
         ensureAdmin(me);
+        Pageable pageable = buildPageable(page, size, sort, ALLOWED_SORTS);
         return reportService.listByReview(reviewId, pageable);
     }
 
-    // 신고 상태 변경 (관리자)
+    // 신고 상태 변경 (관리자) — value로 통일
     @PatchMapping("/{reportId}/status")
     public void changeStatus(
             @AuthenticationPrincipal UserPrincipal me,
@@ -44,14 +50,29 @@ public class AdminReviewReportController {
             @RequestBody ChangeStatusRequest req
     ) {
         ensureAdmin(me);
-        // 서비스 시그니처: (adminId, isAdmin, reportId, newStatusCodeId)
-        reportService.changeStatus(me.getId(), true, reportId, req.newStatusCodeId());
+        reportService.changeStatus(me.getId(), true, reportId, req.newStatusValue());
     }
 
-    public record ChangeStatusRequest(Integer newStatusCodeId) {}
+    // value로 받도록 변경
+    public record ChangeStatusRequest(Integer newStatusValue) {}
+
+    private Pageable buildPageable(int page, int size, String sortParam, Set<String> allowedSorts) {
+        int p = Math.max(0, page);
+        int s = Math.max(1, size);
+
+        String[] sp = sortParam.split(",", 2);
+        String prop = sp[0];
+        String dirStr = sp.length > 1 ? sp[1] : "desc";
+        Sort.Direction dir = "asc".equalsIgnoreCase(dirStr) ? Sort.Direction.ASC : Sort.Direction.DESC;
+
+        String safeProp = allowedSorts.contains(prop) ? prop : "createdAt";
+        return PageRequest.of(p, s, Sort.by(dir, safeProp));
+    }
 
     private void ensureAdmin(UserPrincipal me) {
-        if (me != null && me.getAuthorities() != null) {
+        if (me == null) throw new AccessDeniedException("FORBIDDEN");
+
+        if (me.getAuthorities() != null) {
             boolean hasAdmin = me.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .anyMatch(a -> "ROLE_ADMIN".equals(a) || a.endsWith(":ADMIN") || a.contains("ADMIN"));
@@ -59,7 +80,7 @@ public class AdminReviewReportController {
         }
 
         Integer roleValue = em.createQuery(
-                        "select rc.value from User u left join u.roleCode rc where u.id = :uid",
+                        "select rc.value from com.iherbyou.user.entity.User u left join u.roleCode rc where u.id = :uid",
                         Integer.class
                 )
                 .setParameter("uid", me.getId())

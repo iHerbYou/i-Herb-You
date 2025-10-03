@@ -1,11 +1,19 @@
 package com.iherbyou.community.controller;
 
-import com.iherbyou.community.dto.*;
+import com.iherbyou.community.dto.QnaAnswerCreateRequest;
+import com.iherbyou.community.dto.QnaAnswerProduct;
+import com.iherbyou.community.dto.QnaQuestionCreateRequest;
+import com.iherbyou.community.dto.QnaQuestionCreated;
+import com.iherbyou.community.dto.QnaQuestionProduct;
 import com.iherbyou.community.entity.QnaAnswer;
 import com.iherbyou.community.entity.QnaQuestion;
 import com.iherbyou.community.service.QnaService;
+import com.iherbyou.security.auth.UserPrincipal;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -14,17 +22,16 @@ import java.net.URI;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import com.iherbyou.security.auth.UserPrincipal;
-
 @RestController
-@RequestMapping("/api/qna")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class QnaController {
 
     private final QnaService qnaService;
     private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-    @PostMapping("/questions")
+    // 질문 등록: POST /api/qna
+    @PostMapping("/qna")
     public ResponseEntity<QnaQuestionCreated> createQuestion(
             @AuthenticationPrincipal UserPrincipal me,
             @RequestBody QnaQuestionCreateRequest req
@@ -41,12 +48,12 @@ public class QnaController {
                 "질문이 등록되었습니다."
         );
 
-        URI location = URI.create("/api/qna/questions/" + saved.getId());
+        URI location = URI.create("/api/qna/" + saved.getId());
         return ResponseEntity.created(location).body(body);
     }
 
-    // 상품별 질문 목록: statusValue(=101/102/103) 필터 + 쿼리파라미터 페이징
-    @GetMapping("/questions")
+    // 상품별 질문 목록: GET /api/qna?productId=&statusValue=&page=&size=&sort=
+    @GetMapping("/qna")
     public ResponseEntity<Page<QnaQuestionProduct>> listByProduct(
             @RequestParam Long productId,
             @RequestParam(required = false, name = "statusValue") Integer statusValue,
@@ -77,8 +84,8 @@ public class QnaController {
         return ResponseEntity.ok(body);
     }
 
-    // 내가 쓴 질문 목록: answers=null로 축소 + 쿼리파라미터 페이징
-    @GetMapping("/my")
+    // 내 질문 목록: GET /api/my-qna?page=&size=&sort=
+    @GetMapping("/my-qna")
     public ResponseEntity<Page<QnaQuestionProduct>> myQuestions(
             @AuthenticationPrincipal UserPrincipal me,
             @RequestParam(defaultValue = "0") int page,
@@ -101,7 +108,8 @@ public class QnaController {
         return ResponseEntity.ok(body);
     }
 
-    @PostMapping("/answers")
+    // 답변 등록: POST /api/qna/answers
+    @PostMapping("/qna/answers")
     public ResponseEntity<QnaAnswerProduct> createAnswer(
             @AuthenticationPrincipal UserPrincipal me,
             @RequestBody QnaAnswerCreateRequest req
@@ -116,7 +124,8 @@ public class QnaController {
         return ResponseEntity.created(URI.create("/api/qna/answers/" + saved.getId())).body(res);
     }
 
-    @DeleteMapping("/answers/{answerId}")
+    // 답변 삭제: DELETE /api/qna/answers/{answerId}
+    @DeleteMapping("/qna/answers/{answerId}")
     public ResponseEntity<Void> deleteAnswer(
             @AuthenticationPrincipal UserPrincipal me,
             @PathVariable Long answerId
@@ -125,7 +134,17 @@ public class QnaController {
         return ResponseEntity.noContent().build();
     }
 
-    // 공통 헬퍼: sort 화이트리스트 + page/size 하한선
+    // 질문(연관 답변 포함) 삭제: DELETE /api/qna/{questionId}
+    @DeleteMapping("/qna/{questionId}")
+    public ResponseEntity<Void> deleteQuestionCascade(
+            @AuthenticationPrincipal UserPrincipal me,
+            @PathVariable Long questionId
+    ) {
+        qnaService.deleteQuestion(me.getId(), questionId); // cascade + orphanRemoval 로 답변도 함께 삭제
+        return ResponseEntity.noContent().build();
+    }
+
+    // 공통 정렬/페이징 유틸
     private Pageable buildPageable(int page, int size, String sortParam, List<String> allowedSorts) {
         int p = Math.max(0, page);
         int s = Math.max(1, size);
@@ -135,7 +154,6 @@ public class QnaController {
         String dirStr = sp.length > 1 ? sp[1] : "desc";
         Sort.Direction dir = "asc".equalsIgnoreCase(dirStr) ? Sort.Direction.ASC : Sort.Direction.DESC;
 
-        // 화이트리스트 적용(없으면 기본 createdAt)
         String safeProp = allowedSorts.contains(prop) ? prop : "createdAt";
         return PageRequest.of(p, s, Sort.by(dir, safeProp));
     }
