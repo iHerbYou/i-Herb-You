@@ -3,6 +3,7 @@ package com.iherbyou.ordering.repository;
 import com.iherbyou.ordering.entity.Payment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,4 +19,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     boolean existsByOrder_IdAndPaymentStatusCode_Id(Long orderId, Long paymentStatusCodeId);
 
     Optional<Payment> findByExternalOrderKey(String externalOrderKey);
+
+    List<Payment> findByOrder_IdIn(Collection<Long> orderIds);
 }

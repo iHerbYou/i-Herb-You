@@ -43,6 +43,9 @@ public class Order {
     @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
     private Delivery delivery;
 
+    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
+    private Payment payment;
+
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "recipient", column = @Column(name = "shipping_recipient", length = 20)),

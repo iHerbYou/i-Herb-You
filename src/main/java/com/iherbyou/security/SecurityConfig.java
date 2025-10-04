@@ -25,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
+@org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 public class SecurityConfig {
 
     //private final CustomUserDetailsService customUserDetailsService;
@@ -76,6 +77,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/catalog/**").permitAll()
                         .requestMatchers("/api/wishlist/share/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                        // 관리자 주문 API는 관리자 권한 필요
+                        .requestMatchers("/api/admin/orders/**")
+                            .hasAnyRole("ADMIN_MASTER", "ADMIN_BUSINESS", "ADMIN_DEVELOP", "ADMIN_MARKETING")
 
                         // 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()

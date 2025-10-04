@@ -85,6 +85,7 @@ public class PaymentService {
 
         payment.markRequested(requestedStatus, method, amount, now);
         Payment saved = paymentRepository.save(payment);
+        linkOrderWithPayment(saved);
         log.info("[PaymentRequested] paymentId={} orderId={} method={} amount={} userId={} at={}",
                 saved.getId(), orderId, methodCodeValue, amount, userId, now);
 
@@ -274,6 +275,7 @@ public class PaymentService {
         Code paidStatus = requireCode(40, PAYMENT_STATUS_PAID, "PAYMENT_STATUS:PAID");
         payment.markPaid(paidStatus, LocalDateTime.now());
         Payment saved = paymentRepository.save(payment);
+        linkOrderWithPayment(saved);
 
         String resolvedActor = (actor == null || actor.isBlank()) ? "system" : actor;
         Long orderId = payment.getOrder().getId();
@@ -291,6 +293,12 @@ public class PaymentService {
         log.info("[PaymentSettled] paymentId={} orderId={} actor={}", saved.getId(), orderId, resolvedActor);
 
         return saved;
+    }
+
+    private void linkOrderWithPayment(Payment payment) {
+        if (payment != null && payment.getOrder() != null) {
+            payment.getOrder().setPayment(payment);
+        }
     }
 
 }
