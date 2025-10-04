@@ -1,6 +1,6 @@
 package com.iherbyou.user.entity;
 
-import com.iherbyou.cart.entity.Wishlist;
+import com.iherbyou.wishlist.entity.Wishlist;
 import com.iherbyou.catalog.entity.RestockSubscription;
 import com.iherbyou.common.code.entity.Code;
 import jakarta.persistence.*;
