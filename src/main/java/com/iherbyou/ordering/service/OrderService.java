@@ -5,18 +5,21 @@ import com.iherbyou.common.code.entity.Code;
 import com.iherbyou.common.code.service.CodeService;
 import com.iherbyou.ordering.code.OrderStatus;
 import com.iherbyou.ordering.dto.OrderCreateDto;
+import com.iherbyou.ordering.entity.AddressSnapshot;
 import com.iherbyou.ordering.entity.Order;
 import com.iherbyou.ordering.entity.OrderProduct;
 import com.iherbyou.ordering.entity.OrderStatusHistory;
 import com.iherbyou.ordering.repository.OrderRepository;
 import com.iherbyou.ordering.repository.OrderStatusHistoryRepository;
 import com.iherbyou.user.entity.User;
+import com.iherbyou.user.entity.UserAddress;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -35,19 +38,19 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final CodeService codeService;
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
-    private final EntityManager em; // TODO: 주문 전용 조회용 리포지토리(Dao)로 교체
+    private final EntityManager em;
 
     // 상태 전이 가드: 현재 상태 -> 허용 대상 상태 목록
     private static final Map<OrderStatus, Set<OrderStatus>> ALLOWED_TRANSITIONS = Map.ofEntries(
             Map.entry(OrderStatus.PENDING, Set.of(OrderStatus.PAID, OrderStatus.FAILED, OrderStatus.CANCELED)),
             Map.entry(OrderStatus.PAID, Set.of(OrderStatus.PACKING, OrderStatus.REFUND_REQUESTED, OrderStatus.CANCELED)),
             Map.entry(OrderStatus.PACKING, Set.of(OrderStatus.SHIPPED)),
-            Map.entry(OrderStatus.SHIPPED, Set.of(OrderStatus.COMPLETED, OrderStatus.REFUND_REQUESTED)),
+            Map.entry(OrderStatus.SHIPPED, Set.of(OrderStatus.DELIVERED, OrderStatus.REFUND_REQUESTED)),
+            Map.entry(OrderStatus.DELIVERED, Set.of(OrderStatus.COMPLETED, OrderStatus.REFUND_REQUESTED)),
             Map.entry(OrderStatus.COMPLETED, Set.of()),
             Map.entry(OrderStatus.CANCELED, Set.of()),
             Map.entry(OrderStatus.REFUND_REQUESTED, Set.of(OrderStatus.REFUNDED, OrderStatus.PARTIALLY_REFUNDED)),
             Map.entry(OrderStatus.REFUNDED, Set.of()),
-            Map.entry(OrderStatus.PARTIALLY_REFUNDED, Set.of(OrderStatus.PARTIALLY_REFUNDED, OrderStatus.REFUNDED)),
             Map.entry(OrderStatus.FAILED, Set.of())
     );
 
@@ -77,6 +80,11 @@ public class OrderService {
                 .discount(discount) // 확정 할인액
                 .totalPrice(0)
                 .build();
+
+        AddressSnapshot shippingSnapshot = resolveShippingSnapshot(user);
+        if (shippingSnapshot != null) {
+            order.updateShippingAddress(shippingSnapshot);
+        }
 
         // 4) 아이템 추가 + 소계 계산
         int subtotal = 0;
@@ -120,10 +128,39 @@ public class OrderService {
         return orderRepository.findByUser_IdOrderByOrderDateDesc(userId, pageable);
     }
 
+    public Order confirmOrder(Long userId, Long orderId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("userId is required to confirm order");
+        }
+        if (orderId == null) {
+            throw new IllegalArgumentException("orderId is required to confirm order");
+        }
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("order not found: " + orderId));
+
+        if (order.getUser() == null || !order.getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("access denied for order " + orderId);
+        }
+
+        Code currentCode = order.getOrderStatusCode();
+        OrderStatus currentStatus = currentCode != null ? OrderStatus.fromCodeValue(currentCode.getValue()) : null;
+
+        if (currentStatus == OrderStatus.COMPLETED) {
+            return order;
+        }
+        if (currentStatus != OrderStatus.DELIVERED) {
+            throw new IllegalStateException("order status does not allow confirmation: " + currentStatus);
+        }
+
+        String actor = "user:" + userId;
+        String correlationId = "ORDER_CONFIRMED:" + orderId + ":" + userId;
+        return updateStatus(orderId, OrderStatus.COMPLETED, "ORDER_CONFIRMED", actor, correlationId);
+    }
+
     // 상세 조회 (상품까지 fetch)
     @Transactional(readOnly = true)
     public Order getOrderDetail(Long orderId, Long userId) {
-        // TODO: JWT/세션 연동 완료 후 인증 컴포넌트 기반으로 소유자 검증 교체
         if (!orderRepository.existsByIdAndUser_Id(orderId, userId)) {
             throw new IllegalArgumentException("no permission");
         }
@@ -248,5 +285,17 @@ public class OrderService {
         return requireCode(OrderStatus.GROUP_VALUE, orderStatus.getCodeValue(), "ORDER_STATUS:" + orderStatus);
     }
 
-
+    private AddressSnapshot resolveShippingSnapshot(User user) {
+        if (user == null) {
+            return null;
+        }
+        if (user.getAddresses() == null || user.getAddresses().isEmpty()) {
+            return null;
+        }
+        UserAddress address = user.getAddresses().stream()
+                .filter(UserAddress::isDefault)
+                .findFirst()
+                .orElse(user.getAddresses().get(0));
+        return AddressSnapshot.from(address);
+    }
 }

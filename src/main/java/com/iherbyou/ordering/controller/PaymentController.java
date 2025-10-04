@@ -6,6 +6,7 @@ import com.iherbyou.ordering.dto.PaymentRequestDto;
 import com.iherbyou.ordering.dto.PaymentResponseDto;
 import com.iherbyou.ordering.entity.Payment;
 import com.iherbyou.ordering.service.PaymentService;
+import com.iherbyou.security.auth.UserPrincipal;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,27 +28,27 @@ public class PaymentController {
 
     // 주문 상세 화면에서 결제 수단을 선택하고 결제를 시도할 때 호출되는 API (사용자 인증 정보를 받아 주문 소유 여부를 확인한 뒤 결제 엔터티를 READY 상태로 만듦)
     @PostMapping("/orders/{orderId}/payments")
-    public ResponseEntity<PaymentResponseDto> requestPayment(@AuthenticationPrincipal(expression = "id") Long userId,
+    public ResponseEntity<PaymentResponseDto> requestPayment(@AuthenticationPrincipal UserPrincipal me,
                                                              @PathVariable Long orderId,
                                                              @Valid @RequestBody PaymentRequestDto request) {
-        Payment payment = paymentService.requestPayment(userId, orderId, request.getMethodCodeValue());
+        Payment payment = paymentService.requestPayment(me.getId(), orderId, request.getMethodCodeValue());
         return ResponseEntity.ok(toDto(payment));
     }
 
     // PG에서 결제가 성공적으로 완료되었을 때 호출되는 API (결제 상태를 PAID 로 바꾸고 주문 상태는 OrderService 를 통해 PAID 단계로 전환)
     @PostMapping("/payments/{paymentId}/complete")
-    public ResponseEntity<PaymentResponseDto> completePayment(@AuthenticationPrincipal(expression = "id") Long userId,
+    public ResponseEntity<PaymentResponseDto> completePayment(@AuthenticationPrincipal UserPrincipal me,
                                                               @PathVariable Long paymentId) {
-        Payment payment = paymentService.completePayment(userId, paymentId);
+        Payment payment = paymentService.completePayment(me.getId(), paymentId);
         return ResponseEntity.ok(toDto(payment));
     }
 
     // PG 취소 콜백 혹은 사용자가 결제를 취소했을 때 호출 (결제 상태를 CANCELED 로 만들고 주문 상태를 CANCELED 단계로 동기화)
     @PostMapping("/payments/{paymentId}/cancel")
-    public ResponseEntity<PaymentResponseDto> cancelPayment(@AuthenticationPrincipal(expression = "id") Long userId,
+    public ResponseEntity<PaymentResponseDto> cancelPayment(@AuthenticationPrincipal UserPrincipal me,
                                                             @PathVariable Long paymentId,
                                                             @RequestBody(required = false) PaymentCancelRequestDto request) {
-        String actor = resolveActor(userId, request);
+        String actor = resolveActor(me, request);
         Payment payment = paymentService.cancelPayment(paymentId, actor);
         return ResponseEntity.ok(toDto(payment));
     }
@@ -69,15 +70,16 @@ public class PaymentController {
                 .paymentMethodKey(payment.getPaymentMethodCode() != null ? payment.getPaymentMethodCode().getValue() : null)
                 .requestedAt(payment.getRequestedAt())
                 .paidAt(payment.getPaidAt())
+                .externalOrderKey(payment.getExternalOrderKey())
                 .build();
     }
 
-    private String resolveActor(Long userId, PaymentCancelRequestDto request) {
+    private String resolveActor(UserPrincipal me, PaymentCancelRequestDto request) {
         if (request != null && StringUtils.hasText(request.getActor())) {
             return request.getActor().trim();
         }
-        if (userId != null) {
-            return "user:" + userId;
+        if (me != null) {
+            return "user:" + me.getId();
         }
         return "system";
     }

@@ -3,6 +3,7 @@ package com.iherbyou.ordering.service;
 import com.iherbyou.common.code.entity.Code;
 import com.iherbyou.common.code.service.CodeService;
 import com.iherbyou.ordering.code.OrderStatus;
+import com.iherbyou.ordering.entity.AddressSnapshot;
 import com.iherbyou.ordering.entity.Order;
 import com.iherbyou.ordering.entity.Payment;
 import com.iherbyou.ordering.repository.OrderRepository;
@@ -16,6 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
+
+import com.iherbyou.user.entity.UserAddress;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +33,14 @@ public class PaymentService {
     private static final int PAYMENT_STATUS_FAILED = 406;
     private static final int PAYMENT_STATUS_CANCELED = 405;
 
+    private static final int PAYMENT_METHOD_TOSS = 417; // PG 연동 결제 (토스)
+    private static final Set<Integer> AUTO_COMPLETE_METHODS = Set.of(411, 412, 413, 414, 415, 416, 418);
+
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
     private final CodeService codeService;
     private final OrderService orderService;
+    private final DeliveryService deliveryService;
 
     public Payment requestPayment(Long userId, Long orderId, Integer methodCodeValue) {
         if (userId == null) {
@@ -60,14 +69,31 @@ public class PaymentService {
         BigDecimal amount = BigDecimal.valueOf(order.getTotalPrice());
         LocalDateTime now = LocalDateTime.now();
 
+        ensureShippingSnapshot(order);
+
         Payment payment = (existing != null)
                 ? existing
                 : Payment.builder().order(order).build();
 
+        if (requiresExternalOrderKey(methodCodeValue)) {
+            if (payment.getExternalOrderKey() == null) {
+                payment.assignExternalOrderKey(generateExternalOrderKey(orderId));
+            }
+        } else {
+            payment.assignExternalOrderKey(null);
+        }
+
         payment.markRequested(requestedStatus, method, amount, now);
+        Payment saved = paymentRepository.save(payment);
         log.info("[PaymentRequested] paymentId={} orderId={} method={} amount={} userId={} at={}",
-                payment.getId(), orderId, methodCodeValue, amount, userId, now);
-        return paymentRepository.save(payment);
+                saved.getId(), orderId, methodCodeValue, amount, userId, now);
+
+        if (shouldAutoComplete(methodCodeValue)) {
+            String actor = "user:" + userId;
+            return settlePayment(saved, actor);
+        }
+
+        return saved;
     }
 
     public Payment completePayment(Long userId, Long paymentId) {
@@ -84,21 +110,11 @@ public class PaymentService {
             return payment;
         }
 
-        Code paidStatus = requireCode(40, PAYMENT_STATUS_PAID, "PAYMENT_STATUS:PAID");
-        payment.markPaid(paidStatus, LocalDateTime.now());
-
-        // 멱등 키: 동일 결제 성공 콜백 중복 처리를 막기 위해 결제 ID 기반으로 구성
-        String correlationId = "PAYMENT:" + paymentId + ":PAID";
-        orderService.updateStatus(
-                payment.getOrder().getId(),
-                OrderStatus.PAID,
-                "PAYMENT_PAID",
-                "user:" + userId,
-                correlationId
-        );
+        String actor = "user:" + userId;
+        Payment settled = settlePayment(payment, actor);
         log.info("[PaymentCompleted] paymentId={} orderId={} userId={}", paymentId, payment.getOrder().getId(), userId);
 
-        return payment;
+        return settled;
     }
 
     public Payment markPaymentFailed(Long paymentId, String reason) {
@@ -155,6 +171,27 @@ public class PaymentService {
         return payment;
     }
 
+    public Payment completeExternalPayment(String externalOrderKey, Long amount, String actor) {
+        if (!StringUtils.hasText(externalOrderKey)) {
+            throw new IllegalArgumentException("externalOrderKey is required to complete payment");
+        }
+
+        Payment payment = paymentRepository.findByExternalOrderKey(externalOrderKey.trim())
+                .orElseThrow(() -> new IllegalArgumentException("payment not found for externalOrderKey"));
+
+        if (amount != null && payment.getPaymentPrice() != null) {
+            BigDecimal requested = BigDecimal.valueOf(amount);
+            if (payment.getPaymentPrice().compareTo(requested) != 0) {
+                throw new IllegalStateException("payment amount mismatch for externalOrderKey");
+            }
+        }
+
+        String resolvedActor = (actor == null || actor.isBlank()) ? "system" : actor;
+        Payment settled = settlePayment(payment, resolvedActor);
+        log.info("[PaymentExternalCompleted] externalOrderKey={} paymentId={} actor={}", externalOrderKey, settled.getId(), resolvedActor);
+        return settled;
+    }
+
     private void ensureOrderOwner(Order order, Long userId) {
         if (order.getUser() == null || !order.getUser().getId().equals(userId)) {
             throw new AccessDeniedException("access denied for order " + order.getId());
@@ -177,6 +214,83 @@ public class PaymentService {
             throw new IllegalStateException("code not found: " + context);
         }
         return code;
+    }
+
+    private boolean shouldAutoComplete(Integer methodCodeValue) {
+        if (methodCodeValue == null) {
+            return false;
+        }
+        return methodCodeValue != null && AUTO_COMPLETE_METHODS.contains(methodCodeValue);
+    }
+
+    private boolean requiresExternalOrderKey(Integer methodCodeValue) {
+        return methodCodeValue != null && methodCodeValue == PAYMENT_METHOD_TOSS;
+    }
+
+    private String generateExternalOrderKey(Long orderId) {
+        String prefix = "ORDER-" + orderId + "-";
+        String random = java.util.UUID.randomUUID().toString().replace("-", "");
+        int maxRandomLength = Math.max(6, 64 - prefix.length());
+        if (maxRandomLength <= 0) {
+            throw new IllegalStateException("external order key prefix exceeded length limit");
+        }
+        if (random.length() > maxRandomLength) {
+            random = random.substring(0, maxRandomLength);
+        }
+        if (random.length() < 6) {
+            random = String.format("%-6s", random).replace(' ', '0');
+        }
+        return prefix + random;
+    }
+
+    private void ensureShippingSnapshot(Order order) {
+        if (order.getShippingAddress() != null) {
+            return;
+        }
+        if (order.getUser() == null || order.getUser().getAddresses() == null || order.getUser().getAddresses().isEmpty()) {
+            throw new IllegalStateException("shipping address is required for payment");
+        }
+        UserAddress address = order.getUser().getAddresses().stream()
+                .filter(UserAddress::isDefault)
+                .findFirst()
+                .orElse(order.getUser().getAddresses().get(0));
+        AddressSnapshot snapshot = AddressSnapshot.from(address);
+        order.updateShippingAddress(snapshot);
+    }
+
+    private Payment settlePayment(Payment payment, String actor) {
+        if (payment == null) {
+            throw new IllegalArgumentException("payment is required to settle");
+        }
+        if (payment.getOrder() == null) {
+            throw new IllegalStateException("payment must be attached to an order");
+        }
+
+        if (payment.getPaymentStatusCode() != null
+                && PAYMENT_STATUS_PAID == payment.getPaymentStatusCode().getValue()) {
+            return payment;
+        }
+
+        Code paidStatus = requireCode(40, PAYMENT_STATUS_PAID, "PAYMENT_STATUS:PAID");
+        payment.markPaid(paidStatus, LocalDateTime.now());
+        Payment saved = paymentRepository.save(payment);
+
+        String resolvedActor = (actor == null || actor.isBlank()) ? "system" : actor;
+        Long orderId = payment.getOrder().getId();
+
+        String correlationId = "PAYMENT:" + saved.getId() + ":PAID";
+        orderService.updateStatus(
+                orderId,
+                OrderStatus.PAID,
+                "PAYMENT_PAID",
+                resolvedActor,
+                correlationId
+        );
+
+        deliveryService.prepareAutomaticDelivery(orderId, resolvedActor);
+        log.info("[PaymentSettled] paymentId={} orderId={} actor={}", saved.getId(), orderId, resolvedActor);
+
+        return saved;
     }
 
 }

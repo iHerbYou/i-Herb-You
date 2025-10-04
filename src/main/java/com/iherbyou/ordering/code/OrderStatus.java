@@ -8,12 +8,13 @@ public enum OrderStatus {
     PAID(302),
     PACKING(303),
     SHIPPED(304),
-    COMPLETED(305),
-    CANCELED(306),
-    REFUND_REQUESTED(307),
-    REFUNDED(308),
-    PARTIALLY_REFUNDED(309),
-    FAILED(310);
+    DELIVERED(305),
+    COMPLETED(306),
+    CANCELED(307),
+    REFUND_REQUESTED(308),
+    REFUNDED(309),
+    PARTIALLY_REFUNDED(310),
+    FAILED(311);
 
     public static final int GROUP_VALUE = 30;
 

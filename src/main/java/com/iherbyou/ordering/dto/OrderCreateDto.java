@@ -46,7 +46,7 @@ public class OrderCreateDto {
 
         @NotNull
         @Positive
-        private Integer unitPrice;     // TODO (PRICING-57): 서버 가격 재검증 로직 도입 후 제거/대체 검토
+        private Integer unitPrice;     // TODO: 서버 가격 재검증 로직 도입 후 제거/대체 검토
 
         @PositiveOrZero
         private Integer regularPrice;  // 선택

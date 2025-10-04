@@ -48,3 +48,7 @@ jwt:
     expiration: 1800000    # 30분 (30분 * 60초 * 1000ms)
   refresh-token:
     expiration: 86400000   # 24시간 (24시간 * 60분 * 60초 * 1000ms)
+
+toss:
+  confirm-url: https://api.tosspayments.com/v1/payments/confirm
+  secret-key: ${TOSS_SECRET_KEY:test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6}

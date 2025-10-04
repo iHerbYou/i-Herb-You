@@ -17,5 +17,6 @@ public class PaymentResponseDto {
     private final Integer paymentMethodKey;
     private final LocalDateTime requestedAt;
     private final LocalDateTime paidAt;
+    private final String externalOrderKey;
 
 }

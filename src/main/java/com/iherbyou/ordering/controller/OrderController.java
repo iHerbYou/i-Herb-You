@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +37,14 @@ public class OrderController {
                 .orderStatusKey(order.getOrderStatusCode().getValue())
                 .build();
         return ResponseEntity.ok(res);
+    }
+
+    // 배송 완료 상태의 주문을 사용자가 직접 구매 확정(완료) 상태로 전환하는 엔드포인트
+    @PostMapping("/{orderId}/confirm")
+    public ResponseEntity<Void> confirm(@AuthenticationPrincipal(expression = "id") Long userId,
+                                        @PathVariable Long orderId) {
+        orderService.confirmOrder(userId, orderId);
+        return ResponseEntity.noContent().build();
     }
 
 }
