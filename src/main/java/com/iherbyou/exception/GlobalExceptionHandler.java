@@ -1,6 +1,9 @@
 package com.iherbyou.exception;
 
 import com.iherbyou.exception.catalog.*;
+import com.iherbyou.exception.email.AlreadyVerifiedTokenException;
+import com.iherbyou.exception.email.ExpiredEmailTokenException;
+import com.iherbyou.exception.email.InvalidEmailTokenException;
 import com.iherbyou.exception.user.*;
 import com.iherbyou.exception.wishlist.*;
 import org.springframework.http.HttpStatus;
@@ -26,6 +29,7 @@ public class GlobalExceptionHandler {
     }
 
     // ===================== 회원가입 / 로그인 관련 예외 =====================
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException e) {
         return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -56,6 +60,22 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
+    // ===================== 이메일 인증 관련 예외 =====================
+
+    @ExceptionHandler(InvalidEmailTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidEmailToken(InvalidEmailTokenException e) {
+        return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(ExpiredEmailTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleExpiredEmailToken(ExpiredEmailTokenException e) {
+        return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(AlreadyVerifiedTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleAlreadyVerifiedEmail(AlreadyVerifiedTokenException e) {
+        return buildResponse(HttpStatus.CONFLICT, e.getMessage());
+    }
 
     // ===================== 카테고리 / 상품 관련 예외 =====================
 
@@ -99,7 +119,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
-
     // ===================== 위시리스트 관련 예외 =====================
 
     @ExceptionHandler(WishlistException.class)
@@ -123,6 +142,7 @@ public class GlobalExceptionHandler {
 
 
     // ===================== 그 외 모든 예외 =====================
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleServerError(Exception e) {
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류 발생: " + e.getMessage());
