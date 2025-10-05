@@ -35,8 +35,28 @@ public class PointHistory { // 포인트 이력 관리
     @Column
     private String reason; // 상세 설명 (Text) ex "이벤트 참여 보상", "1년 경과 만료"
 
+    @Column
+    private Long relatedOrderId;
+
+    @Column
+    private Long relatedReviewId;
+
+    @Column
+    private LocalDateTime expiresAt;
+
+    @Builder.Default
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    private boolean expired = false;
+
     @CreationTimestamp
     @Column
     private LocalDateTime createdAt;
 
+    public boolean isExpirable(LocalDateTime now) {
+        return expiresAt != null && !now.isBefore(expiresAt) && !expired;
+    }
+
+    public void markExpired() {
+        this.expired = true;
+    }
 }

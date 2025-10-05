@@ -77,4 +77,31 @@ public class Coupon {
     @Column(nullable = false)
     private LocalDateTime updatedAt; // 수정일시
 
+    public boolean isStatusActive() {
+        return statusCode == null || statusCode.isValidNow();
+    }
+
+    public boolean isWithinValidity(LocalDateTime now) {
+        boolean afterStart = startsAt == null || !now.isBefore(startsAt);
+        boolean beforeEnd = couponEndsAt == null || !now.isAfter(couponEndsAt);
+        return afterStart && beforeEnd;
+    }
+
+    public boolean isIssuableNow(LocalDateTime now) {
+        return isStatusActive() && isWithinValidity(now) && hasRemainingQuantity();
+    }
+
+    public boolean hasRemainingQuantity() {
+        if (totalIssuable == null || totalIssuable <= 0) {
+            return true;
+        }
+        int currentIssued = issuedCount == null ? 0 : issuedCount;
+        return currentIssued < totalIssuable;
+    }
+
+    public void increaseIssuedCount() {
+        int currentIssued = issuedCount == null ? 0 : issuedCount;
+        this.issuedCount = currentIssued + 1;
+    }
+
 }
