@@ -8,6 +8,7 @@ import com.iherbyou.catalog.entity.ProductVariant;
 import com.iherbyou.catalog.entity.Stock;
 import com.iherbyou.catalog.repository.ProductRepository;
 import com.iherbyou.exception.catalog.InvalidParameterException;
+import com.iherbyou.exception.catalog.ProductNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;

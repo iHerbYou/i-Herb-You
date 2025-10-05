@@ -38,13 +38,4 @@ public class RestockSubscription { // 재입고 알림
     @Column
     private LocalDateTime lastNotifiedAt; // 마지막 알림 발송 시각
 
-    // 상태 전환 메서드
-    public void activate() {
-        this.isActive = true;
-    }
-
-    public void deactivate() {
-        this.isActive = false;
-    }
-
 }
