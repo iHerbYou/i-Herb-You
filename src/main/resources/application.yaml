@@ -2,7 +2,7 @@ spring:
   config:
     import: optional:application-personal.yaml
   datasource:
-    url: jdbc:mysql://localhost:3306/iherbyou?serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/iherbyou?serverTimezone=UTC&characterEncoding=UTF-8&useUnicode=true&useSSL=false
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -10,10 +10,9 @@ spring:
   sql:
     init:
       data-locations:
-        - classpath:banner-data.sql
         - classpath:code-data.sql
         - classpath:category-data.sql
-        - classpath:product-dummy.sql
+        - classpath:product-data.sql
       #mode: never  # 임시로 비활성화
       mode: always
 
@@ -30,6 +29,17 @@ spring:
   output:
     ansi:
       enabled: always
+  web:
+    locale: ko_KR   # UTF-8 설정
+
+server:
+  tomcat:
+    uri-encoding: UTF-8
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 springdoc:
   api-docs:
