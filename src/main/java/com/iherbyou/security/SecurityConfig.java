@@ -71,6 +71,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/index.html").permitAll()
                         .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
                         .requestMatchers("/api/auth/refresh").permitAll()
+                        .requestMatchers("/api/banner/**").permitAll()
                         .requestMatchers("/api/codes/**").permitAll()
                         .requestMatchers("/api/catalog/**").permitAll()
                         .requestMatchers("/api/qna/**").permitAll()
