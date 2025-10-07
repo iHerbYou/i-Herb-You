@@ -5,13 +5,18 @@ import com.iherbyou.common.code.service.CodeService;
 import com.iherbyou.exception.email.AlreadyVerifiedTokenException;
 import com.iherbyou.exception.email.ExpiredEmailTokenException;
 import com.iherbyou.exception.email.InvalidEmailTokenException;
+import com.iherbyou.exception.password.ExpiredPasswordResetTokenException;
+import com.iherbyou.exception.password.InvalidPasswordResetTokenException;
+import com.iherbyou.exception.password.UsedPasswordResetTokenException;
 import com.iherbyou.exception.user.*;
 import com.iherbyou.security.auth.UserPrincipal;
 import com.iherbyou.security.jwt.JwtUtil;
 import com.iherbyou.user.dto.*;
 import com.iherbyou.user.entity.EmailVerificationToken;
+import com.iherbyou.user.entity.PasswordResetToken;
 import com.iherbyou.user.entity.User;
 import com.iherbyou.user.repository.EmailVerificationTokenRepository;
+import com.iherbyou.user.repository.PasswordResetTokenRepository;
 import com.iherbyou.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +38,7 @@ public class UserService {
     private final JwtUtil jwtUtil; // JWT Utility 추가
     private final EmailService emailService;
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     /**
      * 회원가입 (SignUp)
@@ -172,6 +178,70 @@ public class UserService {
         log.info("이메일 인증 재발송 완료: {}", email);
     }
 
+    /**
+     * 비밀번호 재설정 요청 (이메일 발송) -> 비밀번호 분실 시 사용
+     */
+    @Transactional
+    public ResetPasswordResponseDto requestResetPassword(ResetPasswordRequestDto request) {
+        log.info("비밀번호 재설정 요청: {}", request.getEmail());
+
+        // 사용자 조회
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("해당 이메일로 가입된 사용자가 없습니다"));
+
+        // 기존 토큰 삭제
+        passwordResetTokenRepository.deleteByUser(user);
+
+        // 새 토큰 생성
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken resetToken = PasswordResetToken.builder()
+                .token(token)
+                .user(user)
+                .expiresAt(LocalDateTime.now().plusHours(1))
+                .build();
+
+        passwordResetTokenRepository.save(resetToken);
+
+        // 이메일 발송
+        emailService.sendPasswordResetEmail(user.getEmail(), token);
+        log.info("비밀번호 재설정 이메일 발송 완료: {}", user.getEmail());
+
+        return ResetPasswordResponseDto.requestSuccess();
+    }
+
+    /**
+     * 비밀번호 재설정 확인 (실제 변경)
+     */
+    @Transactional
+    public ResetPasswordResponseDto resetPassword(String token, ResetPasswordConfirmDto request) {
+        log.info("비밀번호 재설정 시도: token={}", token.substring(0, 10) + "...");
+
+        // token 조회
+        PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new InvalidPasswordResetTokenException("유효하지 않거나 이미 사용된 토큰입니다."));
+
+        // 이미 사용된 토큰인지 확인
+        if (passwordResetToken.isUsed()) {
+            throw new UsedPasswordResetTokenException("이미 사용된 토큰입니다.");
+        }
+
+        // 토큰 만료 확인
+        if (passwordResetToken.isExpired()) {
+            throw new ExpiredPasswordResetTokenException("만료된 토큰입니다. 재발송을 요청해주세요");
+        }
+
+        // 사용자 비밀번호 변경
+        User user = passwordResetToken.getUser();
+        user.changePassword(passwordEncoder.encode(request.getNewPassword())); // 새로운 비밀번호 암호화 해서 재설정
+
+        // 토큰 사용 처리
+        passwordResetToken.markAsUsed();
+        passwordResetTokenRepository.delete(passwordResetToken); // 토큰 삭제
+        log.info("비밀번호 재설정 완료 및 토큰 삭제: {}", user.getEmail());
+
+        return ResetPasswordResponseDto.resetSuccess();
+    }
+
 
     /**
      * 로그인 (Login) - JWT 토큰 생성해서 반환
@@ -269,7 +339,7 @@ public class UserService {
     }
 
     /**
-     * 비밀번호 변경 (Change Password)
+     * 비밀번호 변경 (Change Password) : 비밀번호를 알고있는 상태에서 변경 시도. (로그인한 상태)
      */
     @Transactional
     public ChangePasswordResponseDto changePassword(ChangePasswordRequestDto request, UserPrincipal userPrincipal) {
