@@ -63,7 +63,7 @@ public class EmailService {
             helper.setSubject("[iHerbYou] 비밀번호 재설정 안내");
 
             // 재설정 링크 생성
-            String resetUrl = baseUrl + "/api/users/reset-password?token=" + token;
+            String resetUrl = baseUrl + "/api/users/reset-password-confirm?token=" + token;
 
             String htmlContent = buildPasswordResetEmailHtml(resetUrl);
             helper.setText(htmlContent, true);
