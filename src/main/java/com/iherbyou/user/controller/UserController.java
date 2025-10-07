@@ -40,6 +40,20 @@ public class UserController {
         return ResponseEntity.ok(EmailVerificationResponseDto.resendSuccess());
     }
 
+    // 비밀번호 재설정 요청
+    @PostMapping("/password-reset-request")
+    public ResponseEntity<ResetPasswordResponseDto> requestPasswordReset(@Valid @RequestBody ResetPasswordRequestDto request) {
+        ResetPasswordResponseDto response = userService.requestResetPassword(request);
+        return ResponseEntity.ok(response);
+    }
+
+    // 비밀번호 재설정 확인
+    @PostMapping("/password-reset-confirm")
+    public ResponseEntity<ResetPasswordResponseDto> resetPassword(@RequestParam String token, @Valid @RequestBody ResetPasswordConfirmDto request) {
+        ResetPasswordResponseDto response = userService.resetPassword(token, request);
+        return ResponseEntity.ok(response);
+    }
+
     // 로그인 (login)
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto request) {
