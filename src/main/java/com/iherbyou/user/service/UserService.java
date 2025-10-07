@@ -95,7 +95,7 @@ public class UserService {
         // 반환
         return SignUpResponseDto.builder()
                 .email(savedUser.getEmail())
-                .message("회원가입이 완료되었습니다. 이메일을 확인하여 인증을 완료해주세요.")
+                .message("이메일을 확인하여 인증 후, 회원가입을 완료해주세요.")
                 .build();
     }
 
