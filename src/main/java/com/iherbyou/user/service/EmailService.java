@@ -19,6 +19,9 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
+    @Value("${app.base-url}")
+    private String baseUrl;
+
     /**
      * 이메일 인증 메일 발송
      */
@@ -32,7 +35,7 @@ public class EmailService {
             helper.setSubject("[iHerbYou] [verification email] 이메일 인증을 완료해주세요");
 
             // 인증 링크 생성
-            String verificationUrl = "http://localhost:8080/api/users/verify-email?token=" + token;
+            String verificationUrl = baseUrl + "/api/users/verify-email?token=" + token;
 
             // HTML 이메일 본문
             String htmlContent = buildVerificationEmailHtml(verificationUrl);

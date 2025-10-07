@@ -63,3 +63,6 @@ jwt:
     expiration: 1800000    # 30분 (30분 * 60초 * 1000ms)
   refresh-token:
     expiration: 86400000   # 24시간 (24시간 * 60분 * 60초 * 1000ms)
+
+app: # 이메일 인증 부분에서 링크
+  base-url: http://localhost:8080 # 배포 후에는 주소 변경 필요
