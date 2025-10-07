@@ -10,9 +10,13 @@ spring:
   sql:
     init:
       data-locations:
-        - classpath:code-data.sql
-        - classpath:category-data.sql
-        - classpath:product-data.sql
+        - classpath:banner-data.sql
+          - classpath:category-data.sql
+          - classpath:code-data.sql
+          - classpath:product-dummy.sql
+          - classpath:qna-data.sql
+          - classpath:review-data.sql
+          - classpath:user-data.sql
       #mode: never  # 임시로 비활성화
       mode: always
 
