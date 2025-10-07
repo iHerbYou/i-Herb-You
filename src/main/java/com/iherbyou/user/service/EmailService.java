@@ -22,8 +22,11 @@ public class EmailService {
     @Value("${app.base-url}")
     private String baseUrl;
 
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
+
     /**
-     * 이메일 인증 메일 발송
+     * 이메일 인증 메일 발송 (회원가입시)
      */
     public void sendVerificationEmail(String toEmail, String token) {
         try {
@@ -34,8 +37,8 @@ public class EmailService {
             helper.setTo(toEmail); // 회원가입 한 사람의 email (받는 사람 이메일 설정)
             helper.setSubject("[iHerbYou] [verification email] 이메일 인증을 완료해주세요");
 
-            // 인증 링크 생성
-            String verificationUrl = baseUrl + "/api/users/verify-email?token=" + token;
+            // 인증 링크 생성 (frontend 페이지로 연결)
+            String verificationUrl = frontendUrl + "/verify-email?token=" + token;
 
             // HTML 이메일 본문
             String htmlContent = buildVerificationEmailHtml(verificationUrl);
@@ -62,8 +65,8 @@ public class EmailService {
             helper.setTo(toEmail);
             helper.setSubject("[iHerbYou] 비밀번호 재설정 안내");
 
-            // 재설정 링크 생성
-            String resetUrl = baseUrl + "/api/users/reset-password-confirm?token=" + token;
+            // 재설정 링크 생성 (frontend 페이지로 연결)
+            String resetUrl = frontendUrl + "/reset-password?token=" + token;
 
             String htmlContent = buildPasswordResetEmailHtml(resetUrl);
             helper.setText(htmlContent, true);
