@@ -30,6 +30,22 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
     show-sql: true
 
+  mail: # 이메일 발송
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
   output:
     ansi:
       enabled: always
@@ -62,3 +78,7 @@ jwt:
     expiration: 1800000    # 30분 (30분 * 60초 * 1000ms)
   refresh-token:
     expiration: 86400000   # 24시간 (24시간 * 60분 * 60초 * 1000ms)
+
+app: # 이메일 인증 부분에서 링크
+  base-url: http://localhost:8080 # 배포 후에는 주소 변경 필요
+  frontend-url: http://localhost:5173 # 배포 후에는 주소 변경 필요

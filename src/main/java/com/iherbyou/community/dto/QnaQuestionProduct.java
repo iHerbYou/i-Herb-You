@@ -6,6 +6,7 @@ public record QnaQuestionProduct(
         Long id, // 질문 ID
         Long productId, // 상품 ID
         Long userId, // 질문 작성자 ID
+        String userEmail,   // 질문 작성자 email
         String title, // 질문 제목
         String content, // 질문 내용
         String createdAt, // 작성일시

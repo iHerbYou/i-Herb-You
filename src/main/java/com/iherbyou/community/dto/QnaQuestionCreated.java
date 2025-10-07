@@ -10,7 +10,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public record QnaQuestionCreated(
         Long id,          // 생성된 질문 ID
         Long productId,   // 상품 ID
-        Long userId,      // 작성자 ID
+        Long userId,    // 작성자 ID
+        String userEmail, // 작성자 email
         String title,     // 질문 제목
         String content,   // 질문 내용
         String createdAt, // ISO 포맷 생성일

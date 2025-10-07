@@ -7,18 +7,19 @@ import com.iherbyou.user.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class ReviewService {
 
     private static final int MAX_TEXT_LEN = 1000;
-    private static final String ORDER_STATUS_DELIVERED = "DELIVERED"; // 코드그룹: ORDER_STATUS(30)
-    // todo 실제 코드 사용 -> 수정
-
-    // ✅ feature flag: 기본은 false (개발에서는 통과), 운영에서 true 주면 차단 모드
+    private static final String ORDER_STATUS_DELIVERED = "DELIVERED"; // TODO 실제 코드 사용
     private static final boolean VERIFY_PURCHASE_ENABLED =
             Boolean.parseBoolean(System.getProperty("REVIEWS_VERIFY_PURCHASE", "false"));
 
@@ -31,7 +32,31 @@ public class ReviewService {
         this.reviewRepo = reviewRepo;
     }
 
-    // 리뷰 등록: 기본 검증 + 구매자 확인
+    // ---------- 신규: page/size/sort 오버로드 ----------
+    @Transactional(readOnly = true)
+    public Page<Review> listByProduct(Long productId, int page, int size, String sort) {
+        Pageable pageable = buildPageable(page, size, sort, List.of("createdAt", "id", "rating"));
+        return listByProduct(productId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Review> listMyReviews(Long userId, int page, int size, String sort) {
+        Pageable pageable = buildPageable(page, size, sort, List.of("createdAt", "id", "rating"));
+        return listMyReviews(userId, pageable);
+    }
+
+    // ---------- 기존 (내부/호환용) ----------
+    @Transactional(readOnly = true)
+    public Page<Review> listByProduct(Long productId, Pageable pageable) {
+        return reviewRepo.findByProduct_Id(productId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Review> listMyReviews(Long userId, Pageable pageable) {
+        return reviewRepo.findByUser_Id(userId, pageable);
+    }
+
+    // 리뷰 등록
     @Transactional
     public Review createReview(Long userId, Long productId, Integer rating, String text) {
         Product product = em.find(Product.class, productId);
@@ -61,18 +86,6 @@ public class ReviewService {
                 .build();
 
         return reviewRepo.save(review);
-    }
-
-    // 상품별 목록
-    @Transactional(readOnly = true)
-    public Page<Review> listByProduct(Long productId, Pageable pageable) {
-        return reviewRepo.findByProduct_Id(productId, pageable);
-    }
-
-    // 내가 쓴 리뷰
-    @Transactional(readOnly = true)
-    public Page<Review> listMyReviews(Long userId, Pageable pageable) {
-        return reviewRepo.findByUser_Id(userId, pageable);
     }
 
     // 리뷰 내용 수정
@@ -109,6 +122,24 @@ public class ReviewService {
         return reviewRepo.countByProduct_IdAndRating(productId, rating);
     }
 
+    // ---------- 공통 유틸 ----------
+    private Pageable buildPageable(int page, int size, String sortParam, List<String> allowedProps) {
+        int p = Math.max(0, page);
+        int s = Math.max(1, size);
+
+        String prop = "createdAt";
+        Sort.Direction dir = Sort.Direction.DESC;
+
+        if (sortParam != null && !sortParam.isBlank()) {
+            String[] sp = sortParam.split(",", 2);
+            String candidate = sp[0];
+            if (allowedProps.contains(candidate)) prop = candidate;
+            if (sp.length > 1 && "asc".equalsIgnoreCase(sp[1])) dir = Sort.Direction.ASC;
+        }
+
+        return PageRequest.of(p, s, Sort.by(dir, prop));
+    }
+
     private static String sanitizeOptionalText(String text, int max) {
         if (text == null) return null;
         String v = text.trim();
@@ -117,25 +148,14 @@ public class ReviewService {
         return v;
     }
 
-    // 구매자 검증 (구매자만 리뷰 작성 가능 옵션)
-// 현재는 VERIFY_PURCHASE_ENABLED=false → 항상 true 반환 (검증 생략)
-// 추후 수정 시:
-//  1) 주문 서비스/레포지토리 연동
-//  2) userId + productId 기준으로 주문 상태(OrderStatus)가 "DELIVERED"/"COMPLETED" 인지 확인
-//  3) 해당 주문 건이 존재할 경우 true, 없으면 false 반환
+    // 구매자 검증 (feature flag)
     private boolean isVerifiedPurchaser(Long userId, Long productId) {
         if (!VERIFY_PURCHASE_ENABLED) {
-            return true; // 검증 비활성화 시: 개발/로컬 편의상 항상 허용
+            return true; // 일단 항상 허용
         }
-
         // TODO: 주문 도메인 연동 후 실제 검증 로직으로 교체
-        // ex) return orderRepo.existsByUser_IdAndProduct_IdAndStatus(userId, productId, ORDER_STATUS_DELIVERED);
-
-        // 운영에서 구매 검증 ON인데 실제 구현이 없을 경우 → 안전하게 막음
         throw new IllegalStateException(
                 "구매자 검증 기능이 아직 연결되지 않았습니다. (ORDER_STATUS=" + ORDER_STATUS_DELIVERED + ")"
         );
     }
 }
-
-
