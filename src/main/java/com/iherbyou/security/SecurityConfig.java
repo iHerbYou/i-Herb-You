@@ -70,10 +70,14 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .requestMatchers("/", "/index.html").permitAll()
                         .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
+                        .requestMatchers("/api/users/verify-email", "/api/users/resend-verification").permitAll() // 이메일 인증
                         .requestMatchers("/api/auth/refresh").permitAll()
                         .requestMatchers("/api/banner/**").permitAll()
                         .requestMatchers("/api/codes/**").permitAll()
                         .requestMatchers("/api/catalog/**").permitAll()
+                        .requestMatchers("/api/qna/**").permitAll()
+                        .requestMatchers("/api/reviews/**").permitAll()
+                        .requestMatchers("/api/review-reports/**").permitAll()
                         .requestMatchers("/api/wishlist/share/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
 

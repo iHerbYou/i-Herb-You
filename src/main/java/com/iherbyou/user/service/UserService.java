@@ -2,17 +2,25 @@ package com.iherbyou.user.service;
 
 import com.iherbyou.common.code.entity.Code;
 import com.iherbyou.common.code.service.CodeService;
+import com.iherbyou.exception.email.AlreadyVerifiedTokenException;
+import com.iherbyou.exception.email.ExpiredEmailTokenException;
+import com.iherbyou.exception.email.InvalidEmailTokenException;
 import com.iherbyou.exception.user.*;
 import com.iherbyou.security.auth.UserPrincipal;
 import com.iherbyou.security.jwt.JwtUtil;
 import com.iherbyou.user.dto.*;
+import com.iherbyou.user.entity.EmailVerificationToken;
 import com.iherbyou.user.entity.User;
+import com.iherbyou.user.repository.EmailVerificationTokenRepository;
 import com.iherbyou.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,6 +31,8 @@ public class UserService {
     private final CodeService codeService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil; // JWT Utility 추가
+    private final EmailService emailService;
+    private final EmailVerificationTokenRepository emailVerificationTokenRepository;
 
     /**
      * 회원가입 (SignUp)
@@ -48,10 +58,10 @@ public class UserService {
             throw new IllegalStateException("기본 사용자 권한을 찾을 수 없습니다");
         }
 
-        // 기본 사용자 상태 조회 (그룹 71, 코드 712 = ACTIVE) -> DB에 필수 기준 데이터가 있는지 확인하는 안전장치
-        Code defaultUserStatus = codeService.getDefaultActiveStatus();
-        if (defaultUserStatus == null) {
-            throw new IllegalStateException("기본 사용자 상태를 찾을 수 없습니다");
+        // 기본 사용자 상태 조회 (그룹 71, 코드 711 = INACTIVE) -> DB에 필수 기준 데이터가 있는지 확인하는 안전장치
+        Code inactiveStatus = codeService.getCode(71, 711); // 이메일 인증 전이므로 inactive 상태
+        if (inactiveStatus == null) {
+            throw new IllegalStateException("비활성 상태 코드를 찾을 수 없습니다.");
         }
 
         // User 엔티티 생성
@@ -61,22 +71,107 @@ public class UserService {
                 .name(request.getName())
                 .phoneNumber(request.getPhoneNumber())
                 .roleCode(defaultUserRole)
-                .statusCode(defaultUserStatus)
+                .statusCode(inactiveStatus) // 비활성화 유저 (이메일 인증 전)
                 .build();
 
         // 저장
         User savedUser = userRepository.save(user);
 
-        log.info("회원가입 성공: {} (ID: {}) - 권한: {}, 상태: {}",
-                savedUser.getEmail(), savedUser.getId(),
-                savedUser.getRoleName(), savedUser.getStatusName());
+        // 이메일 인증 토큰 생성
+        String token = UUID.randomUUID().toString();
+        EmailVerificationToken verificationToken = EmailVerificationToken.builder()
+                .token(token)
+                .user(savedUser)
+                .expiresAt(LocalDateTime.now().plusHours(24)) // 24시간 이후 토큰 만료 (이메일 인증 기한)
+                .build();
+
+        emailVerificationTokenRepository.save(verificationToken);
+
+        // 이메일 발송
+        emailService.sendVerificationEmail(savedUser.getEmail(), token);
+
+        log.info("회원가입 성공: {} (ID: {}) - 이메일 인증 메일 발송", savedUser.getEmail(), savedUser.getId());
 
         // 반환
         return SignUpResponseDto.builder()
                 .email(savedUser.getEmail())
-                .message("회원가입이 완료되었습니다. 로그인 해주세요.")
+                .message("이메일을 확인하여 인증 후, 회원가입을 완료해주세요.")
                 .build();
     }
+
+    /**
+     * 이메일 인증 (회원가입 과정)
+     */
+    @Transactional
+    public void verifyEmail(String token) {
+        log.info("이메일 인증 시도: token={}", token.substring(0, 10) + "...");
+
+        // 토큰 조회
+        EmailVerificationToken verificationToken = emailVerificationTokenRepository.findByToken(token)
+                .orElseThrow(() -> new InvalidEmailTokenException("유효하지 않거나 이미 사용된 토큰입니다."));
+
+        // 이미 인증된 토큰인지 확인
+        if (verificationToken.isVerified()) {
+            throw new AlreadyVerifiedTokenException("이미 인증된 토큰입니다.");
+        }
+
+        // 토큰 만료 확인
+        if (verificationToken.isExpired()) {
+            throw new ExpiredEmailTokenException("만료된 토큰입니다. 재발송을 요청해주세요.");
+        }
+
+        // 토큰 인증 완료 처리
+        verificationToken.verify();
+
+        // 사용자 계정 활성화 (INACTIVE -> ACTIVE)
+        User user = verificationToken.getUser();
+        Code activeStatus = codeService.getCode(71, 712);// ACTIVE
+        if (activeStatus == null) {
+            throw new IllegalStateException("활성 상태 코드를 찾을 수 없습니다.");
+        }
+        user.changeUserStatus(activeStatus); // 유저 상태 ACTIVE로 변경
+        log.info("이메일 인증 완료: {}", user.getEmail());
+
+        // 토큰 삭제 (인증 끝났으니 DB에서 제거 -> 재사용 공격 방지 가능)
+        emailVerificationTokenRepository.delete(verificationToken);
+        log.info("이메일 인증 완료 및 토큰 삭제: {} (token: {}...)", user.getEmail(), token.substring(0, 10));
+    }
+
+    /**
+     * 이메일 인증 재발송
+     */
+    @Transactional
+    public void resendVerificationEmail(String email) {
+        log.info("이메일 인증 재발송 요청: {}", email);
+
+        // 사용자 조회
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        // 이미 활성화된 계정인지 확인
+        if (user.isActive()) {
+            throw new IllegalStateException("이미 인증된 계정입니다.");
+        }
+
+        // 기존 토큰 삭제
+        emailVerificationTokenRepository.deleteByUser(user);
+
+        // 새 토큰 생성
+        String token = UUID.randomUUID().toString();
+        EmailVerificationToken verificationToken = EmailVerificationToken.builder()
+                .token(token)
+                .user(user)
+                .expiresAt(LocalDateTime.now().plusHours(24))
+                .build();
+
+        emailVerificationTokenRepository.save(verificationToken);
+
+        // 이메일 재발송
+        emailService.sendVerificationEmail(user.getEmail(), token);
+
+        log.info("이메일 인증 재발송 완료: {}", email);
+    }
+
 
     /**
      * 로그인 (Login) - JWT 토큰 생성해서 반환
