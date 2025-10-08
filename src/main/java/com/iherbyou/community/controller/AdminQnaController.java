@@ -86,7 +86,11 @@ public class AdminQnaController {
 
     // 관리자 권한 확인
     private void ensureAdmin(UserPrincipal me) {
-        if (me != null && me.getAuthorities() != null) {
+        if (me == null) {
+            throw new AccessDeniedException("인증이 필요합니다.");
+        }
+
+        if (me.getAuthorities() != null) {
             boolean hasAdmin = me.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .anyMatch(a -> "ROLE_ADMIN".equals(a) || a.endsWith(":ADMIN") || a.contains("ADMIN"));
@@ -106,4 +110,5 @@ public class AdminQnaController {
             throw new AccessDeniedException("FORBIDDEN");
         }
     }
+
 }

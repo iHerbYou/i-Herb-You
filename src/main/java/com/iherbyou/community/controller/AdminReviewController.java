@@ -55,9 +55,13 @@ public class AdminReviewController {
         return PageRequest.of(p, s, Sort.by(dir, safeProp));
     }
 
-    // 관리자 권한 확인
+    // 관리자 권한 확인 (NPE 방어 포함)
     private void ensureAdmin(UserPrincipal me) {
-        if (me != null && me.getAuthorities() != null) {
+        if (me == null) {
+            throw new AccessDeniedException("AUTH_REQUIRED");
+        }
+
+        if (me.getAuthorities() != null) {
             boolean hasAdmin = me.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .anyMatch(a -> "ROLE_ADMIN".equals(a) || a.endsWith(":ADMIN") || a.contains("ADMIN"));
@@ -65,7 +69,7 @@ public class AdminReviewController {
         }
 
         Integer roleValue = em.createQuery(
-                        "select rc.value from User u left join u.roleCode rc where u.id = :uid",
+                        "select rc.value from com.iherbyou.user.entity.User u left join u.roleCode rc where u.id = :uid",
                         Integer.class
                 )
                 .setParameter("uid", me.getId())
@@ -77,4 +81,5 @@ public class AdminReviewController {
             throw new AccessDeniedException("FORBIDDEN");
         }
     }
+
 }
