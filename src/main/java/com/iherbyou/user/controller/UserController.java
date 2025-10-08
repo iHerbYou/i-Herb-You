@@ -84,4 +84,14 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    // 회원 탈퇴
+    @Operation(summary = "회원 탈퇴", description = "비밀번호 확인 후 계정을 탈퇴처리 (soft delete)")
+    @PostMapping("/withdraw")
+    public ResponseEntity<WithdrawResponseDto> withdraw(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @Valid @RequestBody WithdrawRequestDto request) {
+        WithdrawResponseDto response = userService.withdraw(userPrincipal, request);
+        return ResponseEntity.ok(response);
+    }
+
 }
