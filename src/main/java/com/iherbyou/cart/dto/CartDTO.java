@@ -92,4 +92,10 @@ public class CartDTO {
         private String message;
         private String guestToken;
     }
+
+    @Getter
+    @Setter
+    public static class DeleteSelectedRequestDTO {
+        private List<Long> cartProductIds;  // [1, 3, 5]
+    }
 }

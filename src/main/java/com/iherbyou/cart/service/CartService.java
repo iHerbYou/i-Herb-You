@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -190,12 +191,22 @@ public class CartService {
     }
 
     @Transactional
-    public void deleteSelectedCartProducts(String email, String guestToken) {
+    public void deleteCartProducts(String email, String guestToken, List<Long> cartProductIds) {
         Cart cart = findCartByUserOrGuest(email, guestToken);
-        cartProductRepository.deleteSelectedByCartId(cart.getId());
 
-        cart = cartRepository.findById(cart.getId())
-                .orElseThrow(CartNotFoundException::new);
+        for (Long cartProductId : cartProductIds) {
+            CartProduct cartProduct = cartProductRepository.findById(cartProductId)
+                    .orElseThrow(CartProductNotFoundException::new);
+
+            // 권한 확인
+            if (!cartProduct.getCart().getId().equals(cart.getId())) {
+                throw new UnauthorizedAccessException();
+            }
+
+            cartProductRepository.delete(cartProduct);
+            cart.getCartProducts().remove(cartProduct);
+        }
+
         recalculateCart(cart);
     }
 
@@ -255,6 +266,7 @@ public class CartService {
                 .guestToken(guestToken)
                 .subTotal(0)
                 .totalAmount(0)
+                .cartProducts(new ArrayList<>())  // 빈 리스트로 초기화 ✅
                 .build();
         return cartRepository.save(cart);
     }

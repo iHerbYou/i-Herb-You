@@ -48,29 +48,6 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/items/{cartProductId}/select")
-    public ResponseEntity<Void> updateSelection(
-            @PathVariable Long cartProductId,
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestHeader(value = "X-Guest-Token", required = false) String guestToken,
-            @RequestBody UpdateSelectionRequestDTO request
-    ) {
-        String email = userDetails != null ? userDetails.getUsername() : null;
-        cartService.updateCartProductSelection(cartProductId, email, guestToken, request);
-        return ResponseEntity.ok().build();
-    }
-
-    @PatchMapping("/items/select-all")
-    public ResponseEntity<Void> updateAllSelection(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestHeader(value = "X-Guest-Token", required = false) String guestToken,
-            @RequestBody UpdateSelectionRequestDTO request
-    ) {
-        String email = userDetails != null ? userDetails.getUsername() : null;
-        cartService.updateAllSelection(email, guestToken, request);
-        return ResponseEntity.ok().build();
-    }
-
     @DeleteMapping("/items/{cartProductId}")
     public ResponseEntity<Void> deleteCartProduct(
             @PathVariable Long cartProductId,
@@ -82,23 +59,21 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/items")
-    public ResponseEntity<Void> deleteAllCartProducts(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestHeader(value = "X-Guest-Token", required = false) String guestToken
-    ) {
-        String email = userDetails != null ? userDetails.getUsername() : null;
-        cartService.deleteAllCartProducts(email, guestToken);
-        return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping("/items/selected")
+    @PostMapping("/items/delete-selected")  // ✅ POST로 변경
     public ResponseEntity<Void> deleteSelectedCartProducts(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestHeader(value = "X-Guest-Token", required = false) String guestToken
+            @RequestHeader(value = "X-Guest-Token", required = false) String guestToken,
+            @RequestBody DeleteSelectedRequestDTO request  // ✅ request 사용
     ) {
         String email = userDetails != null ? userDetails.getUsername() : null;
-        cartService.deleteSelectedCartProducts(email, guestToken);
+
+        // 빈 배열이면 전체 삭제
+        if (request.getCartProductIds() == null || request.getCartProductIds().isEmpty()) {
+            cartService.deleteAllCartProducts(email, guestToken);
+        } else {
+            cartService.deleteCartProducts(email, guestToken, request.getCartProductIds());
+        }
+
         return ResponseEntity.ok().build();
     }
 
