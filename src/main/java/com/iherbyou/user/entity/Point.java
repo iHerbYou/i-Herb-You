@@ -28,11 +28,11 @@ public class Point { // 현재 잔액과 생성/수정 일자 저장 (포인트 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer balance = 0; // 포인트 잔액
 
-    @CreatedDate // TODO
+    @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    @LastModifiedDate // TODO
+    @LastModifiedDate
     private LocalDateTime updatedAt;
 
     public void earn(int amount) {

@@ -4,7 +4,8 @@ import com.iherbyou.common.code.entity.Code;
 import com.iherbyou.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.Objects;
 @Builder
 @Getter
 @Setter
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "orders") // 예약어 회피
 public class Order {
@@ -59,7 +61,7 @@ public class Order {
     @Column(length = 50)
     private String customsInfo; // 개인 통관 번호
 
-    @CreationTimestamp
+    @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime orderDate; // 주문일시
 
