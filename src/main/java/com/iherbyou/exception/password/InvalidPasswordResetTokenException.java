@@ -1,0 +1,7 @@
+package com.iherbyou.exception.password;
+
+public class InvalidPasswordResetTokenException extends RuntimeException {
+    public InvalidPasswordResetTokenException(String message) {
+        super(message);
+    }
+}
