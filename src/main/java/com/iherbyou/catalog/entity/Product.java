@@ -1,5 +1,6 @@
 package com.iherbyou.catalog.entity;
 
+import com.iherbyou.catalog.dto.ProductUpdateRequest;
 import com.iherbyou.community.entity.Review;
 import jakarta.persistence.*;
 import lombok.*;
@@ -93,5 +94,20 @@ public class Product {
                 .min(Integer::compareTo)
                 .orElse(0);
     }
+
+    public void updateBasicInfo(ProductUpdateRequest dto, Brand brand) {
+        if (dto.getName() != null) this.name = dto.getName();
+        if (dto.getProductCode() != null) this.code = dto.getProductCode();
+        if (dto.getDescription() != null) this.description = dto.getDescription();
+        if (dto.getInstruction() != null) this.instruction = dto.getInstruction();
+        if (dto.getIngredients() != null) this.ingredients = dto.getIngredients();
+        if (dto.getCautions() != null) this.cautions = dto.getCautions();
+        if (dto.getDisclaimer() != null) this.disclaimer = dto.getDisclaimer();
+        if (dto.getSaleStartDate() != null) this.saleStartDate = dto.getSaleStartDate();
+        if (dto.getExpirationDate() != null) this.expirationDate = dto.getExpirationDate();
+        if (dto.getMaxQtyPerOrder() != null) this.maxQtyPerOrder = dto.getMaxQtyPerOrder();
+        if (brand != null) this.brand = brand;
+    }
+
 
 }

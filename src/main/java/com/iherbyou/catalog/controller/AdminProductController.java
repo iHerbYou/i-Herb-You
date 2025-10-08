@@ -1,6 +1,7 @@
 package com.iherbyou.catalog.controller;
 
 import com.iherbyou.catalog.dto.ProductCreateRequest;
+import com.iherbyou.catalog.dto.ProductUpdateRequest;
 import com.iherbyou.catalog.entity.Product;
 import com.iherbyou.catalog.service.ProductService;
 import com.iherbyou.common.code.service.CodeService;
@@ -13,10 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin/products")
@@ -29,6 +27,7 @@ public class AdminProductController {
     @PersistenceContext
     private EntityManager em;
 
+    // 상품 등록 API
     @PostMapping
     public ResponseEntity<?> createProduct(
             @AuthenticationPrincipal UserPrincipal me,
@@ -37,6 +36,18 @@ public class AdminProductController {
         ensureAdmin(me);
         Product saved = productService.createProduct(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
+
+    // 상품 수정 API
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateProduct(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal me,
+            @RequestBody ProductUpdateRequest request
+    ) {
+        ensureAdmin(me);
+        productService.updateProduct(id, request);
+        return ResponseEntity.ok("Product updated successfully");
     }
 
     // 관리자 권한 확인
