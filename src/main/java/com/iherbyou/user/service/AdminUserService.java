@@ -1,9 +1,12 @@
 package com.iherbyou.user.service;
 
+import com.iherbyou.common.code.entity.Code;
+import com.iherbyou.common.code.service.CodeService;
 import com.iherbyou.exception.user.UserNotFoundException;
 import com.iherbyou.security.auth.UserPrincipal;
 import com.iherbyou.user.dto.admin.AdminUserDto;
 import com.iherbyou.user.dto.admin.AdminUserListResponseDto;
+import com.iherbyou.user.dto.admin.ChangeUserStatusDto;
 import com.iherbyou.user.entity.User;
 import com.iherbyou.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminUserService {
 
     private final UserRepository userRepository;
+    private final CodeService codeService;
 
     /**
      * 관리자 권한 확인
@@ -52,6 +56,31 @@ public class AdminUserService {
         Page<AdminUserDto> userDtos = users.map(user -> AdminUserDto.from(user));
 
         return AdminUserListResponseDto.from(userDtos);
+    }
+
+    /**
+     * 회원 상태 변경 (정지/복구)
+     */
+    @Transactional
+    public void changeUserStatus(UserPrincipal userPrincipal, Long userId, ChangeUserStatusDto request) {
+
+        // 관리자 권한 확인
+        checkAdminPermission(userPrincipal);
+        log.info("회원 상태 변경 시도 - 관리자: {}, 대상 회원 id: {}, 변경할 상태: {}", userPrincipal.getEmail(), userId, request.getStatusCode());
+
+        // 대상 회원 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("대상 회원을 찾을 수 없습니다."));
+
+        // 상태 코드 조회
+        Code newStatus = codeService.getCode(71, request.getStatusCode());
+        if (newStatus == null) {
+            throw new IllegalArgumentException("유효하지 않은 상태코드입니다.");
+        }
+
+        // user 상태 변경
+        user.changeUserStatus(newStatus);
+        log.info("회원 상태 변경 완료 - 회원: {}, 새상태: {}, 사유: {}", user.getEmail(), newStatus.getDisplayName(), request.getReason());
     }
 
 }
