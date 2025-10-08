@@ -29,7 +29,12 @@ public class CartProduct {
     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 1")
     private Boolean isSelected;
 
-    public void changeQty(int qty) { this.qty = qty; }
-    public void changeSelected(boolean selected) { this.isSelected = selected; }
+    public void changeQty(int qty) {
+        this.qty = qty;
+    }
+
+    public void changeSelected(boolean selected) {
+        this.isSelected = selected;
+    }
 
 }
