@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class QnaService {
@@ -26,7 +25,7 @@ public class QnaService {
 
     private final QnaQuestionRepository questionRepo;
     private final QnaAnswerRepository answerRepo;
-    private final CodeService codeService; // ✅ 서버에서 권한 판별용
+    private final CodeService codeService;
 
     @PersistenceContext
     private EntityManager em;
@@ -37,6 +36,21 @@ public class QnaService {
         this.questionRepo = questionRepo;
         this.answerRepo = answerRepo;
         this.codeService = codeService;
+    }
+
+    // 상품별 목록 (statusValue 필터 가능)
+    @Transactional(readOnly = true)
+    public Page<QnaQuestion> listByProduct(Long productId, Integer statusValue, Pageable pageable) {
+        if (statusValue == null) {
+            return questionRepo.findByProduct_Id(productId, pageable);
+        }
+        return questionRepo.findByProduct_IdAndStatusCodeId(productId, statusValue, pageable);
+    }
+
+    // 내 질문 목록
+    @Transactional(readOnly = true)
+    public Page<QnaQuestion> listMyQuestions(Long userId, Pageable pageable) {
+        return questionRepo.findByUser_Id(userId, pageable);
     }
 
     // 질문 생성
@@ -63,28 +77,12 @@ public class QnaService {
         return questionRepo.save(q);
     }
 
-    // 상품별 목록 (statusValue 필터 가능)
-    @Transactional(readOnly = true)
-    public Page<QnaQuestion> listByProduct(Long productId, Integer statusValue, Pageable pageable) {
-        if (statusValue == null) {
-            return questionRepo.findByProduct_Id(productId, pageable);
-        }
-        return questionRepo.findByProduct_IdAndStatusCodeId(productId, statusValue, pageable);
-    }
-
-    // 내 질문 목록
-    @Transactional(readOnly = true)
-    public Page<QnaQuestion> listMyQuestions(Long userId, Pageable pageable) {
-        return questionRepo.findByUser_Id(userId, pageable);
-    }
-
-    // 답변 생성 (서버에서 관리자 판별)
+    // 답변 생성 (관리자만)
     @Transactional
     public QnaAnswer createAnswer(Long actorId, Long questionId, String content) {
         QnaQuestion q = questionRepo.findById(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("질문을 찾을 수 없습니다."));
 
-        // ✅ User/Code 엔티티 변경 없이 role value만 JPQL로 바로 조회
         Integer roleValue = em.createQuery(
                         "select rc.value from User u join u.roleCode rc where u.id = :uid", Integer.class)
                 .setParameter("uid", actorId)
@@ -129,18 +127,35 @@ public class QnaService {
         answerRepo.delete(a);
     }
 
-    // 정렬
-    @Transactional(readOnly = true)
-    public List<QnaAnswer> listAnswers(Long questionId) {
-        return answerRepo.findByQnaQuestion_IdOrderByCreatedAtAsc(questionId);
+    // 질문 삭제 (연관 답변 포함: cascade + orphanRemoval)
+    @Transactional
+    public void deleteQuestion(Long actorId, Long questionId) {
+        QnaQuestion q = questionRepo.findById(questionId)
+                .orElseThrow(() -> new IllegalArgumentException("질문을 찾을 수 없습니다."));
+
+        boolean owner = q.getUser().getId().equals(actorId);
+
+        Integer roleValue = em.createQuery(
+                        "select rc.value from User u join u.roleCode rc where u.id = :uid", Integer.class)
+                .setParameter("uid", actorId)
+                .getSingleResult();
+        boolean isAdmin = codeService.isAdminRole(roleValue);
+
+        if (!owner && !isAdmin) throw new IllegalStateException("권한이 없습니다.");
+
+        // QnaQuestion 엔티티에 cascade = ALL, orphanRemoval = true 설정되어 있으므로
+        // 질문 삭제 시 연관 답변도 함께 삭제된다.
+        questionRepo.delete(q);
     }
 
-    // count
-    @Transactional(readOnly = true)
-    public long countAnswers(Long questionId) {
-        return answerRepo.countByQnaQuestion_Id(questionId);
+    // 질문 상태 변경 (관리자)
+    @Transactional
+    public void changeQuestionStatus(Long questionId, Integer statusCodeValue) {
+        int updated = questionRepo.updateStatus(questionId, statusCodeValue);
+        if (updated == 0) throw new IllegalStateException("질문 상태 변경에 실패했습니다.");
     }
 
+    // 텍스트 검증 유틸
     private static String requireText(String src, int max, String emptyMsg) {
         if (src == null) throw new IllegalArgumentException(emptyMsg);
         String v = src.strip();

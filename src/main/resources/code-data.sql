@@ -141,10 +141,11 @@ VALUES ((SELECT id FROM code_group WHERE value = 70), 701, 'USER', '일반회원
 
 -- 71: USER_STATUS (711~)
 INSERT INTO code (code_group_id, value, display_name, description, is_active, sort_order, created_at, updated_at)
-VALUES ((SELECT id FROM code_group WHERE value = 71), 711, 'DELETED', '탈퇴', 1, 1, NOW(), NOW()),
+VALUES ((SELECT id FROM code_group WHERE value = 71), 711, 'INACTIVE', '이메일 미인증', 1, 1, NOW(), NOW()),
        ((SELECT id FROM code_group WHERE value = 71), 712, 'ACTIVE', '정상', 1, 2, NOW(), NOW()),
        ((SELECT id FROM code_group WHERE value = 71), 713, 'SUSPENDED', '정지', 1, 3, NOW(), NOW()),
-       ((SELECT id FROM code_group WHERE value = 71), 714, 'DORMANT', '휴면', 1, 4, NOW(), NOW());
+       ((SELECT id FROM code_group WHERE value = 71), 714, 'DORMANT', '휴면', 1, 4, NOW(), NOW()),
+       ((SELECT id FROM code_group WHERE value = 71), 715, 'DELETED', '탈퇴', 1, 5, NOW(), NOW());
 
 -- 80: LOGIN_PROVIDER (801~)
 INSERT INTO code (code_group_id, value, display_name, description, is_active, sort_order, created_at, updated_at)

@@ -2,7 +2,7 @@ spring:
   config:
     import: optional:application-personal.yaml
   datasource:
-    url: jdbc:mysql://localhost:3306/iherbyou?serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/iherbyou?serverTimezone=UTC&characterEncoding=UTF-8&useUnicode=true&useSSL=false
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -11,9 +11,12 @@ spring:
     init:
       data-locations:
         - classpath:banner-data.sql
-        - classpath:code-data.sql
         - classpath:category-data.sql
+        - classpath:code-data.sql
         - classpath:product-dummy.sql
+        - classpath:qna-data.sql
+        - classpath:review-data.sql
+        - classpath:user-data.sql
       #mode: never  # 임시로 비활성화
       mode: always
 
@@ -27,9 +30,36 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
     show-sql: true
 
+  mail: # 이메일 발송
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
   output:
     ansi:
       enabled: always
+  web:
+    locale: ko_KR   # UTF-8 설정
+
+server:
+  tomcat:
+    uri-encoding: UTF-8
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 springdoc:
   api-docs:
@@ -48,6 +78,10 @@ jwt:
     expiration: 1800000    # 30분 (30분 * 60초 * 1000ms)
   refresh-token:
     expiration: 86400000   # 24시간 (24시간 * 60분 * 60초 * 1000ms)
+
+app: # 이메일 인증 부분에서 링크
+  base-url: http://localhost:8080 # 배포 후에는 주소 변경 필요
+  frontend-url: http://localhost:5173 # 배포 후에는 주소 변경 필요 -> https://www.iherbyou.store/
 
 toss:
   confirm-url: https://api.tosspayments.com/v1/payments/confirm
