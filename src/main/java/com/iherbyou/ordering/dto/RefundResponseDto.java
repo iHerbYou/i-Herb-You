@@ -19,6 +19,7 @@ public class RefundResponseDto {
     private Integer statusKey;
     private Integer deliveryOptionKey;
     private LocalDateTime requestedAt;
+    private LocalDateTime completedAt;
 
     public static RefundResponseDto from(Refund refund) {
         return RefundResponseDto.builder()
@@ -28,6 +29,7 @@ public class RefundResponseDto {
                 .statusKey(refund.getStatusCode() != null ? refund.getStatusCode().getValue() : null)
                 .deliveryOptionKey(refund.getDeliveryOptionCode() != null ? refund.getDeliveryOptionCode().getValue() : null)
                 .requestedAt(refund.getRequestedAt())
+                .completedAt(refund.getCompletedAt())
                 .build();
     }
 }

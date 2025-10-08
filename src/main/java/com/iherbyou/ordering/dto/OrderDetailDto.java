@@ -25,6 +25,7 @@ public class OrderDetailDto {
     private String trackingNumber;
     private LocalDateTime delStartAt;
     private LocalDateTime delCompleteAt;
+    private Integer deliveryStatusKey;
 
     // 라인아이템들
     private List<OrderItemDto> items;
