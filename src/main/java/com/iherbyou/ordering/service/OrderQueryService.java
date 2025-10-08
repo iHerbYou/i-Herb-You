@@ -72,6 +72,11 @@ public class OrderQueryService {
                 .trackingNumber(o.getDelivery() != null ? o.getDelivery().getTrackingNumber() : null)
                 .delStartAt(o.getDelivery() != null ? o.getDelivery().getDelStartAt() : null)
                 .delCompleteAt(o.getDelivery() != null ? o.getDelivery().getDelCompleteAt() : null)
+                .deliveryStatusKey(
+                        (o.getDelivery() != null && o.getDelivery().getCode() != null)
+                                ? o.getDelivery().getCode().getValue()
+                                : null
+                )
                 .items(items)
                 .build();
     }

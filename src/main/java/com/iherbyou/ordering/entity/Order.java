@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,6 +23,10 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Version
+    @Column(nullable = false)
+    private Long version; // 낙관 락 버전: 동시 상태 전이 경합 차단
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false) // 회원 id (FK, NOT NULL)
@@ -37,6 +42,19 @@ public class Order {
 
     @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
     private Delivery delivery;
+
+    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
+    private Payment payment;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "recipient", column = @Column(name = "shipping_recipient", length = 20)),
+            @AttributeOverride(name = "phone", column = @Column(name = "shipping_phone", length = 30)),
+            @AttributeOverride(name = "zipcode", column = @Column(name = "shipping_zipcode", length = 10)),
+            @AttributeOverride(name = "addressLine1", column = @Column(name = "shipping_address_line1", length = 200)),
+            @AttributeOverride(name = "addressLine2", column = @Column(name = "shipping_address_line2", length = 200))
+    })
+    private AddressSnapshot shippingAddress;
 
     @Column(length = 50)
     private String customsInfo; // 개인 통관 번호
@@ -70,6 +88,17 @@ public class Order {
         if (op == null) return;
         this.orderProducts.add(op);
         op.setOrder(this);
+    }
+
+    public void attachDelivery(Delivery delivery) {
+        this.delivery = delivery;
+        if (delivery != null && delivery.getOrder() != this) {
+            delivery.attachOrder(this);
+        }
+    }
+
+    public void updateShippingAddress(AddressSnapshot snapshot) {
+        this.shippingAddress = Objects.requireNonNull(snapshot, "shippingAddress must not be null");
     }
 
 }

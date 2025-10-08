@@ -55,12 +55,13 @@ VALUES ((SELECT id FROM code_group WHERE value = 30), 301, 'PENDING', '주문 �
        ((SELECT id FROM code_group WHERE value = 30), 302, 'PAID', '결제 완료', 1, 2, NOW(), NOW()),
        ((SELECT id FROM code_group WHERE value = 30), 303, 'PACKING', '상품 준비', 1, 3, NOW(), NOW()),
        ((SELECT id FROM code_group WHERE value = 30), 304, 'SHIPPED', '출고 완료', 1, 4, NOW(), NOW()),
-       ((SELECT id FROM code_group WHERE value = 30), 305, 'COMPLETED', '거래 완료', 1, 5, NOW(), NOW()),
-       ((SELECT id FROM code_group WHERE value = 30), 306, 'CANCELED', '주문 취소', 1, 6, NOW(), NOW()),
-       ((SELECT id FROM code_group WHERE value = 30), 307, 'REFUND_REQUESTED', '환불 요청', 1, 7, NOW(), NOW()),
-       ((SELECT id FROM code_group WHERE value = 30), 308, 'REFUNDED', '환불 완료', 1, 8, NOW(), NOW()),
-       ((SELECT id FROM code_group WHERE value = 30), 309, 'PARTIAL_REFUNDED', '부분 환불', 1, 9, NOW(), NOW()),
-       ((SELECT id FROM code_group WHERE value = 30), 310, 'FAILED', '결제/출고 실패', 1, 10, NOW(), NOW());
+       ((SELECT id FROM code_group WHERE value = 30), 305, 'DELIVERED', '배송 완료', 1, 5, NOW(), NOW()),
+       ((SELECT id FROM code_group WHERE value = 30), 306, 'COMPLETED', '구매 확정', 1, 6, NOW(), NOW()),
+       ((SELECT id FROM code_group WHERE value = 30), 307, 'CANCELED', '주문 취소', 1, 7, NOW(), NOW()),
+       ((SELECT id FROM code_group WHERE value = 30), 308, 'REFUND_REQUESTED', '환불 요청', 1, 8, NOW(), NOW()),
+       ((SELECT id FROM code_group WHERE value = 30), 309, 'REFUNDED', '환불 완료', 1, 9, NOW(), NOW()),
+       ((SELECT id FROM code_group WHERE value = 30), 310, 'PARTIAL_REFUNDED', '부분 환불', 1, 10, NOW(), NOW()),
+       ((SELECT id FROM code_group WHERE value = 30), 311, 'FAILED', '결제/출고 실패', 1, 11, NOW(), NOW());
 
 -- 40: PAYMENT_STATUS (401~)
 INSERT INTO code (code_group_id, value, display_name, description, is_active, sort_order, created_at, updated_at)
