@@ -1,12 +1,10 @@
 package com.iherbyou.catalog.service;
 
-import com.iherbyou.catalog.dto.ProductDetailDto;
-import com.iherbyou.catalog.dto.ProductListDto;
-import com.iherbyou.catalog.entity.Product;
-import com.iherbyou.catalog.entity.ProductCategory;
-import com.iherbyou.catalog.entity.ProductVariant;
-import com.iherbyou.catalog.entity.Stock;
-import com.iherbyou.catalog.repository.ProductRepository;
+import com.iherbyou.catalog.dto.*;
+import com.iherbyou.catalog.entity.*;
+import com.iherbyou.catalog.repository.*;
+import com.iherbyou.exception.catalog.BrandNotFoundException;
+import com.iherbyou.exception.catalog.CategoryNotFoundException;
 import com.iherbyou.exception.catalog.InvalidParameterException;
 import com.iherbyou.exception.catalog.ProductNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,6 +19,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -30,6 +29,12 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final BrandRepository brandRepository;
+    private final CategoryRepository categoryRepository;
+    private final ProductCategoryRepository productCategoryRepository;
+    private final ProductImgRepository productImgRepository;
+    private final ProductVariantRepository productVariantRepository;
+    private final StockRepository stockRepository;
 
     @Transactional(readOnly = true)
     public Page<ProductListDto> getProducts(Pageable pageable,
@@ -190,6 +195,91 @@ public class ProductService {
         Page<Product> products = productRepository.findAllOrderByAvgRatingDesc(pageable);
 
         return products.map(ProductListDto::fromEntity).getContent();
+    }
+
+    // admin - 상품(+브랜드, 이미지, 옵션, 재고) 등록
+    @Transactional
+    public Product createProduct(ProductCreateRequest dto) {
+        // 브랜드 조회
+        Brand brand = brandRepository.findById(dto.getBrandId())
+                .orElseThrow(() -> new BrandNotFoundException(dto.getBrandId()));
+
+        // 상품 생성 및 저장
+        Product product = Product.builder()
+                .name(dto.getName())
+                .code(dto.getProductCode())
+                .description(dto.getDescription())
+                .instruction(dto.getInstruction())
+                .ingredients(dto.getIngredients())
+                .cautions(dto.getCautions())
+                .disclaimer(dto.getDisclaimer())
+                .saleStartDate(LocalDateTime.now())
+                .expirationDate(dto.getExpirationDate())
+                .maxQtyPerOrder(dto.getMaxQtyPerOrder())
+                .brand(brand)
+                .build();
+        productRepository.save(product);
+
+        // 카테고리 연결
+        if (dto.getCategoryIds() != null) {
+            for (Long categoryId : dto.getCategoryIds()) {
+            Category category = categoryRepository.findById((categoryId))
+                    .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+
+            ProductCategory pc = ProductCategory.builder()
+                    .product(product)
+                    .category(category)
+                    .build();
+
+            productCategoryRepository.save(pc);
+            }
+        }
+
+        // 이미지 등록
+        if (dto.getProductImgs() != null) {
+            for (ProductImgDto imgDto : dto.getProductImgs()) {
+            ProductImg img = ProductImg.builder()
+                    .product(product)
+                    .imageUrl(imgDto.getImageUrl())
+                    .isPrimary(imgDto.isPrimary())
+                    .build();
+
+            productImgRepository.save(img);
+            }
+        }
+
+        // 옵션 + 재고
+        if (dto.getVariants() != null) {
+            for (ProductVariantDto variantDto : dto.getVariants()) {
+            ProductVariant variant = ProductVariant.builder()
+                    .product(product)
+                    .variantName(variantDto.getVariantName())
+                    .listPrice(variantDto.getListPrice())
+                    .salePrice(variantDto.getSalePrice())
+                    .volume(variantDto.getVolume())
+                    .upcCode(variantDto.getUpcCode())
+                    .pillSize(variantDto.getPillSize())
+                    .nutritionFacts(variantDto.getNutritionFacts())
+                    .maxQtyPerOrder(variantDto.getMaxQtyPerOrder())
+                    .restockEta(variantDto.getRestockEta())
+                    .build();
+
+            productVariantRepository.save(variant);
+
+            StockDto stockDto = variantDto.getStock();
+            if (stockDto != null) {
+                Stock stock = Stock.builder()
+                        .productVariant(variant)
+                        .amount(stockDto.getAmount())
+                        .restockedAt(stockDto.getRestockedAt())
+                        .build();
+
+                stockRepository.save(stock);
+            }
+            }
+        }
+
+        return product;
     }
 
 }
