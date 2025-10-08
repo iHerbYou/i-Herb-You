@@ -3,7 +3,8 @@ package com.iherbyou.user.entity;
 import com.iherbyou.common.code.entity.Code;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 public class PointHistory { // 포인트 이력 관리
 
@@ -48,8 +50,8 @@ public class PointHistory { // 포인트 이력 관리
     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private boolean expired = false;
 
-    @CreationTimestamp
-    @Column
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     public boolean isExpirable(LocalDateTime now) {
