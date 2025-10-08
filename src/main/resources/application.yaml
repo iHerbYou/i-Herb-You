@@ -82,3 +82,7 @@ jwt:
 app: # 이메일 인증 부분에서 링크
   base-url: http://localhost:8080 # 배포 후에는 주소 변경 필요
   frontend-url: http://localhost:5173 # 배포 후에는 주소 변경 필요 -> https://www.iherbyou.store/
+
+toss:
+  confirm-url: https://api.tosspayments.com/v1/payments/confirm
+  secret-key: ${TOSS_SECRET_KEY:test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6}
