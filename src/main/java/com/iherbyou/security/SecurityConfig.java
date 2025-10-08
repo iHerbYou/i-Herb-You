@@ -71,10 +71,16 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .requestMatchers("/", "/index.html").permitAll()
                         .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
+                        .requestMatchers("/api/users/verify-email", "/api/users/resend-verification").permitAll() // 이메일 인증
                         .requestMatchers("/api/auth/refresh").permitAll()
+                        .requestMatchers("/api/users/password-reset-request").permitAll() // 비밀번호 재설정 요청
+                        .requestMatchers("/api/users/password-reset-confirm").permitAll()
                         .requestMatchers("/api/banner/**").permitAll()
                         .requestMatchers("/api/codes/**").permitAll()
                         .requestMatchers("/api/catalog/**").permitAll()
+                        .requestMatchers("/api/qna/**").permitAll()
+                        .requestMatchers("/api/reviews/**").permitAll()
+                        .requestMatchers("/api/review-reports/**").permitAll()
                         .requestMatchers("/api/wishlist/share/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
                         // 관리자 주문 API는 관리자 권한 필요
