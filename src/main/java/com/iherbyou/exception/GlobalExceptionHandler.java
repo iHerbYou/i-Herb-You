@@ -1,5 +1,6 @@
 package com.iherbyou.exception;
 
+import com.iherbyou.exception.Promotion.PointInsufficientBalanceException;
 import com.iherbyou.exception.banner.*;
 import com.iherbyou.exception.catalog.*;
 import com.iherbyou.exception.user.*;
@@ -58,6 +59,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidPasswordException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidPassword(InvalidPasswordException e) {
         return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(PointInsufficientBalanceException.class)
+    public ResponseEntity<Map<String, Object>> handlePointInsufficient(PointInsufficientBalanceException e) {
+        return buildResponse(HttpStatus.CONFLICT, e.getMessage());
     }
 
 

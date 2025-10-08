@@ -1,5 +1,6 @@
 package com.iherbyou.user.entity;
 
+import com.iherbyou.exception.Promotion.PointInsufficientBalanceException;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -41,7 +42,8 @@ public class Point { // 현재 잔액과 생성/수정 일자 저장 (포인트 
 
     public void spend(int amount) {
         if (amount > balance) {
-            throw new IllegalArgumentException("포인트 잔액이 부족합니다.");
+            Long userId = user != null ? user.getId() : null;
+            throw new PointInsufficientBalanceException(userId, balance, amount);
         }
         this.balance -= amount;
     }
