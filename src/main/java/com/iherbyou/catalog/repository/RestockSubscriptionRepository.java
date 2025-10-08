@@ -6,6 +6,7 @@ import com.iherbyou.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -13,4 +14,7 @@ public interface RestockSubscriptionRepository extends JpaRepository<RestockSubs
 
     Optional<RestockSubscription> findByUserAndProductVariant(User user, ProductVariant productVariant);
 
+    void deleteAllByProductVariant(ProductVariant productVariant);
+
+    List<RestockSubscription> findByIsActive(Boolean isActive);
 }

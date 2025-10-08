@@ -1,64 +1,52 @@
 package com.iherbyou.catalog.controller;
 
-import com.iherbyou.catalog.dto.ProductCreateRequest;
-import com.iherbyou.catalog.dto.ProductUpdateRequest;
-import com.iherbyou.catalog.entity.Product;
-import com.iherbyou.catalog.service.ProductService;
+import com.iherbyou.catalog.dto.RestockSubscriptionResponse;
+import com.iherbyou.catalog.service.RestockSubscriptionService;
 import com.iherbyou.common.code.service.CodeService;
 import com.iherbyou.security.auth.UserPrincipal;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/admin/products")
-@RequiredArgsConstructor
-public class AdminProductController {
+import java.util.List;
 
-    private final ProductService productService;
+@RestController
+@RequestMapping("/api/admin/restock-subscriptions")
+@RequiredArgsConstructor
+public class AdminRestockSubscriptionController {
+
+    private final RestockSubscriptionService restockSubscriptionService;
     private final CodeService codeService;
 
     @PersistenceContext
     private EntityManager em;
 
-    // 상품 등록 API
-    @PostMapping
-    public ResponseEntity<?> createProduct(
-            @AuthenticationPrincipal UserPrincipal me,
-            @RequestBody ProductCreateRequest request) {
-
-        ensureAdmin(me);
-        Product saved = productService.createProduct(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-    }
-
-    // 상품 수정 API
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduct(
-            @PathVariable Long id,
-            @AuthenticationPrincipal UserPrincipal me,
-            @RequestBody ProductUpdateRequest request
+    // 재입고 알림 목록 조회
+    @GetMapping
+    public ResponseEntity<List<RestockSubscriptionResponse>> getAllSubscriptions(
+            @RequestParam(required = false) Boolean isActive,
+            @AuthenticationPrincipal UserPrincipal me
     ) {
         ensureAdmin(me);
-        productService.updateProduct(id, request);
-        return ResponseEntity.ok("Product updated successfully");
+        List<RestockSubscriptionResponse> subscriptions =
+                restockSubscriptionService.getAllSubscriptions(isActive);
+        return ResponseEntity.ok(subscriptions);
     }
 
-    // 상품 삭제 API
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(
+    // 재입고 알림 발송
+    @PostMapping("/{id}/notify")
+    public ResponseEntity<?> notifyRestock(
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal me
     ) {
         ensureAdmin(me);
-        productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();  // 204 No Content
+        restockSubscriptionService.notifyRestock(id);
+        return ResponseEntity.ok("Restock notification sent successfully.");
     }
 
     // 관리자 권한 확인

@@ -34,6 +34,7 @@ public class ProductService {
     private final ProductImgRepository productImgRepository;
     private final ProductVariantRepository productVariantRepository;
     private final StockRepository stockRepository;
+    private final RestockSubscriptionRepository restockSubscriptionRepository;
 
     @Transactional(readOnly = true)
     public Page<ProductListDto> getProducts(Pageable pageable,
@@ -223,59 +224,59 @@ public class ProductService {
         // 카테고리 연결
         if (dto.getCategoryIds() != null) {
             for (Long categoryId : dto.getCategoryIds()) {
-            Category category = categoryRepository.findById((categoryId))
-                    .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+                Category category = categoryRepository.findById((categoryId))
+                        .orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
-            ProductCategory pc = ProductCategory.builder()
-                    .product(product)
-                    .category(category)
-                    .build();
+                ProductCategory pc = ProductCategory.builder()
+                        .product(product)
+                        .category(category)
+                        .build();
 
-            productCategoryRepository.save(pc);
+                productCategoryRepository.save(pc);
             }
         }
 
         // 이미지 등록
         if (dto.getProductImgs() != null) {
             for (ProductImgDto imgDto : dto.getProductImgs()) {
-            ProductImg img = ProductImg.builder()
-                    .product(product)
-                    .imageUrl(imgDto.getImageUrl())
-                    .isPrimary(imgDto.isPrimary())
-                    .build();
+                ProductImg img = ProductImg.builder()
+                        .product(product)
+                        .imageUrl(imgDto.getImageUrl())
+                        .isPrimary(imgDto.isPrimary())
+                        .build();
 
-            productImgRepository.save(img);
+                productImgRepository.save(img);
             }
         }
 
         // 옵션 + 재고
         if (dto.getVariants() != null) {
             for (ProductVariantDto variantDto : dto.getVariants()) {
-            ProductVariant variant = ProductVariant.builder()
-                    .product(product)
-                    .variantName(variantDto.getVariantName())
-                    .listPrice(variantDto.getListPrice())
-                    .salePrice(variantDto.getSalePrice())
-                    .volume(variantDto.getVolume())
-                    .upcCode(variantDto.getUpcCode())
-                    .pillSize(variantDto.getPillSize())
-                    .nutritionFacts(variantDto.getNutritionFacts())
-                    .maxQtyPerOrder(variantDto.getMaxQtyPerOrder())
-                    .restockEta(variantDto.getRestockEta())
-                    .build();
-
-            productVariantRepository.save(variant);
-
-            StockDto stockDto = variantDto.getStock();
-            if (stockDto != null) {
-                Stock stock = Stock.builder()
-                        .productVariant(variant)
-                        .amount(stockDto.getAmount())
-                        .restockedAt(stockDto.getRestockedAt())
+                ProductVariant variant = ProductVariant.builder()
+                        .product(product)
+                        .variantName(variantDto.getVariantName())
+                        .listPrice(variantDto.getListPrice())
+                        .salePrice(variantDto.getSalePrice())
+                        .volume(variantDto.getVolume())
+                        .upcCode(variantDto.getUpcCode())
+                        .pillSize(variantDto.getPillSize())
+                        .nutritionFacts(variantDto.getNutritionFacts())
+                        .maxQtyPerOrder(variantDto.getMaxQtyPerOrder())
+                        .restockEta(variantDto.getRestockEta())
                         .build();
 
-                stockRepository.save(stock);
-            }
+                productVariantRepository.save(variant);
+
+                StockDto stockDto = variantDto.getStock();
+                if (stockDto != null) {
+                    Stock stock = Stock.builder()
+                            .productVariant(variant)
+                            .amount(stockDto.getAmount())
+                            .restockedAt(stockDto.getRestockedAt())
+                            .build();
+
+                    stockRepository.save(stock);
+                }
             }
         }
 
@@ -387,6 +388,38 @@ public class ProductService {
                 stockRepository.save(stock);
             }
         }
+    }
+
+    // admin - 상품 삭제
+    @Transactional
+    public void deleteProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+
+        // 재입고 알림 삭제
+        List<ProductVariant> variants = productVariantRepository.findByProduct(product);
+        for (ProductVariant variant : variants) {
+            restockSubscriptionRepository.deleteAllByProductVariant(variant);
+        }
+
+        // 재고 삭제
+        for (ProductVariant variant : variants) {
+            if (variant.getStock() != null) {
+                stockRepository.delete(variant.getStock());
+            }
+        }
+
+        // 옵션 삭제
+        productVariantRepository.deleteAll(variants);
+
+        // 이미지 삭제
+        productImgRepository.deleteByProduct(product);
+
+        // 카테고리 연결 삭제
+        productCategoryRepository.deleteByProduct(product);
+
+        // 상품 삭제
+        productRepository.delete(product);
     }
 
 }

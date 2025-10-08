@@ -93,7 +93,7 @@ public class CategoryService {
         for (Category c : categories) {
             CategoryTreeDto dto = dtoMap.get(c.getId());
             Long parentId = dtoMap.get(c.getId()).getParentId();
-            
+
             if (parentId == null) {
                 // 루트 카테고리 (depth=1)
                 roots.add(dto);
