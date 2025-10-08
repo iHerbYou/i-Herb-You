@@ -5,6 +5,9 @@ import com.iherbyou.exception.catalog.*;
 import com.iherbyou.exception.email.AlreadyVerifiedTokenException;
 import com.iherbyou.exception.email.ExpiredEmailTokenException;
 import com.iherbyou.exception.email.InvalidEmailTokenException;
+import com.iherbyou.exception.password.ExpiredPasswordResetTokenException;
+import com.iherbyou.exception.password.InvalidPasswordResetTokenException;
+import com.iherbyou.exception.password.UsedPasswordResetTokenException;
 import com.iherbyou.exception.user.*;
 import com.iherbyou.exception.wishlist.*;
 import org.springframework.http.HttpStatus;
@@ -77,6 +80,23 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AlreadyVerifiedTokenException.class)
     public ResponseEntity<Map<String, Object>> handleAlreadyVerifiedEmail(AlreadyVerifiedTokenException e) {
+        return buildResponse(HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    // ===================== 비밀번호 재설정 관련 예외 =====================
+
+    @ExceptionHandler(InvalidPasswordResetTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidPasswordResetToken(InvalidPasswordResetTokenException e) {
+        return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(ExpiredPasswordResetTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleExpiredPasswordResetToken(ExpiredPasswordResetTokenException e) {
+        return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(UsedPasswordResetTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleUsedPasswordResetToken(UsedPasswordResetTokenException e) {
         return buildResponse(HttpStatus.CONFLICT, e.getMessage());
     }
 
