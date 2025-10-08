@@ -367,4 +367,32 @@ public class UserService {
         return ChangePasswordResponseDto.success();
     }
 
+    /**
+     * 회원 탈퇴 (soft delete)
+     */
+    @Transactional
+    public WithdrawResponseDto withdraw(UserPrincipal userPrincipal, WithdrawRequestDto request) {
+        log.info("회원 탈퇴 시도: {}", userPrincipal.getEmail());
+
+        // 회원 확인
+        User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다"));
+
+        // 비밀번호 일치 여부 확인
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            log.warn("회원 탈퇴 실패 - 비밀번호 불일치: {}", userPrincipal.getEmail());
+            throw new InvalidPasswordException("비밀번호가 올바르지 않습니다");
+        }
+
+        // 회원 상태 코드 DELETED로 변경 (soft delete)
+        Code deletedStatus = codeService.getCode(71, 715); // DELETED
+        if (deletedStatus == null) {
+            throw new IllegalStateException("탈퇴 상태 코드를 찾을 수 없습니다.");
+        }
+        user.changeUserStatus(deletedStatus);
+        log.info("회원 탈퇴 완료: {}", user.getEmail());
+
+        return WithdrawResponseDto.success();
+    }
+
 }
