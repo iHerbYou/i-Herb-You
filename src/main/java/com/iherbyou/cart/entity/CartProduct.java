@@ -23,10 +23,18 @@ public class CartProduct {
     @JoinColumn(name = "product_variant_id", nullable = false)
     private ProductVariant productVariant;
 
-    @Column(nullable = false, columnDefinition = "INT CHECK (qty > 0)")
-    private Integer qty = 1;
+    @Column(nullable = false)
+    private Integer qty;
 
     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 1")
     private Boolean isSelected;
+
+    public void changeQty(int qty) {
+        this.qty = qty;
+    }
+
+    public void changeSelected(boolean selected) {
+        this.isSelected = selected;
+    }
 
 }

@@ -46,6 +46,7 @@ public class Cart {
 
     // 1:N (장바구니 하나에 여러 항목)
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<CartProduct> cartProducts = new ArrayList<>();
 
 }

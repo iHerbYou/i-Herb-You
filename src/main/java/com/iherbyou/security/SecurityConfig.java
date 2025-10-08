@@ -76,6 +76,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/password-reset-request").permitAll() // 비밀번호 재설정 요청
                         .requestMatchers("/api/users/password-reset-confirm").permitAll()
                         .requestMatchers("/api/banner/**").permitAll()
+                        .requestMatchers("/api/cart/**").permitAll()
                         .requestMatchers("/api/codes/**").permitAll()
                         .requestMatchers("/api/catalog/**").permitAll()
                         .requestMatchers("/api/qna/**").permitAll()
