@@ -3,12 +3,15 @@ package com.iherbyou.ordering.service;
 import com.iherbyou.common.code.entity.Code;
 import com.iherbyou.common.code.service.CodeService;
 import com.iherbyou.ordering.code.OrderStatus;
+import com.iherbyou.ordering.config.RefundPolicyProperties;
 import com.iherbyou.ordering.dto.RefundRequestDto;
 import com.iherbyou.ordering.dto.RefundResponseDto;
+import com.iherbyou.ordering.entity.Delivery;
 import com.iherbyou.ordering.entity.Payment;
 import com.iherbyou.ordering.entity.Refund;
 import com.iherbyou.ordering.repository.PaymentRepository;
 import com.iherbyou.ordering.repository.RefundRepository;
+import com.iherbyou.ordering.repository.DeliveryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -33,8 +36,10 @@ public class RefundService {
 
     private final PaymentRepository paymentRepository;
     private final RefundRepository refundRepository;
+    private final DeliveryRepository deliveryRepository;
     private final CodeService codeService;
     private final OrderService orderService;
+    private final RefundPolicyProperties refundPolicyProperties;
 
     public RefundResponseDto requestRefund(Long userId, Long paymentId, RefundRequestDto request) {
         if (userId == null) {
@@ -50,6 +55,7 @@ public class RefundService {
         ensureOrderOwner(payment, userId);
 
         ensurePaymentIsRefundable(payment);
+        ensureRefundWindow(payment);
 
         BigDecimal amount = request.getAmount();
         BigDecimal alreadyRefunded = refundRepository.findByPayment_Id(paymentId).stream()
@@ -160,6 +166,30 @@ public class RefundService {
         if (payment.getPaymentStatusCode() == null
                 || PAYMENT_STATUS_PAID != payment.getPaymentStatusCode().getValue()) {
             throw new IllegalStateException("payment is not settled");
+        }
+    }
+
+    private void ensureRefundWindow(Payment payment) {
+        if (payment.getOrder() == null) {
+            throw new IllegalStateException("payment must be attached to an order");
+        }
+
+        Code orderStatus = payment.getOrder().getOrderStatusCode();
+        if (orderStatus != null && orderStatus.getValue() == OrderStatus.COMPLETED.getCodeValue()) {
+            throw new IllegalStateException("refund not allowed after order completion");
+        }
+
+        Delivery delivery = deliveryRepository.findByOrder_Id(payment.getOrder().getId())
+                .orElseThrow(() -> new IllegalStateException("delivery not found for order"));
+
+        LocalDateTime deliveredAt = delivery.getDelCompleteAt();
+        if (deliveredAt == null) {
+            throw new IllegalStateException("delivery completion time is not recorded");
+        }
+
+        LocalDateTime deadline = deliveredAt.plus(refundPolicyProperties.getCompletionWindow());
+        if (LocalDateTime.now().isAfter(deadline)) {
+            throw new IllegalStateException("refund window has expired");
         }
     }
 
