@@ -27,6 +27,11 @@ public class PromotionCouponFacade {
 
     public Optional<UserCoupon> issueWelcomeCoupon(Long userId) {
         User user = requireUser(userId);
+        return issueWelcomeCoupon(user);
+    }
+
+    public Optional<UserCoupon> issueWelcomeCoupon(User user) {
+        ensureUser(user);
         return promotionCouponService.issueWelcomeCoupon(user);
     }
 
@@ -85,6 +90,12 @@ public class PromotionCouponFacade {
     private void ensureUserMatches(User user, Long userId) {
         if (user == null || user.getId() == null || !user.getId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "user does not own resource");
+        }
+    }
+
+    private void ensureUser(User user) {
+        if (user == null || user.getId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "user not found");
         }
     }
 

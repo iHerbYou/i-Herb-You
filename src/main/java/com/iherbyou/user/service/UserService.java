@@ -86,7 +86,7 @@ public class UserService {
         User savedUser = userRepository.save(user);
 
         try {
-            promotionCouponFacade.issueWelcomeCoupon(savedUser.getId());
+            promotionCouponFacade.issueWelcomeCoupon(savedUser);
         } catch (Exception e) {
             log.warn("[WelcomeCoupon][failed] userId={}", savedUser.getId(), e);
         }
