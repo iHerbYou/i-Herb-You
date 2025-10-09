@@ -54,46 +54,6 @@ INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
 VALUES ((SELECT id FROM product WHERE code = 'P88179641598' LIMIT 1), 1890, '2025-09-29 12:00:00');
 
 
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '오쏘몰'),
-        '오쏘몰 이뮨 멀티비타민 미네랄 (액상 20ml + 정제 919mg) x 30개입, 1개',
-        'P51929317174', '오쏘몰 이뮨 멀티비타민 미네랄 (액상 20ml + 정제 919mg) x 30개입, 1개',
-        '하루 1개를 식후에 섭취하세요.', '비타민 A, C, D, E, B군, 아연, 마그네슘, 셀레늄',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2024-12-31 00:00:00', 30, 6, 1890, 4.6, 280, 77270);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P51929317174' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192931/51929317174.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P51929317174' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192931/51929317174.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P51929317174' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192931/51929317174.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P51929317174' LIMIT 1), '30개입', 77270, 75270, 30, '600000000003', '액상+정제',
-        '비타민 및 미네랄 충족', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P51929317174' LIMIT 1), '15개입', 47270, 45270, 15, '600000000004', '액상+정제',
-        '비타민 및 미네랄 충족', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '30개입'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929317174' LIMIT 1)
-         LIMIT 1),
-        150, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '15개입'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929317174' LIMIT 1)
-         LIMIT 1),
-        100, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P51929317174' LIMIT 1),
-        (SELECT id FROM category WHERE name = '종합비타민' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P51929317174' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
                      sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
@@ -105,11 +65,8 @@ VALUES ((SELECT id FROM brand WHERE name = '센트룸'),
         '2025-01-01 00:00:00', 30, 6, 1890, 4.4, 280, 39990);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P86787803460' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8678780/86787803460.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P86787803460' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8678780/86787803460.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P86787803460' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8678780/86787803460.3.jpg', '성분 정보', 2, 0);
+        'https://shop-phinf.pstatic.net/20250722_202/17531851798463DS2w_JPEG/1054673588311759_439268804.jpg?type=m510',
+        '대표 이미지', 0, 1);
 INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
                              nutrition_facts, max_qty_per_order, restock_eta)
 VALUES ((SELECT id FROM product WHERE code = 'P86787803460' LIMIT 1), '112정', 39990, 36990, 112, '600000000005',
@@ -774,7 +731,7 @@ VALUES ((SELECT id FROM brand WHERE name = '종근당'),
         'P81588702516', '종근당 고함량 비타민B 비타민비 군 영양제 활성 수용성 컴플렉스 B12 B1 B3 B6',
         '하루 1정을 식후에 섭취하세요.', '비타민 B1, B3, B6, B12, 엽산, 판토텐산',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-01-17 00:00:00', 30, 6, 1890, 4.2, 280, 14900);
+        '2025-01-17 00:00:00', 30, 6, 7997, 4.2, 280, 14900);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P81588702516' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8158870/81588702516.1.jpg', '대표 이미지', 0, 1),
@@ -897,7 +854,7 @@ VALUES ((SELECT id FROM brand WHERE name = '칼맥'),
         'P82310385955', '종근당 비타민B군 비군 고함량 B3 B5 B7 B9 B12 영양제 수용성 컴플렉스',
         '하루 1정을 식후에 섭취하세요.', '비타민 B3, B5, B7, B9, B12, 엽산, 판토텐산',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-01-20 00:00:00', 30, 6, 1890, 4.1, 280, 14900);
+        '2025-01-20 00:00:00', 30, 6, 7981, 4.1, 280, 14900);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P82310385955' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8231038/82310385955.1.jpg', '대표 이미지', 0, 1),
@@ -938,7 +895,7 @@ VALUES ((SELECT id FROM brand WHERE name = '기타'),
         'P88837633834', '배석철의 아미나 고용량 비타민B3 500mg 미국산 니코틴산아미드 100캡슐, 1개',
         '하루 1캡슐을 식후에 섭취하세요.', '비타민 B3, 니코틴산아미드',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-01-21 00:00:00', 30, 6, 1890, 4.5, 280, 48000);
+        '2025-01-21 00:00:00', 30, 6, 7982, 4.5, 280, 48000);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P88837633834' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8883763/88837633834.1.jpg', '대표 이미지', 0, 1),
@@ -1011,47 +968,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P51929252328' LIMIT 1),
         (SELECT id FROM category WHERE name = '비타민 B' LIMIT 1));
 INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
 VALUES ((SELECT id FROM product WHERE code = 'P51929252328' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '솔가'),
-        '솔가 비타민B 컴플렉스 100 250베지캡슐',
-        'P36465556619', '솔가 비타민B 컴플렉스 100 250베지캡슐',
-        '하루 1캡슐을 식후에 섭취하세요.', '비타민 B1, B2, B3, B6, B12, 엽산, 판토텐산',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-01-23 00:00:00', 30, 6, 1890, 4.6, 280, 34280);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P36465556619' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_3646555/36465556619.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P36465556619' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_3646555/36465556619.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P36465556619' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_3646555/36465556619.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P36465556619' LIMIT 1), '250캡슐', 34280, 32280, 250, '600000000049',
-        '10x10x5mm', '비타민B군 복합', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P36465556619' LIMIT 1), '100캡슐', 24280, 22280, 100, '600000000050',
-        '10x10x5mm', '비타민B군 복합', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '250캡슐'
-           AND product_id = (SELECT id FROM product WHERE code = 'P36465556619' LIMIT 1)
-         LIMIT 1),
-        60, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '100캡슐'
-           AND product_id = (SELECT id FROM product WHERE code = 'P36465556619' LIMIT 1)
-         LIMIT 1),
-        40, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P36465556619' LIMIT 1),
-        (SELECT id FROM category WHERE name = '비타민 B' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P36465556619' LIMIT 1), 1890, '2025-09-29 12:00:00');
 
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
@@ -1191,7 +1107,7 @@ VALUES ((SELECT id FROM brand WHERE name = '영롱'),
         'P83696034930', '[3+1]영롱 판토쉴드 비타민B 판토텐산 [장용성 코팅 캡슐]비타민비 영양제 B6 B12',
         '하루 1캡슐을 식후에 섭취하세요.', '비타민 B5, B6, B12, 판토텐산',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-01-27 00:00:00', 30, 6, 1890, 4.4, 280, 84000);
+        '2025-01-27 00:00:00', 30, 6, 7983, 4.4, 280, 84000);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P83696034930' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8369603/83696034930.1.jpg', '대표 이미지', 0, 1),
@@ -1355,7 +1271,7 @@ VALUES ((SELECT id FROM brand WHERE name = '자로우포뮬러스'),
         'P82642627596', '자로우 판토텐산 B5 500mg 100캡슐 재로우',
         '하루 1캡슐을 식후에 섭취하세요.', '비타민 B5, 판토텐산',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-01-31 00:00:00', 30, 6, 1890, 4.4, 280, 20800);
+        '2025-01-31 00:00:00', 30, 6, 7984, 4.4, 280, 20800);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P82642627596' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8264262/82642627596.1.jpg', '대표 이미지', 0, 1),
@@ -1995,7 +1911,7 @@ VALUES ((SELECT id FROM brand WHERE name = '종근당'),
         'P85782904066', '종근당 비타민d 2000iu 임산부 성인 비타민d3 3개월분',
         '하루 1정을 식후에 섭취하세요.', '비타민 D3, 콜레칼시페롤',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-02-15 00:00:00', 30, 6, 1890, 4.3, 280, 11900);
+        '2025-10-09 00:00:00', 30, 6, 7993, 4.3, 280, 11900);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P85782904066' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8578290/85782904066.1.jpg', '대표 이미지', 0, 1),
@@ -2118,7 +2034,7 @@ VALUES ((SELECT id FROM brand WHERE name = '바료랑'),
         'P89179871015', '아기비타민D 유아 어린이 드롭 액상 비타민D3 400IU',
         '하루 1-2방울을 섭취하세요.', '비타민 D3, 콜레칼시페롤',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-02-18 00:00:00', 30, 6, 1890, 4.5, 280, 19800);
+        '2025-02-18 00:00:00', 30, 6, 7992, 4.5, 280, 19800);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P89179871015' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8917987/89179871015.1.jpg', '대표 이미지', 0, 1),
@@ -2453,7 +2369,7 @@ VALUES ((SELECT id FROM brand WHERE name = '퓨어팅'),
         'P89154046973', '퓨어팅 비타민D 2000IU 임산부 성인 60정 비타민D3',
         '하루 1정을 식후에 섭취하세요.', '비타민 D3, 콜레칼시페롤',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-02-26 00:00:00', 30, 6, 1890, 4.4, 280, 18900);
+        '2025-02-26 00:00:00', 30, 6, 7990, 4.4, 280, 18900);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P89154046973' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8915404/89154046973.1.jpg', '대표 이미지', 0, 1),
@@ -2628,7 +2544,7 @@ VALUES ((SELECT id FROM brand WHERE name = '아임비타'),
         'P88808819064', '종근당건강 아임비타 앰플 멀티비타민 이뮨샷 선물세트 20개입, 1개',
         '하루 1개를 식후에 섭취하세요.', '비타민 A, C, D, E, B군, 아연, 마그네슘, 셀레늄',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-03-02 00:00:00', 30, 6, 1890, 4.5, 280, 51000);
+        '2025-10-09 00:00:00', 30, 6, 1890, 4.5, 280, 51000);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P88808819064' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8880881/88808819064.1.jpg', '대표 이미지', 0, 1),
@@ -2967,47 +2883,6 @@ VALUES ('오리진');
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
                      sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '영롱'),
-        '[평점4.8] 영롱 세이프 비타민K2+칼슘 약사설계 [MK7 메나퀴논]120mcg 효능',
-        'P88437738531', '[평점4.8] 영롱 세이프 비타민K2+칼슘 약사설계 [MK7 메나퀴논]120mcg 효능',
-        '하루 1정을 식후에 섭취하세요.', '비타민 K2, 메나퀴논 MK-7, 칼슘',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-03-10 00:00:00', 30, 6, 1890, 4.8, 280, 19900);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P88437738531' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8843773/88437738531.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P88437738531' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8843773/88437738531.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P88437738531' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8843773/88437738531.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P88437738531' LIMIT 1), '60정', 19900, 17900, 60, '600000000141',
-        '10x10x5mm', '비타민K2+칼슘', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P88437738531' LIMIT 1), '30정', 12900, 10900, 30, '600000000142',
-        '10x10x5mm', '비타민K2+칼슘', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '60정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P88437738531' LIMIT 1)
-         LIMIT 1),
-        110, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '30정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P88437738531' LIMIT 1)
-         LIMIT 1),
-        75, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P88437738531' LIMIT 1),
-        (SELECT id FROM category WHERE name = '비타민 K' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P88437738531' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
 VALUES ((SELECT id FROM brand WHERE name = '닥터스베스트'),
         '닥터스베스트 내추럴 비타민 K2 MK-7 45mcg 베지 캡  180정  1개',
         'P49792688046', '닥터스베스트 내추럴 비타민 K2 MK-7 45mcg 베지 캡  180정  1개',
@@ -3054,7 +2929,7 @@ VALUES ((SELECT id FROM brand WHERE name = '엔썸잇'),
         'P51219209111', '비타민 K2 식약청인증 MK-7 엔썸잇 뼈건강 영양제 메나퀴논 대용량 3개월분  1개  90정',
         '하루 1정을 식후에 섭취하세요.', '비타민 K2, 메나퀴논 MK-7',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-03-12 00:00:00', 30, 6, 1890, 4.4, 280, 23500);
+        '2025-03-12 00:00:00', 30, 6, 7998, 4.4, 280, 23500);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P51219209111' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_5121920/51219209111.1.jpg', '대표 이미지', 0, 1),
@@ -3307,7 +3182,7 @@ VALUES ((SELECT id FROM brand WHERE name = '종근당'),
         'P84112158990', '종근당 뼈에좋은 칼슘 마그네슘 비타민D 아연 영양제 6개월 칼마디 임산부 마칼디',
         '하루 1-2정을 식후에 섭취하세요.', '칼슘, 마그네슘, 비타민 D, 아연',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-03-18 00:00:00', 30, 6, 1890, 4.4, 280, 28900);
+        '2025-03-18 00:00:00', 30, 6, 8000, 4.4, 280, 28900);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P84112158990' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8411215/84112158990.1.jpg', '대표 이미지', 0, 1),
@@ -3503,47 +3378,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P51929594138' LIMIT 1),
         (SELECT id FROM category WHERE name = '칼슘' LIMIT 1));
 INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
 VALUES ((SELECT id FROM product WHERE code = 'P51929594138' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = 'GNM자연의품격'),
-        'GNM자연의품격 칼슘 마그네슘 아연 비타민D 1350mg x 90정, 1개',
-        'P51929613826', 'GNM자연의품격 칼슘 마그네슘 아연 비타민D 1350mg x 90정, 1개',
-        '하루 1-2정을 식후에 섭취하세요.', '칼슘, 마그네슘, 아연, 비타민 D',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-03-23 00:00:00', 30, 6, 1890, 4.1, 280, 8210);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P51929613826' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192961/51929613826.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P51929613826' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192961/51929613826.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P51929613826' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192961/51929613826.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P51929613826' LIMIT 1), '90정', 8210, 6210, 90, '600000000167',
-        '10x10x5mm', '칼슘+마그네슘+아연+비타민D', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P51929613826' LIMIT 1), '45정', 5210, 3210, 45, '600000000168',
-        '10x10x5mm', '칼슘+마그네슘+아연+비타민D', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '90정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929613826' LIMIT 1)
-         LIMIT 1),
-        180, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '45정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929613826' LIMIT 1)
-         LIMIT 1),
-        120, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P51929613826' LIMIT 1),
-        (SELECT id FROM category WHERE name = '칼슘' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P51929613826' LIMIT 1), 1890, '2025-09-29 12:00:00');
 
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
@@ -4019,7 +3853,7 @@ VALUES ((SELECT id FROM brand WHERE name = '닥터스베스트'),
         'P88016571260', '1+1 닥터스베스트 킬레이트 마그네슘 글리시네이트 100mg 120타블렛',
         '하루 1-2정을 식후에 섭취하세요.', '마그네슘, 글리시네이트',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-04-04 00:00:00', 30, 6, 1890, 4.4, 280, 32700);
+        '2025-04-04 00:00:00', 30, 6, 7999, 4.4, 280, 32700);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P88016571260' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8801657/88016571260.1.jpg', '대표 이미지', 0, 1),
@@ -4051,47 +3885,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P88016571260' LIMIT 1),
         (SELECT id FROM category WHERE name = '마그네슘' LIMIT 1));
 INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
 VALUES ((SELECT id FROM product WHERE code = 'P88016571260' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = 'GNM자연의품격'),
-        'GNM자연의품격 마그네슘05 800mg x 120정, 1개',
-        'P51929282682', 'GNM자연의품격 마그네슘05 800mg x 120정, 1개',
-        '하루 1-2정을 식후에 섭취하세요.', '마그네슘, 산화마그네슘',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-04-05 00:00:00', 30, 6, 1890, 4.1, 280, 11600);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P51929282682' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192928/51929282682.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P51929282682' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192928/51929282682.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P51929282682' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192928/51929282682.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P51929282682' LIMIT 1), '120정', 11600, 9600, 120, '600000000193',
-        '10x10x5mm', '마그네슘 고함량', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P51929282682' LIMIT 1), '60정', 7600, 5600, 60, '600000000194',
-        '10x10x5mm', '마그네슘 고함량', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '120정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929282682' LIMIT 1)
-         LIMIT 1),
-        150, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '60정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929282682' LIMIT 1)
-         LIMIT 1),
-        100, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P51929282682' LIMIT 1),
-        (SELECT id FROM category WHERE name = '마그네슘' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P51929282682' LIMIT 1), 1890, '2025-09-29 12:00:00');
 
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
@@ -4582,7 +4375,7 @@ VALUES ((SELECT id FROM brand WHERE name = '기타'),
         'P83357292328', '에코뉴트리션 3개월분 철분제 여성 남성 임산부 비헴철 헤마 철분 영양제',
         '하루 1-2정을 식후에 섭취하세요.', '비헴철, 헤마 철분',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-04-17 00:00:00', 30, 6, 1890, 4.3, 280, 0);
+        '2025-04-17 00:00:00', 30, 6, 7980, 4.3, 280, 0);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P83357292328' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8335729/83357292328.1.jpg', '대표 이미지', 0, 1),
@@ -6705,7 +6498,7 @@ VALUES ((SELECT id FROM brand WHERE name = '기타'),
         'P89750254429', '트루 씨모스 슈퍼푸드 망고 473g Sea Moss Gel 씨모스 젤 바다이끼',
         '하루 1-2스푼을 물에 타서 섭취하세요.', '씨모스 젤, 바다이끼',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-06-06 00:00:00', 30, 6, 1890, 4.3, 280, 36900);
+        '2025-06-06 00:00:00', 30, 6, 7995, 4.3, 280, 36900);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P89750254429' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8975025/89750254429.1.jpg', '대표 이미지', 0, 1),
@@ -9101,7 +8894,7 @@ VALUES ((SELECT id FROM brand WHERE name = 'Lazyboo 미국구매대행'),
         'P13440847243', 'Vimerson Health CoQ10 Ubiquinone 비머슨 헬스 코엔자임큐텐 30정',
         '하루 1-2정을 식후에 섭취하세요.', '코엔자임 Q10, 유비퀴논',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-08-01 00:00:00', 30, 6, 1890, 4.2, 280, 45300);
+        '2025-10-09 00:00:00', 30, 6, 1890, 4.2, 280, 45300);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P13440847243' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_1344084/13440847243.1.jpg', '대표 이미지', 0, 1),
@@ -9183,7 +8976,7 @@ VALUES ((SELECT id FROM brand WHERE name = '소스내추럴스'),
         'P82541376829', 'Source Naturals Coenzyme Q10 Ubiquinone 미국 소스내츄럴 코엔자임 코큐텐 유비퀴논 90정(90일분) 2통',
         '하루 1-2정을 식후에 섭취하세요.', '코엔자임 Q10, 유비퀴논',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-08-03 00:00:00', 30, 6, 1890, 4.3, 280, 83000);
+        '2025-08-03 00:00:00', 30, 6, 1890, 5.0, 280, 83000);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P82541376829' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8254137/82541376829.1.jpg', '대표 이미지', 0, 1),
@@ -9328,128 +9121,6 @@ VALUES ('ALLBARN');
 INSERT IGNORE INTO brand (name)
 VALUES ('하프클럽');
 
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '평생비책'),
-        '평생비책 수용성 커큐민 맥스 60정 1박스 나노 강황 추출물 피페린',
-        'P89359300401', '평생비책 수용성 커큐민 맥스 60정 1박스 나노 강황 추출물 피페린',
-        '하루 1-2정을 식후에 섭취하세요.', '커큐민, 강황 추출물, 피페린',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-08-06 00:00:00', 30, 6, 1890, 4.2, 280, 19900);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P89359300401' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8935930/89359300401.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P89359300401' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8935930/89359300401.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P89359300401' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8935930/89359300401.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P89359300401' LIMIT 1), '60정', 19900, 17900, 60, '600000000439',
-        '10x10x5mm', '평생비책 수용성', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P89359300401' LIMIT 1), '30정', 11900, 9900, 30, '600000000440',
-        '10x10x5mm', '평생비책 수용성', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '60정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P89359300401' LIMIT 1)
-         LIMIT 1),
-        65, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '30정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P89359300401' LIMIT 1)
-         LIMIT 1),
-        40, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P89359300401' LIMIT 1),
-        (SELECT id FROM category WHERE name = '강황&커큐민' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P89359300401' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = 'ALLBARUN'),
-        '허브큐어 ALLBARUN 올바른 커큐민 골드 500 수용성 강황 500mg x 60정, 1개',
-        'P56333850962', '허브큐어 ALLBARUN 올바른 커큐민 골드 500 수용성 강황 500mg x 60정, 1개',
-        '하루 1-2정을 식후에 섭취하세요.', '커큐민, 강황',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-08-07 00:00:00', 30, 6, 1890, 4.3, 280, 15400);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P56333850962' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5633385/56333850962.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P56333850962' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5633385/56333850962.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P56333850962' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5633385/56333850962.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P56333850962' LIMIT 1), '60정', 15400, 13400, 60, '600000000441',
-        '10x10x5mm', 'ALLBARUN 골드', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P56333850962' LIMIT 1), '30정', 9400, 7400, 30, '600000000442',
-        '10x10x5mm', 'ALLBARUN 골드', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '60정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P56333850962' LIMIT 1)
-         LIMIT 1),
-        80, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '30정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P56333850962' LIMIT 1)
-         LIMIT 1),
-        50, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P56333850962' LIMIT 1),
-        (SELECT id FROM category WHERE name = '강황&커큐민' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P56333850962' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = 'JW중외제약'),
-        '비오팜 JW중외제약 수용성 강황 커큐민 C3 콤플렉스 플러스 바이오페린 피페린 흑후추 700mg x 60정, 1개',
-        'P56353061560', '비오팜 JW중외제약 수용성 강황 커큐민 C3 콤플렉스 플러스 바이오페린 피페린 흑후추 700mg x 60정, 1개',
-        '하루 1-2정을 식후에 섭취하세요.', '커큐민, 강황, 피페린, 흑후추',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-08-08 00:00:00', 30, 6, 1890, 4.1, 280, 19500);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P56353061560' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5635306/56353061560.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P56353061560' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5635306/56353061560.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P56353061560' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5635306/56353061560.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P56353061560' LIMIT 1), '60정', 19500, 17500, 60, '600000000443',
-        '10x10x5mm', 'JW중외제약 C3', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P56353061560' LIMIT 1), '30정', 11500, 9500, 30, '600000000444',
-        '10x10x5mm', 'JW중외제약 C3', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '60정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P56353061560' LIMIT 1)
-         LIMIT 1),
-        70, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '30정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P56353061560' LIMIT 1)
-         LIMIT 1),
-        45, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P56353061560' LIMIT 1),
-        (SELECT id FROM category WHERE name = '강황&커큐민' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P56353061560' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
                      sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
@@ -9581,7 +9252,7 @@ VALUES ((SELECT id FROM brand WHERE name = '닥터루템'),
         'P87019830595', '닥터루템 수용성 리포좀 강황 커큐민 영양제 3박스',
         '하루 1-2정을 식후에 섭취하세요.', '커큐민, 강황, 리포좀',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-08-12 00:00:00', 30, 6, 1890, 4.3, 280, 64360);
+        '2025-08-12 00:00:00', 30, 6, 7994, 4.3, 280, 64360);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P87019830595' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8701983/87019830595.1.jpg', '대표 이미지', 0, 1),
@@ -9622,7 +9293,7 @@ VALUES ((SELECT id FROM brand WHERE name = '비제닉스'),
         'P89693951408', '비제닉스 아쿠아 커큐민 부스터 수용성 강황 퀘르세틴 코엔자임Q10',
         '하루 1-2정을 식후에 섭취하세요.', '커큐민, 강황, 퀘르세틴, 코엔자임Q10',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-08-13 00:00:00', 30, 6, 1890, 4.4, 280, 69000);
+        '2025-10-09 00:00:00', 30, 6, 1890, 4.4, 280, 69000);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P89693951408' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8969395/89693951408.1.jpg', '대표 이미지', 0, 1),
@@ -9841,47 +9512,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P89729030700' LIMIT 1), 1890, '202
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
                      sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '겟라이팅퍼블릭'),
-        '2세대 미셀화테크 흡수율 높은 수용성 커큐민 2통 총120정 고약사 강황 커큐민 효능',
-        'P88699353526', '2세대 미셀화테크 흡수율 높은 수용성 커큐민 2통 총120정 고약사 강황 커큐민 효능',
-        '하루 1-2정을 식후에 섭취하세요.', '커큐민, 강황',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-08-18 00:00:00', 30, 6, 1890, 4.0, 280, 19970);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P88699353526' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8869935/88699353526.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P88699353526' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8869935/88699353526.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P88699353526' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8869935/88699353526.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P88699353526' LIMIT 1), '2통', 19970, 17970, 2, '600000000463',
-        '10x10x5mm', '겟라이팅퍼블릭 2세대', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P88699353526' LIMIT 1), '1통', 10970, 8970, 1, '600000000464', '10x10x5mm',
-        '겟라이팅퍼블릭 2세대', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '2통'
-           AND product_id = (SELECT id FROM product WHERE code = 'P88699353526' LIMIT 1)
-         LIMIT 1),
-        35, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '1통'
-           AND product_id = (SELECT id FROM product WHERE code = 'P88699353526' LIMIT 1)
-         LIMIT 1),
-        22, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P88699353526' LIMIT 1),
-        (SELECT id FROM category WHERE name = '강황&커큐민' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P88699353526' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
 VALUES ((SELECT id FROM brand WHERE name = '특별시장'),
         '오레 수용성 하루커큐민 나노화 액상형 인도산 강황추출물 피페린 함유',
         'P89919716153', '오레 수용성 하루커큐민 나노화 액상형 인도산 강황추출물 피페린 함유',
@@ -10051,7 +9681,7 @@ VALUES ((SELECT id FROM brand WHERE name = '뉴트리하트'),
         'P87448381429', '리포즘글루타치온 인지질코팅 리포좀글루타치온 효능 효과 환원형 리포솜 글루타티온 클루타치온',
         '하루 1-2정을 식후에 섭취하세요.', '글루타치온, 리포좀',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-08-23 00:00:00', 30, 6, 1890, 4.1, 280, 24900);
+        '2025-10-09 00:00:00', 30, 6, 1890, 4.1, 280, 24900);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P87448381429' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8744838/87448381429.1.jpg', '대표 이미지', 0, 1),
@@ -10193,7 +9823,7 @@ VALUES ((SELECT id FROM brand WHERE name = '청춘발전소'),
         'P87443963094', '[1포 순수함량 700mg] 정직한 글루타치온 환원형 고함량 고순도 효과 효능',
         '하루 1-2포를 식후에 섭취하세요.', '글루타치온, 환원형',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-08-26 00:00:00', 30, 6, 1890, 4.1, 280, 24900);
+        '2025-08-26 00:00:00', 30, 6, 1890, 5.0, 280, 24900);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P87443963094' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8744396/87443963094.1.jpg', '대표 이미지', 0, 1),
@@ -10316,7 +9946,7 @@ VALUES ((SELECT id FROM brand WHERE name = '킵유어핏'),
         'P87045416254', '퓨어타치온 500mg 리포좀 글루타치온 고순도 리포즘 글루타치온 효능 글로타치온',
         '하루 1-2정을 식후에 섭취하세요.', '글루타치온, 리포좀',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-08-29 00:00:00', 30, 6, 1890, 4.0, 280, 23900);
+        '2025-08-29 00:00:00', 30, 6, 7996, 4.0, 280, 23900);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P87045416254' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_8704541/87045416254.1.jpg', '대표 이미지', 0, 1),
@@ -10579,7 +10209,7 @@ VALUES ((SELECT id FROM brand WHERE name = 'GNM자연의품격'),
         'P11064647078', 'GNM 건조한 눈엔 루테인 오메가3 5박스(총 5개월분)',
         '하루 1-2정을 식후에 섭취하세요.', '루테인, 오메가3',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-09-04 00:00:00', 30, 6, 1890, 4.1, 280, 39800);
+        '2025-10-09 00:00:00', 30, 6, 1890, 4.1, 280, 39800);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P11064647078' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_1106464/11064647078.1.jpg', '대표 이미지', 0, 1),
@@ -10611,47 +10241,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P11064647078' LIMIT 1),
         (SELECT id FROM category WHERE name = '루테인' LIMIT 1));
 INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
 VALUES ((SELECT id FROM product WHERE code = 'P11064647078' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '솔티스'),
-        '솔티스 눈 프로텍션 프로 S3 20캡슐',
-        'P56244540584', '솔티스 눈 프로텍션 프로 S3 20캡슐',
-        '하루 1-2캡슐을 식후에 섭취하세요.', '루테인, 눈건강',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-09-05 00:00:00', 30, 6, 1890, 4.2, 280, 12900);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P56244540584' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5624454/56244540584.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P56244540584' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5624454/56244540584.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P56244540584' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5624454/56244540584.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P56244540584' LIMIT 1), '20캡슐', 12900, 10900, 20, '600000000499',
-        '10x10x5mm', '솔티스 프로텍션', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P56244540584' LIMIT 1), '10캡슐', 7900, 5900, 10, '600000000500',
-        '10x10x5mm', '솔티스 프로텍션', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '20캡슐'
-           AND product_id = (SELECT id FROM product WHERE code = 'P56244540584' LIMIT 1)
-         LIMIT 1),
-        75, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '10캡슐'
-           AND product_id = (SELECT id FROM product WHERE code = 'P56244540584' LIMIT 1)
-         LIMIT 1),
-        48, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P56244540584' LIMIT 1),
-        (SELECT id FROM category WHERE name = '루테인' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P56244540584' LIMIT 1), 1890, '2025-09-29 12:00:00');
 
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
@@ -10697,53 +10286,12 @@ VALUES ((SELECT id FROM product WHERE code = 'P51929296035' LIMIT 1), 1890, '202
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
                      sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '튼튼백서'),
-        '튼튼백서 루테인 지아잔틴 아스타잔틴 132mg x 90캡슐, 1개',
-        'P51929018547', '튼튼백서 루테인 지아잔틴 아스타잔틴 132mg x 90캡슐, 1개',
-        '하루 1-2캡슐을 식후에 섭취하세요.', '루테인, 지아잔틴, 아스타잔틴',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-09-07 00:00:00', 30, 6, 1890, 4.0, 280, 19900);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P51929018547' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192901/51929018547.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P51929018547' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192901/51929018547.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P51929018547' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192901/51929018547.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P51929018547' LIMIT 1), '90캡슐', 19900, 17900, 90, '600000000503',
-        '10x10x5mm', '튼튼백서 복합', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P51929018547' LIMIT 1), '45캡슐', 11900, 9900, 45, '600000000504',
-        '10x10x5mm', '튼튼백서 복합', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '90캡슐'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929018547' LIMIT 1)
-         LIMIT 1),
-        65, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '45캡슐'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929018547' LIMIT 1)
-         LIMIT 1),
-        42, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P51929018547' LIMIT 1),
-        (SELECT id FROM category WHERE name = '루테인' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P51929018547' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
 VALUES ((SELECT id FROM brand WHERE name = '종근당'),
         '종근당 초임계 루테인 아스타잔틴 눈건강 헤마토코쿠스 베타카로틴',
         'P9161375186', '종근당 초임계 루테인 아스타잔틴 눈건강 헤마토코쿠스 베타카로틴',
         '하루 1-2정을 식후에 섭취하세요.', '루테인, 아스타잔틴, 베타카로틴',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-09-08 00:00:00', 30, 6, 1890, 4.1, 280, 14900);
+        '2025-09-08 00:00:00', 30, 6, 1890, 5.0, 280, 14900);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P9161375186' LIMIT 1),
         'https://shopping-phinf.pstatic.net/main_9161375/9161375186.1.jpg', '대표 이미지', 0, 1),
@@ -10816,47 +10364,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P56639098657' LIMIT 1),
         (SELECT id FROM category WHERE name = '제아잔틴' LIMIT 1));
 INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
 VALUES ((SELECT id FROM product WHERE code = 'P56639098657' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = 'GNM자연의품격'),
-        'GNM자연의품격 초임계 알티지오메가3 루테인지아잔틴 1050mg x 30캡슐, 3개',
-        'P51929514314', 'GNM자연의품격 초임계 알티지오메가3 루테인지아잔틴 1050mg x 30캡슐, 3개',
-        '하루 1-2캡슐을 식후에 섭취하세요.', '지아잔틴, 오메가3',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-09-10 00:00:00', 30, 6, 1890, 4.0, 280, 33520);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P51929514314' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192951/51929514314.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P51929514314' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192951/51929514314.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P51929514314' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192951/51929514314.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P51929514314' LIMIT 1), '3개', 33520, 31520, 3, '600000000509',
-        '10x10x5mm', 'GNM 알티지', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P51929514314' LIMIT 1), '1개', 13520, 11520, 1, '600000000510',
-        '10x10x5mm', 'GNM 알티지', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '3개'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929514314' LIMIT 1)
-         LIMIT 1),
-        25, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '1개'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929514314' LIMIT 1)
-         LIMIT 1),
-        16, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P51929514314' LIMIT 1),
-        (SELECT id FROM category WHERE name = '제아잔틴' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P51929514314' LIMIT 1), 1890, '2025-09-29 12:00:00');
 
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
@@ -11863,47 +11370,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P56944139037' LIMIT 1), 1890, '202
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
                      sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '셀렉스'),
-        '셀렉스 썬화이버 프리바이오틱스 250g, 4개',
-        'P56587106833', '셀렉스 썬화이버 프리바이오틱스 250g, 4개',
-        '하루 1-2포를 식후에 섭취하세요.', '프리바이오틱스, 썬화이버',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-10-05 00:00:00', 30, 6, 1890, 4.4, 280, 101460);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P56587106833' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5658710/56587106833.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P56587106833' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5658710/56587106833.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P56587106833' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5658710/56587106833.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P56587106833' LIMIT 1), '4개', 101460, 99460, 4, '600000000559', '포장',
-        '셀렉스 썬화이버', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P56587106833' LIMIT 1), '2개', 51460, 49460, 2, '600000000560', '포장',
-        '셀렉스 썬화이버', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '4개'
-           AND product_id = (SELECT id FROM product WHERE code = 'P56587106833' LIMIT 1)
-         LIMIT 1),
-        15, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '2개'
-           AND product_id = (SELECT id FROM product WHERE code = 'P56587106833' LIMIT 1)
-         LIMIT 1),
-        10, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P56587106833' LIMIT 1),
-        (SELECT id FROM category WHERE name = '프리바이오틱스' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P56587106833' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
 VALUES ((SELECT id FROM brand WHERE name = '종근당건강'),
         '종근당건강 프리바이오틱스 FOS 에프오에스 5g x 30포, 1개',
         'P51929039120', '종근당건강 프리바이오틱스 FOS 에프오에스 5g x 30포, 1개',
@@ -12254,88 +11720,6 @@ VALUES ('힐링포뮬라');
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
                      sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '뉴트리원'),
-        '뉴트리원 카무트 효소 골드 3g x 30포, 6개',
-        'P51929179620', '뉴트리원 카무트 효소 골드 3g x 30포, 6개',
-        '하루 1-2포를 식후에 섭취하세요.', '카무트 효소, 소화 효소',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-10-14 00:00:00', 30, 6, 1890, 4.2, 280, 58080);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P51929179620' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192917/51929179620.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P51929179620' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192917/51929179620.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P51929179620' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192917/51929179620.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P51929179620' LIMIT 1), '6개', 58080, 56080, 6, '600000000577', '포장',
-        '뉴트리원 카무트', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P51929179620' LIMIT 1), '3개', 30080, 28080, 3, '600000000578', '포장',
-        '뉴트리원 카무트', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '6개'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929179620' LIMIT 1)
-         LIMIT 1),
-        18, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '3개'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929179620' LIMIT 1)
-         LIMIT 1),
-        12, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P51929179620' LIMIT 1),
-        (SELECT id FROM category WHERE name = '소화 효소' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P51929179620' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '그레인온'),
-        '그레인온 골드 카무트 효소 3g x 30포, 2개',
-        'P51929486771', '그레인온 골드 카무트 효소 3g x 30포, 2개',
-        '하루 1-2포를 식후에 섭취하세요.', '카무트 효소, 소화 효소',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-10-15 00:00:00', 30, 6, 1890, 4.1, 280, 28800);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P51929486771' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192948/51929486771.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P51929486771' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192948/51929486771.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P51929486771' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192948/51929486771.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P51929486771' LIMIT 1), '2개', 28800, 26800, 2, '600000000579', '포장',
-        '그레인온 골드', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P51929486771' LIMIT 1), '1개', 15800, 13800, 1, '600000000580', '포장',
-        '그레인온 골드', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '2개'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929486771' LIMIT 1)
-         LIMIT 1),
-        35, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '1개'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929486771' LIMIT 1)
-         LIMIT 1),
-        22, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P51929486771' LIMIT 1),
-        (SELECT id FROM category WHERE name = '소화 효소' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P51929486771' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
 VALUES ((SELECT id FROM brand WHERE name = '우고래빗'),
         '[6+1] 우고래빗 쓱 효소 곡물 발효 유산균 소화효소 30포, 7개',
         'P89280422357', '[6+1] 우고래빗 쓱 효소 곡물 발효 유산균 소화효소 30포, 7개',
@@ -12541,47 +11925,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P88615315723' LIMIT 1), 1890, '202
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
                      sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '그레인온'),
-        '그레인온 카무트 브랜드밀 프리미엄 효소 90  3g x 30포, 3개',
-        'P51929312297', '그레인온 카무트 브랜드밀 프리미엄 효소 90  3g x 30포, 3개',
-        '하루 1-2포를 식후에 섭취하세요.', '카무트 효소, 브랜드밀',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-10-21 00:00:00', 30, 6, 1890, 4.2, 280, 47800);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P51929312297' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192931/51929312297.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P51929312297' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192931/51929312297.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P51929312297' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192931/51929312297.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P51929312297' LIMIT 1), '3개', 47800, 45800, 3, '600000000591', '포장',
-        '그레인온 프리미엄', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P51929312297' LIMIT 1), '1개', 19800, 17800, 1, '600000000592', '포장',
-        '그레인온 프리미엄', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '3개'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929312297' LIMIT 1)
-         LIMIT 1),
-        28, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '1개'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929312297' LIMIT 1)
-         LIMIT 1),
-        18, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P51929312297' LIMIT 1),
-        (SELECT id FROM category WHERE name = '소화 효소' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P51929312297' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
 VALUES ((SELECT id FROM brand WHERE name = '효소원 쇼핑몰'),
         '효소원 N 저분자 발효 곡물 소화 효소 효소',
         'P80536628752', '효소원 N 저분자 발효 곡물 소화 효소 효소',
@@ -12759,47 +12102,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P86675168775' LIMIT 1),
         (SELECT id FROM category WHERE name = '소화 효소' LIMIT 1));
 INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
 VALUES ((SELECT id FROM product WHERE code = 'P86675168775' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '나우푸드'),
-        '나우푸드 슈퍼 엔자임 소화효소 90캡슐',
-        'P35368852618', '나우푸드 슈퍼 엔자임 소화효소 90캡슐',
-        '하루 1-2캡슐을 식후에 섭취하세요.', '슈퍼 엔자임, 소화효소',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-10-26 00:00:00', 30, 6, 1890, 4.1, 280, 16380);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P35368852618' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_3536885/35368852618.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P35368852618' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_3536885/35368852618.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P35368852618' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_3536885/35368852618.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P35368852618' LIMIT 1), '90캡슐', 16380, 14380, 90, '600000000601',
-        '10x10x5mm', '나우푸드 슈퍼엔자임', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P35368852618' LIMIT 1), '45캡슐', 9380, 7380, 45, '600000000602',
-        '10x10x5mm', '나우푸드 슈퍼엔자임', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '90캡슐'
-           AND product_id = (SELECT id FROM product WHERE code = 'P35368852618' LIMIT 1)
-         LIMIT 1),
-        60, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '45캡슐'
-           AND product_id = (SELECT id FROM product WHERE code = 'P35368852618' LIMIT 1)
-         LIMIT 1),
-        38, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P35368852618' LIMIT 1),
-        (SELECT id FROM category WHERE name = '소화 효소' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P35368852618' LIMIT 1), 1890, '2025-09-29 12:00:00');
 
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
@@ -14661,88 +13963,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P89071198438' LIMIT 1), 1890, '202
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
                      sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '종근당'),
-        '종근당 소연골 콘드로이친1200 맥스 뮤코다당단백 콘드로이틴 조인트 900mg x 120정',
-        'P89698994397', '종근당 소연골 콘드로이친1200 맥스 뮤코다당단백 콘드로이틴 조인트 900mg x 120정',
-        '하루 1-2정을 식후에 섭취하세요.', '콘드로이친, 뮤코다당단백',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-12-09 00:00:00', 30, 6, 1890, 4.1, 280, 59900);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P89698994397' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8969899/89698994397.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P89698994397' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8969899/89698994397.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P89698994397' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8969899/89698994397.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P89698994397' LIMIT 1), '120정', 59900, 57900, 120, '600000000689',
-        '10x10x5mm', '종근당 소연골', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P89698994397' LIMIT 1), '60정', 32900, 30900, 60, '600000000690',
-        '10x10x5mm', '종근당 소연골', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '120정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P89698994397' LIMIT 1)
-         LIMIT 1),
-        22, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '60정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P89698994397' LIMIT 1)
-         LIMIT 1),
-        14, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P89698994397' LIMIT 1),
-        (SELECT id FROM category WHERE name = '콘드로이틴' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P89698994397' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '종근당'),
-        '종근당 소연골 콘드로이친1200 맥스 콘드로이틴 콘드리친 뮤코다당단백 부스터 약1달',
-        'P87632275292', '종근당 소연골 콘드로이친1200 맥스 콘드로이틴 콘드리친 뮤코다당단백 부스터 약1달',
-        '하루 1-2정을 식후에 섭취하세요.', '콘드로이친, 뮤코다당단백',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-12-10 00:00:00', 30, 6, 1890, 4.0, 280, 28800);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P87632275292' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8763227/87632275292.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P87632275292' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8763227/87632275292.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P87632275292' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8763227/87632275292.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P87632275292' LIMIT 1), '1달분', 28800, 26800, 30, '600000000691',
-        '10x10x5mm', '종근당 부스터', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P87632275292' LIMIT 1), '15일분', 16800, 14800, 15, '600000000692',
-        '10x10x5mm', '종근당 부스터', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '1달분'
-           AND product_id = (SELECT id FROM product WHERE code = 'P87632275292' LIMIT 1)
-         LIMIT 1),
-        45, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '15일분'
-           AND product_id = (SELECT id FROM product WHERE code = 'P87632275292' LIMIT 1)
-         LIMIT 1),
-        28, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P87632275292' LIMIT 1),
-        (SELECT id FROM category WHERE name = '콘드로이틴' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P87632275292' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
 VALUES ((SELECT id FROM brand WHERE name = '옥션'),
         '맥스 콘드로이틴 1200 관절 소유래 소연골 콘드로이친 효능 콘트로이친 1200 약2개월분',
         'P54032780590', '맥스 콘드로이틴 1200 관절 소유래 소연골 콘드로이친 효능 콘트로이친 1200 약2개월분',
@@ -14780,47 +14000,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P54032780590' LIMIT 1),
         (SELECT id FROM category WHERE name = '콘드로이틴' LIMIT 1));
 INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
 VALUES ((SELECT id FROM product WHERE code = 'P54032780590' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '현 가든'),
-        '지성콘드로이친 1200 6개월 주영엔에스 소연골 콘드로이친 관절엔 6박스 콘드로이틴',
-        'P88444872554', '지성콘드로이친 1200 6개월 주영엔에스 소연골 콘드로이친 관절엔 6박스 콘드로이틴',
-        '하루 1-2정을 식후에 섭취하세요.', '콘드로이친, 소연골',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-12-12 00:00:00', 30, 6, 1890, 4.5, 280, 345600);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8844487/88444872554.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8844487/88444872554.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8844487/88444872554.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1), '6박스', 345600, 343600, 6, '600000000695',
-        '10x10x5mm', '현가든 지성', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1), '3박스', 175600, 173600, 3, '600000000696',
-        '10x10x5mm', '현가든 지성', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '6박스'
-           AND product_id = (SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1)
-         LIMIT 1),
-        3, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '3박스'
-           AND product_id = (SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1)
-         LIMIT 1),
-        2, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1),
-        (SELECT id FROM category WHERE name = '콘드로이틴' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1), 1890, '2025-09-29 12:00:00');
 
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
@@ -15256,47 +14435,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P54032780590' LIMIT 1), 2050, '202
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
                      sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '현 가든'),
-        '지성콘드로이친 1200 6개월 주영엔에스 소연골 콘드로이친 관절엔 6박스 콘드로이틴',
-        'P88444872554', '지성콘드로이친 1200 6개월 주영엔에스 소연골 콘드로이친 관절엔 6박스 콘드로이틴',
-        '하루 1-2정을 식후에 섭취하세요.', '콘드로이친, 소연골',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-12-20 00:00:00', 30, 6, 180, 4.5, 45, 345600);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8844487/88444872554.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8844487/88444872554.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8844487/88444872554.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1), '6박스', 345600, 343600, 6, '600000000695',
-        '10x10x5mm', '현가든 지성', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1), '3박스', 175600, 173600, 3, '600000000696',
-        '10x10x5mm', '현가든 지성', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '6박스'
-           AND product_id = (SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1)
-         LIMIT 1),
-        3, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '3박스'
-           AND product_id = (SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1)
-         LIMIT 1),
-        2, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1),
-        (SELECT id FROM category WHERE name = '콘드로이틴' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P88444872554' LIMIT 1), 180, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
 VALUES ((SELECT id FROM brand WHERE name = '프롬바이오'),
         '프롬바이오 관절연골엔 보스웰리아 콘드로이친 뮤코다당단백 콘드로이틴 소연골 소유래 100정',
         'P88666476883', '프롬바이오 관절연골엔 보스웰리아 콘드로이친 뮤코다당단백 콘드로이틴 소연골 소유래 100정',
@@ -15478,47 +14616,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P88631683152' LIMIT 1), 750, '2025
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
                      sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = 'GNM자연의품격'),
-        'GNM자연의품격 관절엔 MSM 글루코사민 비타민D 1200mg x 60정, 3개',
-        'P51929502988', 'GNM자연의품격 관절엔 MSM 글루코사민 비타민D 1200mg x 60정, 3개',
-        '하루 1-2정을 식후에 섭취하세요.', 'MSM, 글루코사민, 비타민D',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-10-28 00:00:00', 30, 6, 1420, 4.1, 210, 28270);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P51929502988' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192950/51929502988.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P51929502988' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192950/51929502988.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P51929502988' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192950/51929502988.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P51929502988' LIMIT 1), '3개', 28270, 26270, 3, '600000000705',
-        '10x10x5mm', 'GNM자연의품격 관절엔', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P51929502988' LIMIT 1), '1개', 10270, 8270, 1, '600000000706', '10x10x5mm',
-        'GNM자연의품격 관절엔', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '3개'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929502988' LIMIT 1)
-         LIMIT 1),
-        20, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '1개'
-           AND product_id = (SELECT id FROM product WHERE code = 'P51929502988' LIMIT 1)
-         LIMIT 1),
-        12, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P51929502988' LIMIT 1),
-        (SELECT id FROM category WHERE name = 'MSM' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P51929502988' LIMIT 1), 1420, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
 VALUES ((SELECT id FROM brand WHERE name = '종근당'),
         '종근당 프리미엄 MSM 1000mg x 120정, 2개',
         'P51929207355', '종근당 프리미엄 MSM 1000mg x 120정, 2개',
@@ -15638,47 +14735,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P89130315481' LIMIT 1),
         (SELECT id FROM category WHERE name = '집중력&기억력' LIMIT 1));
 INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
 VALUES ((SELECT id FROM product WHERE code = 'P89130315481' LIMIT 1), 1890, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '뉴트리웰라이프'),
-        '어텐션T 60포 청소년 학생 시험공부 집중력 필수 아미노산 영양제',
-        'P88607216121', '어텐션T 60포 청소년 학생 시험공부 집중력 필수 아미노산 영양제',
-        '하루 1-2포를 물에 타서 섭취하세요.', '아미노산, 집중력',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-12-15 00:00:00', 30, 6, 2450, 4.1, 380, 29400);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P88607216121' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8860721/88607216121.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P88607216121' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8860721/88607216121.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P88607216121' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8860721/88607216121.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P88607216121' LIMIT 1), '60포', 29400, 27400, 60, '600000000715',
-        '10x10x5mm', '뉴트리웰라이프 어텐션T', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P88607216121' LIMIT 1), '30포', 17400, 15400, 30, '600000000716',
-        '10x10x5mm', '뉴트리웰라이프 어텐션T', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '60포'
-           AND product_id = (SELECT id FROM product WHERE code = 'P88607216121' LIMIT 1)
-         LIMIT 1),
-        25, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '30포'
-           AND product_id = (SELECT id FROM product WHERE code = 'P88607216121' LIMIT 1)
-         LIMIT 1),
-        16, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P88607216121' LIMIT 1),
-        (SELECT id FROM category WHERE name = '집중력&기억력' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P88607216121' LIMIT 1), 2450, '2025-09-29 12:00:00');
 
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
@@ -15907,47 +14963,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P83023580528' LIMIT 1),
         (SELECT id FROM category WHERE name = '집중력&기억력' LIMIT 1));
 INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
 VALUES ((SELECT id FROM product WHERE code = 'P83023580528' LIMIT 1), 680, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '위드바이오'),
-        '수험생 집중력 기억력좋은감퇴영양제 은행잎 플라보놀효능효과',
-        'P89874018213', '수험생 집중력 기억력좋은감퇴영양제 은행잎 플라보놀효능효과',
-        '하루 1-2정을 식후에 섭취하세요.', '은행잎, 플라보놀',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-12-22 00:00:00', 30, 6, 1890, 4.0, 280, 16100);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P89874018213' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8987401/89874018213.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P89874018213' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8987401/89874018213.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P89874018213' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8987401/89874018213.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P89874018213' LIMIT 1), '60정', 16100, 14100, 60, '600000000729',
-        '10x10x5mm', '위드바이오 수험생', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P89874018213' LIMIT 1), '30정', 9100, 7100, 30, '600000000730',
-        '10x10x5mm', '위드바이오 수험생', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '60정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P89874018213' LIMIT 1)
-         LIMIT 1),
-        35, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '30정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P89874018213' LIMIT 1)
-         LIMIT 1),
-        22, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P89874018213' LIMIT 1),
-        (SELECT id FROM category WHERE name = '집중력&기억력' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P89874018213' LIMIT 1), 1890, '2025-09-29 12:00:00');
 
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
@@ -16726,47 +15741,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P53547017659' LIMIT 1), 920, '2025
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
                      sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '스포츠리서치'),
-        '스포츠리서치 트리플 스트렝스 피쉬 오일 90정, 1개',
-        'P53547120084', '스포츠리서치 트리플 스트렝스 피쉬 오일 90정, 1개',
-        '하루 1-2정을 식후에 섭취하세요.', '피쉬오일, 트리플스트렝스',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-12-18 00:00:00', 30, 6, 1680, 4.1, 280, 30400);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P53547120084' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5354712/53547120084.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P53547120084' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5354712/53547120084.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P53547120084' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5354712/53547120084.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P53547120084' LIMIT 1), '90정', 30400, 28400, 90, '600000000771',
-        '10x10x5mm', '스포츠리서치 트리플스트렝스', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P53547120084' LIMIT 1), '45정', 18400, 16400, 45, '600000000772',
-        '10x10x5mm', '스포츠리서치 트리플스트렝스', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '90정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P53547120084' LIMIT 1)
-         LIMIT 1),
-        18, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '45정'
-           AND product_id = (SELECT id FROM product WHERE code = 'P53547120084' LIMIT 1)
-         LIMIT 1),
-        12, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P53547120084' LIMIT 1),
-        (SELECT id FROM category WHERE name = '오메가3 피쉬 오일' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P53547120084' LIMIT 1), 1680, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
 VALUES ((SELECT id FROM brand WHERE name = '블랙모어스'),
         '[알티지오메가]블랙모어스 오메가3 250캡슐 오더리스 피쉬오일 미니 캡슐 510MG',
         'P83118452870', '[알티지오메가]블랙모어스 오메가3 250캡슐 오더리스 피쉬오일 미니 캡슐 510MG',
@@ -17247,11 +16221,7 @@ VALUES ((SELECT id FROM brand WHERE name = '뉴트리모어'),
         '2025-12-15 00:00:00', 30, 6, 450, 4.4, 120, 138000);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P56355501328' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5635550/56355501328.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P56355501328' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5635550/56355501328.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P56355501328' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5635550/56355501328.3.jpg', '성분 정보', 2, 0);
+        'https://shopping-phinf.pstatic.net/main_5635550/56355501328.20250820145526.jpg?type=f640', '대표 이미지', 0, 1);
 INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
                              nutrition_facts, max_qty_per_order, restock_eta)
 VALUES ((SELECT id FROM product WHERE code = 'P56355501328' LIMIT 1), '4개', 138000, 136000, 4, '600000000795',
@@ -17898,47 +16868,6 @@ VALUES ((SELECT id FROM product WHERE code = 'P52647379145' LIMIT 1), 1420, '202
 
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
                      sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '칼라일'),
-        '칼라일 남극 크릴오일 2000mg x 120캡슐, 2개',
-        'P53530694605', '칼라일 남극 크릴오일 2000mg x 120캡슐, 2개',
-        '하루 1-2정을 식후에 섭취하세요.', '크릴오일, 남극',
-        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-12-22 00:00:00', 30, 6, 920, 4.2, 180, 45400);
-INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P53530694605' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5353069/53530694605.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P53530694605' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5353069/53530694605.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P53530694605' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5353069/53530694605.3.jpg', '성분 정보', 2, 0);
-INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
-                             nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P53530694605' LIMIT 1), '2개', 45400, 43400, 2, '600000000825',
-        '10x10x5mm', '칼라일 남극크릴오일', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P53530694605' LIMIT 1), '1개', 26400, 24400, 1, '600000000826',
-        '10x10x5mm', '칼라일 남극크릴오일', 6, NULL);
-INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
-VALUES ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '2개'
-           AND product_id = (SELECT id FROM product WHERE code = 'P53530694605' LIMIT 1)
-         LIMIT 1),
-        12, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '1개'
-           AND product_id = (SELECT id FROM product WHERE code = 'P53530694605' LIMIT 1)
-         LIMIT 1),
-        8, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
-INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P53530694605' LIMIT 1),
-        (SELECT id FROM category WHERE name = '크릴 오일' LIMIT 1));
-INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P53530694605' LIMIT 1), 920, '2025-09-29 12:00:00');
-
-
-INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
-                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
 VALUES ((SELECT id FROM brand WHERE name = '뉴트리코어'),
         '뉴트리코어 맥스 크릴오일 1100mg x 30캡슐, 5개',
         'P52647725715', '뉴트리코어 맥스 크릴오일 1100mg x 30캡슐, 5개',
@@ -18142,44 +17071,701 @@ INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
 VALUES ((SELECT id FROM product WHERE code = 'P52647379703' LIMIT 1), 920, '2025-09-29 12:00:00');
 
 
+INSERT IGNORE INTO brand (name)
+VALUES ('프로틴마켓');
+INSERT IGNORE INTO brand (name)
+VALUES ('헬시오');
+INSERT IGNORE INTO brand (name)
+VALUES ('메이크바디');
+INSERT IGNORE INTO brand (name)
+VALUES ('원데이뉴트리션');
+INSERT IGNORE INTO brand (name)
+VALUES ('킹콩팩토리');
+INSERT IGNORE INTO brand (name)
+VALUES ('그로우잇');
+INSERT IGNORE INTO brand (name)
+VALUES ('칼로바이');
+INSERT IGNORE INTO brand (name)
+VALUES ('지웨이');
+
 INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
                      sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
-VALUES ((SELECT id FROM brand WHERE name = '에버하스'),
-        '비아벨로 비크릴 100 인지질 크릴오일',
-        'P89491369992', '비아벨로 비크릴 100 인지질 크릴오일',
-        '하루 1-2정을 식후에 섭취하세요.', '크릴오일, 인지질',
+VALUES ((SELECT id FROM brand WHERE name = '프로틴마켓'),
+        '독일 분리유청단백질 저먼프로트9000 웨이프로틴 파우더 쉐이크 포대 보충제 WPI 1kg',
+        'P10620003279', '독일 분리유청단백질 저먼프로트9000 웨이프로틴 파우더 쉐이크 포대 보충제 WPI 1kg',
+        '운동 후 30분 내에 1회 제공량을 섭취하세요.', '분리유청단백질, WPI',
         '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
-        '2025-12-20 00:00:00', 30, 6, 680, 4.3, 150, 30780);
+        '2025-11-15 00:00:00', 30, 6, 2847, 4.2, 156, 49900);
+
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
-VALUES ((SELECT id FROM product WHERE code = 'P89491369992' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8949136/89491369992.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P89491369992' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8949136/89491369992.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P89491369992' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8949136/89491369992.3.jpg', '성분 정보', 2, 0);
+VALUES ((SELECT id FROM product WHERE code = 'P10620003279' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_1062000/10620003279.36.jpg', '대표 이미지', 0, 1);
+
 INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
                              nutrition_facts, max_qty_per_order, restock_eta)
-VALUES ((SELECT id FROM product WHERE code = 'P89491369992' LIMIT 1), '100캡슐', 30780, 28780, 100, '600000000837',
-        '10x10x5mm', '에버하스 비아벨로비크릴', 6, NULL),
-       ((SELECT id FROM product WHERE code = 'P89491369992' LIMIT 1), '50캡슐', 17780, 15780, 50, '600000000838',
-        '10x10x5mm', '에버하스 비아벨로비크릴', 6, NULL);
+VALUES ((SELECT id FROM product WHERE code = 'P10620003279' LIMIT 1), '1kg', 49900, 47900, 1000, '600000000001', '파우더',
+        '분리유청단백질 90%', 6, NULL);
+
 INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
 VALUES ((SELECT id
          FROM product_variant
-         WHERE variant_name = '100캡슐'
-           AND product_id = (SELECT id FROM product WHERE code = 'P89491369992' LIMIT 1)
+         WHERE variant_name = '1kg'
+           AND product_id = (SELECT id FROM product WHERE code = 'P10620003279' LIMIT 1)
          LIMIT 1),
-        12, '2025-09-29 12:00:00', '2025-08-20 12:00:00'),
-       ((SELECT id
-         FROM product_variant
-         WHERE variant_name = '50캡슐'
-           AND product_id = (SELECT id FROM product WHERE code = 'P89491369992' LIMIT 1)
-         LIMIT 1),
-        8, '2025-09-29 12:00:00', '2025-08-20 12:00:00');
+        45, '2025-12-20 14:30:00', '2025-11-10 14:30:00');
+
 INSERT INTO product_category (product_id, category_id)
-VALUES ((SELECT id FROM product WHERE code = 'P89491369992' LIMIT 1),
-        (SELECT id FROM category WHERE name = '크릴 오일' LIMIT 1));
+VALUES ((SELECT id FROM product WHERE code = 'P10620003279' LIMIT 1),
+        (SELECT id FROM category WHERE name = '유청 단백질' LIMIT 1));
+
 INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
-VALUES ((SELECT id FROM product WHERE code = 'P89491369992' LIMIT 1), 680, '2025-09-29 12:00:00');
+VALUES ((SELECT id FROM product WHERE code = 'P10620003279' LIMIT 1), 2847, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '헬시오'),
+        '헬시오 히치웨이 WPI 단백질보충제 프로틴 분리유청단백질 초코맛 1.5kg 1통',
+        'P82036647858', '헬시오 히치웨이 WPI 단백질보충제 프로틴 분리유청단백질 초코맛 1.5kg 1통',
+        '운동 후 30분 내에 1회 제공량을 섭취하세요.', '분리유청단백질, WPI, 코코아파우더',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-10-28 00:00:00', 30, 6, 1923, 4.4, 287, 64900);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P82036647858' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_8203664/82036647858.8.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P82036647858' LIMIT 1), '1.5kg', 64900, 62900, 1500, '600000000002',
+        '파우더', '분리유청단백질 90%', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '1.5kg'
+           AND product_id = (SELECT id FROM product WHERE code = 'P82036647858' LIMIT 1)
+         LIMIT 1),
+        32, '2025-12-20 14:30:00', '2025-11-15 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P82036647858' LIMIT 1),
+        (SELECT id FROM category WHERE name = '유청 단백질' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P82036647858' LIMIT 1), 1923, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '헬시오'),
+        '머슬헬퍼웨이 단백질 보충제 쉐이크 분리유청 프로틴 식물성 파우더 초코맛 1kg 1통',
+        'P82271542438', '머슬헬퍼웨이 단백질 보충제 쉐이크 분리유청 프로틴 식물성 파우더 초코맛 1kg 1통',
+        '운동 후 30분 내에 1회 제공량을 섭취하세요.', '분리유청단백질, 식물성단백질, 코코아파우더',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-12-03 00:00:00', 30, 6, 1456, 4.1, 198, 25900);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P82271542438' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_8227154/82271542438.19.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P82271542438' LIMIT 1), '1kg', 25900, 23900, 1000, '600000000003', '파우더',
+        '혼합단백질 85%', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '1kg'
+           AND product_id = (SELECT id FROM product WHERE code = 'P82271542438' LIMIT 1)
+         LIMIT 1),
+        67, '2025-12-20 14:30:00', '2025-11-25 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P82271542438' LIMIT 1),
+        (SELECT id FROM category WHERE name = '유청 단백질' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P82271542438' LIMIT 1), 1456, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '메이크바디'),
+        '메이크바디 단백질보충제 헬스보충제 유청단백질 게라웨이프로틴 2kg (1통) 프로틴',
+        'P8683485586', '메이크바디 단백질보충제 헬스보충제 유청단백질 게라웨이프로틴 2kg (1통) 프로틴',
+        '운동 후 30분 내에 1회 제공량을 섭취하세요.', '유청단백질, 게라닌',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-11-22 00:00:00', 30, 6, 2678, 4.5, 312, 52000);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P8683485586' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_8683485/8683485586.33.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P8683485586' LIMIT 1), '2kg', 52000, 50000, 2000, '600000000004', '파우더',
+        '유청단백질 80%', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '2kg'
+           AND product_id = (SELECT id FROM product WHERE code = 'P8683485586' LIMIT 1)
+         LIMIT 1),
+        28, '2025-12-20 14:30:00', '2025-11-18 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P8683485586' LIMIT 1),
+        (SELECT id FROM category WHERE name = '유청 단백질' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P8683485586' LIMIT 1), 2678, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '원데이뉴트리션'),
+        'WPI 분리유청단백질 분말가루 락토프리 마이백 웨이프로틴 쉐이크 포대 보충제 1.3kg',
+        'P82724927180', 'WPI 분리유청단백질 분말가루 락토프리 마이백 웨이프로틴 쉐이크 포대 보충제 1.3kg',
+        '운동 후 30분 내에 1회 제공량을 섭취하세요.', '분리유청단백질, WPI',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-10-12 00:00:00', 30, 6, 3092, 4.6, 445, 65500);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P82724927180' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_8272492/82724927180.13.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P82724927180' LIMIT 1), '1.3kg', 65500, 63500, 1300, '600000000005',
+        '파우더', '분리유청단백질 95%', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '1.3kg'
+           AND product_id = (SELECT id FROM product WHERE code = 'P82724927180' LIMIT 1)
+         LIMIT 1),
+        41, '2025-12-20 14:30:00', '2025-11-05 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P82724927180' LIMIT 1),
+        (SELECT id FROM category WHERE name = '유청 단백질' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P82724927180' LIMIT 1), 3092, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '킹콩팩토리'),
+        '킹콩팩토리 벌크업 게이너 552 초코맛 4kg 단백질 헬스 보충제 탄수화물 근육 체중증가',
+        'P80192640932', '킹콩팩토리 벌크업 게이너 552 초코맛 4kg 단백질 헬스 보충제 탄수화물 근육 체중증가',
+        '운동 후 30분 내에 1회 제공량을 섭취하세요.', '유청단백질, 탄수화물, 코코아파우더',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-11-08 00:00:00', 30, 6, 1789, 4.3, 234, 61900);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P80192640932' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_8019264/80192640932.7.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P80192640932' LIMIT 1), '4kg', 61900, 59900, 4000, '600000000006', '파우더',
+        '벌크업 게이너', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '4kg'
+           AND product_id = (SELECT id FROM product WHERE code = 'P80192640932' LIMIT 1)
+         LIMIT 1),
+        19, '2025-12-20 14:30:00', '2025-11-12 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P80192640932' LIMIT 1),
+        (SELECT id FROM category WHERE name = '유청 단백질' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P80192640932' LIMIT 1), 1789, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '헬시오'),
+        '머슬헬퍼 게이너 단백질보충제 쉐이크 프로틴 체중증가 분리유청 초코맛 초코맛 1kg 1통',
+        'P82278399027', '머슬헬퍼 게이너 단백질보충제 쉐이크 프로틴 체중증가 분리유청 초코맛 초코맛 1kg 1통',
+        '운동 후 30분 내에 1회 제공량을 섭취하세요.', '분리유청단백질, 탄수화물, 코코아파우더',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-12-17 00:00:00', 30, 6, 1234, 4.0, 89, 24900);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P82278399027' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_8227839/82278399027.12.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P82278399027' LIMIT 1), '1kg', 24900, 22900, 1000, '600000000007', '파우더',
+        '게이너 프로틴', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '1kg'
+           AND product_id = (SELECT id FROM product WHERE code = 'P82278399027' LIMIT 1)
+         LIMIT 1),
+        73, '2025-12-20 14:30:00', '2025-12-01 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P82278399027' LIMIT 1),
+        (SELECT id FROM category WHERE name = '유청 단백질' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P82278399027' LIMIT 1), 1234, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '그로우잇'),
+        '그로우잇 단백질 쉐이크 파우치 저당 식사대용 오트그레인+크런치초코, 14포, 1개',
+        'P89203692253', '그로우잇 단백질 쉐이크 파우치 저당 식사대용 오트그레인+크런치초코, 14포, 1개',
+        '식사 대용으로 1포를 물에 타서 섭취하세요.', '단백질, 오트그레인, 코코아',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-11-30 00:00:00', 30, 6, 2156, 4.4, 267, 52000);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P89203692253' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_8920369/89203692253.12.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P89203692253' LIMIT 1), '14포', 52000, 50000, 14, '600000000008', '파우치',
+        '식사대용 단백질', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '14포'
+           AND product_id = (SELECT id FROM product WHERE code = 'P89203692253' LIMIT 1)
+         LIMIT 1),
+        56, '2025-12-20 14:30:00', '2025-11-28 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P89203692253' LIMIT 1),
+        (SELECT id FROM category WHERE name = '유청 단백질' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P89203692253' LIMIT 1), 2156, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '칼로바이'),
+        '칼로바이 밸런스 파워 쉐이크 아이솔레이트 초코맛, 2kg, 1개',
+        'P54770905586', '칼로바이 밸런스 파워 쉐이크 아이솔레이트 초코맛, 2kg, 1개',
+        '운동 후 30분 내에 1회 제공량을 섭취하세요.', '아이솔레이트 단백질, 코코아파우더',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-10-05 00:00:00', 30, 6, 2987, 4.5, 378, 59840);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P54770905586' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_5477090/54770905586.20250828153105.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P54770905586' LIMIT 1), '2kg', 59840, 57840, 2000, '600000000009', '파우더',
+        '아이솔레이트 90%', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '2kg'
+           AND product_id = (SELECT id FROM product WHERE code = 'P54770905586' LIMIT 1)
+         LIMIT 1),
+        38, '2025-12-20 14:30:00', '2025-10-01 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P54770905586' LIMIT 1),
+        (SELECT id FROM category WHERE name = '유청 단백질' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P54770905586' LIMIT 1), 2987, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '지웨이'),
+        '지웨이 지플렉스 단백질 보충제 쉐이크 WPI 분리유청 프로틴 1kg',
+        'P7610334935', '지웨이 지플렉스 단백질 보충제 쉐이크 WPI 분리유청 프로틴 1kg',
+        '운동 후 30분 내에 1회 제공량을 섭취하세요.', '분리유청단백질, WPI',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-12-08 00:00:00', 30, 6, 1678, 4.2, 201, 41000);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P7610334935' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_7610334/7610334935.21.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P7610334935' LIMIT 1), '1kg', 41000, 39000, 1000, '600000000010', '파우더',
+        '분리유청단백질 90%', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '1kg'
+           AND product_id = (SELECT id FROM product WHERE code = 'P7610334935' LIMIT 1)
+         LIMIT 1),
+        62, '2025-12-20 14:30:00', '2025-12-05 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P7610334935' LIMIT 1),
+        (SELECT id FROM category WHERE name = '유청 단백질' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P7610334935' LIMIT 1), 1678, '2025-12-20 14:30:00');
 
 
+INSERT IGNORE INTO brand (name)
+VALUES ('비비랩');
+INSERT IGNORE INTO brand (name)
+VALUES ('절대콜라겐');
+INSERT IGNORE INTO brand (name)
+VALUES ('라이필');
+INSERT IGNORE INTO brand (name)
+VALUES ('청춘발전소');
+INSERT IGNORE INTO brand (name)
+VALUES ('지웨이');
+INSERT IGNORE INTO brand (name)
+VALUES ('닥터올로지');
+INSERT IGNORE INTO brand (name)
+VALUES ('순수식품');
+INSERT IGNORE INTO brand (name)
+VALUES ('뉴트원');
+INSERT IGNORE INTO brand (name)
+VALUES ('NH');
+INSERT IGNORE INTO brand (name)
+VALUES ('유유제약');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '비비랩'),
+        '뉴트리원 비비랩 차주영 저분자 콜라겐 S 인텐시브 3통 3개월분 어류 어린 피쉬 펩타이드',
+        'P86406102951', '뉴트리원 비비랩 차주영 저분자 콜라겐 S 인텐시브 3통 3개월분 어류 어린 피쉬 펩타이드',
+        '하루 1-2포를 공복에 섭취하세요.', '저분자 피쉬 콜라겐, 펩타이드',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-11-18 00:00:00', 30, 6, 2456, 4.4, 312, 53900);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P86406102951' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_8640610/86406102951.103.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P86406102951' LIMIT 1), '3통', 53900, 51900, 3, '600000000011', '포장',
+        '저분자 피쉬 콜라겐', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '3통'
+           AND product_id = (SELECT id FROM product WHERE code = 'P86406102951' LIMIT 1)
+         LIMIT 1),
+        42, '2025-12-20 14:30:00', '2025-11-15 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P86406102951' LIMIT 1),
+        (SELECT id FROM category WHERE name = '콜라겐' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P86406102951' LIMIT 1), 2456, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '절대콜라겐'),
+        '절대콜라겐 프랑스 저분자 피쉬 콜라겐 펩타이드 어류 어린 가루 150g',
+        'P11726153888', '절대콜라겐 프랑스 저분자 피쉬 콜라겐 펩타이드 어류 어린 가루 150g',
+        '하루 1-2스푼을 물에 타서 섭취하세요.', '프랑스 저분자 피쉬 콜라겐, 펩타이드',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-12-05 00:00:00', 30, 6, 1876, 4.1, 198, 17500);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P11726153888' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_1172615/11726153888.19.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P11726153888' LIMIT 1), '150g', 17500, 15500, 150, '600000000012', '파우더',
+        '프랑스 저분자 콜라겐', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '150g'
+           AND product_id = (SELECT id FROM product WHERE code = 'P11726153888' LIMIT 1)
+         LIMIT 1),
+        68, '2025-12-20 14:30:00', '2025-12-01 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P11726153888' LIMIT 1),
+        (SELECT id FROM category WHERE name = '콜라겐' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P11726153888' LIMIT 1), 1876, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '라이필'),
+        '라이필 더마콜라겐 시그니처 800mg x 84정, 3개',
+        'P51929211188', '라이필 더마콜라겐 시그니처 800mg x 84정, 3개',
+        '하루 2-3정을 식후에 섭취하세요.', '더마콜라겐, 히알루론산',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-10-22 00:00:00', 30, 6, 3124, 4.5, 423, 61090);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P51929211188' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_5192921/51929211188.20250404100706.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P51929211188' LIMIT 1), '3개', 61090, 59090, 252, '600000000013', '정제',
+        '더마콜라겐 800mg', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '3개'
+           AND product_id = (SELECT id FROM product WHERE code = 'P51929211188' LIMIT 1)
+         LIMIT 1),
+        35, '2025-12-20 14:30:00', '2025-10-18 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P51929211188' LIMIT 1),
+        (SELECT id FROM category WHERE name = '콜라겐' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P51929211188' LIMIT 1), 3124, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '청춘발전소'),
+        '캐나다 저분자 콜라겐 피쉬 300달톤 고함량 엘라스틴 정직한콜라겐 1달분',
+        'P84695739629', '캐나다 저분자 콜라겐 피쉬 300달톤 고함량 엘라스틴 정직한콜라겐 1달분',
+        '하루 1-2포를 공복에 섭취하세요.', '캐나다 저분자 피쉬 콜라겐, 엘라스틴',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-11-25 00:00:00', 30, 6, 2234, 4.3, 267, 39000);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P84695739629' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_8469573/84695739629.21.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P84695739629' LIMIT 1), '1달분', 39000, 37000, 30, '600000000014', '포장',
+        '300달톤 저분자 콜라겐', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '1달분'
+           AND product_id = (SELECT id FROM product WHERE code = 'P84695739629' LIMIT 1)
+         LIMIT 1),
+        51, '2025-12-20 14:30:00', '2025-11-20 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P84695739629' LIMIT 1),
+        (SELECT id FROM category WHERE name = '콜라겐' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P84695739629' LIMIT 1), 2234, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '지웨이'),
+        '지웨이 초저분자 콜라겐 300달톤 먹는 어린 저분자 피쉬콜라겐 펩타이드 150g',
+        'P82424722415', '지웨이 초저분자 콜라겐 300달톤 먹는 어린 저분자 피쉬콜라겐 펩타이드 150g',
+        '하루 1-2스푼을 물에 타서 섭취하세요.', '초저분자 피쉬 콜라겐, 펩타이드',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-12-12 00:00:00', 30, 6, 1567, 4.2, 189, 18800);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P82424722415' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_8242472/82424722415.13.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P82424722415' LIMIT 1), '150g', 18800, 16800, 150, '600000000015', '파우더',
+        '300달톤 초저분자 콜라겐', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '150g'
+           AND product_id = (SELECT id FROM product WHERE code = 'P82424722415' LIMIT 1)
+         LIMIT 1),
+        74, '2025-12-20 14:30:00', '2025-12-08 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P82424722415' LIMIT 1),
+        (SELECT id FROM category WHERE name = '콜라겐' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P82424722415' LIMIT 1), 1567, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '닥터올로지'),
+        '닥터올로지 올인원 저분자 피쉬 콜라겐 펩타이드 20g x 14포, 4개',
+        'P51929258985', '닥터올로지 올인원 저분자 피쉬 콜라겐 펩타이드 20g x 14포, 4개',
+        '하루 1포를 공복에 섭취하세요.', '저분자 피쉬 콜라겐, 펩타이드',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-10-08 00:00:00', 30, 6, 2789, 4.4, 345, 59900);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P51929258985' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_5192925/51929258985.20241213210324.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P51929258985' LIMIT 1), '4개', 59900, 57900, 56, '600000000016', '포장',
+        '올인원 저분자 콜라겐', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '4개'
+           AND product_id = (SELECT id FROM product WHERE code = 'P51929258985' LIMIT 1)
+         LIMIT 1),
+        29, '2025-12-20 14:30:00', '2025-10-03 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P51929258985' LIMIT 1),
+        (SELECT id FROM category WHERE name = '콜라겐' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P51929258985' LIMIT 1), 2789, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '순수식품'),
+        '순수식품 엘라스틴 데스모신 저분자 피쉬콜라겐 히알루론산 밀크세라마이드 2g x 30포, 1개',
+        'P51929028016', '순수식품 엘라스틴 데스모신 저분자 피쉬콜라겐 히알루론산 밀크세라마이드 2g x 30포, 1개',
+        '하루 1포를 공복에 섭취하세요.', '저분자 피쉬 콜라겐, 엘라스틴, 히알루론산, 밀크세라마이드',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-12-15 00:00:00', 30, 6, 1345, 4.0, 156, 11450);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P51929028016' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_5192902/51929028016.20250430141641.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P51929028016' LIMIT 1), '1개', 11450, 9450, 30, '600000000017', '포장',
+        '복합 콜라겐', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '1개'
+           AND product_id = (SELECT id FROM product WHERE code = 'P51929028016' LIMIT 1)
+         LIMIT 1),
+        83, '2025-12-20 14:30:00', '2025-12-10 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P51929028016' LIMIT 1),
+        (SELECT id FROM category WHERE name = '콜라겐' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P51929028016' LIMIT 1), 1345, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '뉴트원'),
+        '뉴트원 콜라겐 프리미엄 5000 20ml x 15포, 4개',
+        'P51929569930', '뉴트원 콜라겐 프리미엄 5000 20ml x 15포, 4개',
+        '하루 1포를 공복에 섭취하세요.', '콜라겐 5000mg, 히알루론산',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-11-02 00:00:00', 30, 6, 2987, 4.6, 412, 71280);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P51929569930' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_5192956/51929569930.20250214174801.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P51929569930' LIMIT 1), '4개', 71280, 69280, 60, '600000000018', '포장',
+        '콜라겐 5000mg', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '4개'
+           AND product_id = (SELECT id FROM product WHERE code = 'P51929569930' LIMIT 1)
+         LIMIT 1),
+        26, '2025-12-20 14:30:00', '2025-10-28 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P51929569930' LIMIT 1),
+        (SELECT id FROM category WHERE name = '콜라겐' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P51929569930' LIMIT 1), 2987, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = 'NH'),
+        '(1+1)농협 석류 콜라겐 젤리스틱 30포x2박스 총60포 저분자 히알루론산',
+        'P82478339868', '(1+1)농협 석류 콜라겐 젤리스틱 30포x2박스 총60포 저분자 히알루론산',
+        '하루 1-2포를 식후에 섭취하세요.', '석류 콜라겐, 저분자 히알루론산',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-12-01 00:00:00', 30, 6, 2134, 4.3, 278, 39900);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P82478339868' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_8247833/82478339868.20.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P82478339868' LIMIT 1), '2박스', 39900, 37900, 60, '600000000019', '젤리스틱',
+        '석류 콜라겐', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '2박스'
+           AND product_id = (SELECT id FROM product WHERE code = 'P82478339868' LIMIT 1)
+         LIMIT 1),
+        47, '2025-12-20 14:30:00', '2025-11-27 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P82478339868' LIMIT 1),
+        (SELECT id FROM category WHERE name = '콜라겐' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P82478339868' LIMIT 1), 2134, '2025-12-20 14:30:00');
+
+INSERT INTO product (brand_id, name, code, description, instruction, ingredients, cautions, disclaimer,
+                     sale_start_date, expiration_date, max_qty_per_order, sales, avg_rating, review_count, min_price)
+VALUES ((SELECT id FROM brand WHERE name = '유유제약'),
+        '유유제약 저분자 피쉬 어린 콜라겐 엘라스틴 히알루론산 20g x 15포, 4개',
+        'P51929473344', '유유제약 저분자 피쉬 어린 콜라겐 엘라스틴 히알루론산 20g x 15포, 4개',
+        '하루 1포를 공복에 섭취하세요.', '저분자 피쉬 콜라겐, 엘라스틴, 히알루론산',
+        '과다섭취 시 부작용이 있을 수 있습니다.', '본 제품은 질병의 예방 및 치료를 위한 의약품이 아닙니다.',
+        '2025-10-15 00:00:00', 30, 6, 2678, 4.5, 356, 80000);
+
+INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
+VALUES ((SELECT id FROM product WHERE code = 'P51929473344' LIMIT 1),
+        'https://shopping-phinf.pstatic.net/main_5192947/51929473344.20241224142511.jpg', '대표 이미지', 0, 1);
+
+INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
+                             nutrition_facts, max_qty_per_order, restock_eta)
+VALUES ((SELECT id FROM product WHERE code = 'P51929473344' LIMIT 1), '4개', 80000, 78000, 60, '600000000020', '포장',
+        '복합 콜라겐', 6, NULL);
+
+INSERT IGNORE INTO stock (product_variant_id, amount, updated_at, restocked_at)
+VALUES ((SELECT id
+         FROM product_variant
+         WHERE variant_name = '4개'
+           AND product_id = (SELECT id FROM product WHERE code = 'P51929473344' LIMIT 1)
+         LIMIT 1),
+        33, '2025-12-20 14:30:00', '2025-10-10 14:30:00');
+
+INSERT INTO product_category (product_id, category_id)
+VALUES ((SELECT id FROM product WHERE code = 'P51929473344' LIMIT 1),
+        (SELECT id FROM category WHERE name = '콜라겐' LIMIT 1));
+
+INSERT IGNORE INTO product_rank (product_id, recent_sales, updated_at)
+VALUES ((SELECT id FROM product WHERE code = 'P51929473344' LIMIT 1), 2678, '2025-12-20 14:30:00');
