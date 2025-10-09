@@ -35,23 +35,28 @@ public class PromotionCouponFacade {
         return promotionCouponService.getUsableCoupons(userId);
     }
 
-    public Optional<UserCoupon> lockCoupon(Long orderId, String couponCode) {
+    public Optional<UserCoupon> lockCoupon(Long userId, Long orderId, String couponCode) {
         Order order = requireOrder(orderId);
         User user = requireOrderUser(order);
-        return promotionCouponService.lockCouponForOrder(user.getId(), couponCode, order);
+        ensureUserMatches(user, userId);
+        return promotionCouponService.lockCouponForOrder(userId, couponCode, order);
     }
 
-    public void redeemCoupon(Long orderId, Long userCouponId, int discountAmount) {
+    public void redeemCoupon(Long userId, Long orderId, Long userCouponId, int discountAmount) {
         Order order = requireOrder(orderId);
+        ensureUserMatches(requireOrderUser(order), userId);
         UserCoupon coupon = requireUserCoupon(userCouponId);
         ensureCouponLockedToOrder(coupon, orderId);
+        ensureCouponOwner(coupon, userId);
         promotionCouponService.redeemCoupon(userCouponId, order, discountAmount);
     }
 
-    public void releaseCoupon(Long orderId, Long userCouponId) {
-        requireOrder(orderId);
+    public void releaseCoupon(Long userId, Long orderId, Long userCouponId) {
+        Order order = requireOrder(orderId);
+        ensureUserMatches(requireOrderUser(order), userId);
         UserCoupon coupon = requireUserCoupon(userCouponId);
         ensureCouponBelongsOrUnassigned(coupon, orderId);
+        ensureCouponOwner(coupon, userId);
         promotionCouponService.releaseCoupon(userCouponId);
     }
 
@@ -77,12 +82,24 @@ public class PromotionCouponFacade {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "user coupon not found"));
     }
 
+    private void ensureUserMatches(User user, Long userId) {
+        if (user == null || user.getId() == null || !user.getId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "user does not own resource");
+        }
+    }
+
     private void ensureCouponLockedToOrder(UserCoupon coupon, Long orderId) {
         if (coupon.getOrder() == null || coupon.getOrder().getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "coupon is not locked to an order");
         }
         if (!coupon.getOrder().getId().equals(orderId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "coupon does not belong to order");
+        }
+    }
+
+    private void ensureCouponOwner(UserCoupon coupon, Long userId) {
+        if (coupon.getUser() == null || coupon.getUser().getId() == null || !coupon.getUser().getId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "coupon does not belong to user");
         }
     }
 

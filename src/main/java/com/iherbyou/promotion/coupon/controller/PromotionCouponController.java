@@ -7,6 +7,7 @@ import com.iherbyou.promotion.coupon.dto.ReleaseCouponRequest;
 import com.iherbyou.promotion.coupon.dto.UsableCouponDto;
 import com.iherbyou.promotion.coupon.dto.WelcomeCouponResponse;
 import com.iherbyou.promotion.coupon.service.PromotionCouponFacade;
+import com.iherbyou.security.auth.UserPrincipal;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -29,25 +31,33 @@ public class PromotionCouponController {
     private final PromotionCouponFacade promotionCouponFacade;
 
     @PostMapping("/users/{userId}/coupons/welcome")
-    public WelcomeCouponResponse issueWelcomeCoupon(@PathVariable Long userId) {
-        return promotionCouponFacade.issueWelcomeCoupon(userId)
+    public WelcomeCouponResponse issueWelcomeCoupon(@AuthenticationPrincipal UserPrincipal principal,
+                                                   @PathVariable Long userId) {
+        Long principalId = requirePrincipal(principal);
+        ensureSameUser(principalId, userId);
+        return promotionCouponFacade.issueWelcomeCoupon(principalId)
                 .map(UsableCouponDto::from)
                 .map(WelcomeCouponResponse::issuedResponse)
                 .orElseGet(WelcomeCouponResponse::skippedResponse);
     }
 
     @GetMapping("/users/{userId}/coupons/usable")
-    public List<UsableCouponDto> getUsableCoupons(@PathVariable Long userId) {
-        return promotionCouponFacade.getUsableCoupons(userId).stream()
+    public List<UsableCouponDto> getUsableCoupons(@AuthenticationPrincipal UserPrincipal principal,
+                                                  @PathVariable Long userId) {
+        Long principalId = requirePrincipal(principal);
+        ensureSameUser(principalId, userId);
+        return promotionCouponFacade.getUsableCoupons(principalId).stream()
                 .map(UsableCouponDto::from)
                 .toList();
     }
 
     @PostMapping("/orders/{orderId}/coupons/lock")
-    public ResponseEntity<CouponLockResultDto> lockCoupon(@PathVariable Long orderId,
+    public ResponseEntity<CouponLockResultDto> lockCoupon(@AuthenticationPrincipal UserPrincipal principal,
+                                                          @PathVariable Long orderId,
                                                           @Valid @RequestBody LockCouponRequest request) {
+        Long principalId = requirePrincipal(principal);
         try {
-            return promotionCouponFacade.lockCoupon(orderId, request.getCouponCode())
+            return promotionCouponFacade.lockCoupon(principalId, orderId, request.getCouponCode())
                     .map(CouponLockResultDto::from)
                     .map(ResponseEntity::ok)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "no usable coupon found"));
@@ -57,16 +67,33 @@ public class PromotionCouponController {
     }
 
     @PostMapping("/orders/{orderId}/coupons/redeem")
-    public ResponseEntity<Void> redeemCoupon(@PathVariable Long orderId,
+    public ResponseEntity<Void> redeemCoupon(@AuthenticationPrincipal UserPrincipal principal,
+                                             @PathVariable Long orderId,
                                              @Valid @RequestBody RedeemCouponRequest request) {
-        promotionCouponFacade.redeemCoupon(orderId, request.getUserCouponId(), request.getDiscountAmount());
+        Long principalId = requirePrincipal(principal);
+        promotionCouponFacade.redeemCoupon(principalId, orderId, request.getUserCouponId(), request.getDiscountAmount());
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/orders/{orderId}/coupons/release")
-    public ResponseEntity<Void> releaseCoupon(@PathVariable Long orderId,
+    public ResponseEntity<Void> releaseCoupon(@AuthenticationPrincipal UserPrincipal principal,
+                                              @PathVariable Long orderId,
                                               @Valid @RequestBody ReleaseCouponRequest request) {
-        promotionCouponFacade.releaseCoupon(orderId, request.getUserCouponId());
+        Long principalId = requirePrincipal(principal);
+        promotionCouponFacade.releaseCoupon(principalId, orderId, request.getUserCouponId());
         return ResponseEntity.noContent().build();
+    }
+
+    private Long requirePrincipal(UserPrincipal principal) {
+        if (principal == null || principal.getId() == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "authentication required");
+        }
+        return principal.getId();
+    }
+
+    private void ensureSameUser(Long principalId, Long userId) {
+        if (!principalId.equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "userId mismatch");
+        }
     }
 }

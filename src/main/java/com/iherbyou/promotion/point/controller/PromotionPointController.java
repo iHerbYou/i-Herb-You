@@ -7,6 +7,7 @@ import com.iherbyou.promotion.point.dto.PointHistoryItemDto;
 import com.iherbyou.promotion.point.dto.UsePointsRequest;
 import com.iherbyou.promotion.point.service.PromotionPointFacade;
 import com.iherbyou.user.entity.PointHistory;
+import com.iherbyou.security.auth.UserPrincipal;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -30,41 +32,53 @@ public class PromotionPointController {
     private final PromotionPointFacade promotionPointFacade;
 
     @PostMapping("/reviews/{reviewId}/points")
-    public ResponseEntity<PointBalanceDto> grantReviewPoints(@PathVariable Long reviewId,
+    public ResponseEntity<PointBalanceDto> grantReviewPoints(@AuthenticationPrincipal UserPrincipal principal,
+                                                             @PathVariable Long reviewId,
                                                              @Valid @RequestBody GrantReviewPointsRequest request) {
-        Optional<PointHistory> history = promotionPointFacade.grantReviewPoints(request.getUserId(), reviewId, request.isContainsImage());
+        Long principalId = requirePrincipal(principal);
+        ensureRequestUser(principalId, request.getUserId());
+        Optional<PointHistory> history = promotionPointFacade.grantReviewPoints(principalId, reviewId, request.isContainsImage());
         int balance = history.map(PointHistory::getBalanceAfter)
-                .orElseGet(() -> promotionPointFacade.currentBalance(request.getUserId()));
-        return ResponseEntity.ok(PointBalanceDto.of(request.getUserId(), balance));
+                .orElseGet(() -> promotionPointFacade.currentBalance(principalId));
+        return ResponseEntity.ok(PointBalanceDto.of(principalId, balance));
     }
 
     @PostMapping("/orders/{orderId}/points/earn")
-    public ResponseEntity<PointBalanceDto> grantOrderCompletionPoints(@PathVariable Long orderId,
+    public ResponseEntity<PointBalanceDto> grantOrderCompletionPoints(@AuthenticationPrincipal UserPrincipal principal,
+                                                                      @PathVariable Long orderId,
                                                                       @Valid @RequestBody GrantOrderCompletionPointsRequest request) {
-        Optional<PointHistory> history = promotionPointFacade.grantOrderCompletionPoints(request.getUserId(), orderId, request.getPaymentAmount());
+        Long principalId = requirePrincipal(principal);
+        ensureRequestUser(principalId, request.getUserId());
+        Optional<PointHistory> history = promotionPointFacade.grantOrderCompletionPoints(principalId, orderId, request.getPaymentAmount());
         int balance = history.map(PointHistory::getBalanceAfter)
-                .orElseGet(() -> promotionPointFacade.currentBalance(request.getUserId()));
-        return ResponseEntity.ok(PointBalanceDto.of(request.getUserId(), balance));
+                .orElseGet(() -> promotionPointFacade.currentBalance(principalId));
+        return ResponseEntity.ok(PointBalanceDto.of(principalId, balance));
     }
 
     @PostMapping("/orders/{orderId}/points/use")
-    public ResponseEntity<PointBalanceDto> usePoints(@PathVariable Long orderId,
+    public ResponseEntity<PointBalanceDto> usePoints(@AuthenticationPrincipal UserPrincipal principal,
+                                                     @PathVariable Long orderId,
                                                      @Valid @RequestBody UsePointsRequest request) {
+        Long principalId = requirePrincipal(principal);
+        ensureRequestUser(principalId, request.getUserId());
         try {
-            promotionPointFacade.usePoints(request.getUserId(), orderId, request.getAmount());
+            promotionPointFacade.usePoints(principalId, orderId, request.getAmount());
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
         }
-        int balance = promotionPointFacade.currentBalance(request.getUserId());
-        return ResponseEntity.ok(PointBalanceDto.of(request.getUserId(), balance));
+        int balance = promotionPointFacade.currentBalance(principalId);
+        return ResponseEntity.ok(PointBalanceDto.of(principalId, balance));
     }
 
     @PostMapping("/orders/{orderId}/points/restore")
-    public ResponseEntity<PointBalanceDto> restorePoints(@PathVariable Long orderId,
+    public ResponseEntity<PointBalanceDto> restorePoints(@AuthenticationPrincipal UserPrincipal principal,
+                                                         @PathVariable Long orderId,
                                                          @Valid @RequestBody UsePointsRequest request) {
-        promotionPointFacade.restorePoints(request.getUserId(), orderId, request.getAmount());
-        int balance = promotionPointFacade.currentBalance(request.getUserId());
-        return ResponseEntity.ok(PointBalanceDto.of(request.getUserId(), balance));
+        Long principalId = requirePrincipal(principal);
+        ensureRequestUser(principalId, request.getUserId());
+        promotionPointFacade.restorePoints(principalId, orderId, request.getAmount());
+        int balance = promotionPointFacade.currentBalance(principalId);
+        return ResponseEntity.ok(PointBalanceDto.of(principalId, balance));
     }
 
     @PostMapping("/internal/points/expire")
@@ -74,16 +88,44 @@ public class PromotionPointController {
     }
 
     @GetMapping("/users/{userId}/points")
-    public PointBalanceDto getPointBalance(@PathVariable Long userId) {
-        int balance = promotionPointFacade.currentBalance(userId);
-        return PointBalanceDto.of(userId, balance);
+    public PointBalanceDto getPointBalance(@AuthenticationPrincipal UserPrincipal principal,
+                                           @PathVariable Long userId) {
+        Long principalId = requirePrincipal(principal);
+        ensureSameUser(principalId, userId);
+        int balance = promotionPointFacade.currentBalance(principalId);
+        return PointBalanceDto.of(principalId, balance);
     }
 
     @GetMapping("/users/{userId}/points/history")
-    public List<PointHistoryItemDto> getPointHistory(@PathVariable Long userId) {
-        List<PointHistory> histories = promotionPointFacade.getHistories(userId);
+    public List<PointHistoryItemDto> getPointHistory(@AuthenticationPrincipal UserPrincipal principal,
+                                                     @PathVariable Long userId) {
+        Long principalId = requirePrincipal(principal);
+        ensureSameUser(principalId, userId);
+        List<PointHistory> histories = promotionPointFacade.getHistories(principalId);
         return histories.stream()
                 .map(PointHistoryItemDto::from)
                 .toList();
+    }
+
+    private Long requirePrincipal(UserPrincipal principal) {
+        if (principal == null || principal.getId() == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "authentication required");
+        }
+        return principal.getId();
+    }
+
+    private void ensureRequestUser(Long principalId, Long requestUserId) {
+        if (requestUserId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "userId is required");
+        }
+        if (!principalId.equals(requestUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "userId mismatch");
+        }
+    }
+
+    private void ensureSameUser(Long principalId, Long userId) {
+        if (!principalId.equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "userId mismatch");
+        }
     }
 }
