@@ -118,18 +118,38 @@ public class CategoryService {
         return roots;
     }
 
-    // 특정 카테고리의 상품 목록 가져오기
+    // 특정 카테고리의 상품 목록 가져오기 (하위 카테고리 포함)
     public List<ProductListDto> getProductsByCategory(Long categoryId) {
         // 카테고리 존재 여부 확인
         if (!categoryRepository.existsById(categoryId)) {
             throw new CategoryNotFoundException(categoryId);
         }
 
-        List<Product> products = productRepository.findByCategoryId(categoryId, Pageable.unpaged()).getContent();
+        // 해당 카테고리와 모든 하위 카테고리 ID 수집
+        List<Long> categoryIds = getAllSubCategoryIds(categoryId);
+        
+        // 모든 카테고리의 상품 조회
+        List<Product> products = productRepository.findByCategoryIds(categoryIds, Pageable.unpaged()).getContent();
 
         return products.stream()
                 .map(ProductListDto::fromEntity)
                 .toList();
+    }
+
+    // 특정 카테고리와 모든 하위 카테고리 ID를 재귀적으로 수집
+    public List<Long> getAllSubCategoryIds(Long categoryId) {
+        List<Long> categoryIds = new ArrayList<>();
+        categoryIds.add(categoryId); // 자기 자신도 포함
+        
+        // 직접 하위 카테고리들 조회
+        List<Category> directChildren = categoryRepository.findByParentId(categoryId);
+        
+        // 각 하위 카테고리에 대해 재귀적으로 하위 카테고리 ID 수집
+        for (Category child : directChildren) {
+            categoryIds.addAll(getAllSubCategoryIds(child.getId()));
+        }
+        
+        return categoryIds;
     }
 
     // 카테고리 단계(대/중/소) 계산

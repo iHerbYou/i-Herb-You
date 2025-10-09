@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryService categoryService;
 
     @Transactional(readOnly = true)
     public Page<ProductListDto> getProducts(Pageable pageable,
@@ -76,12 +77,14 @@ public class ProductService {
             });
         }
 
-        // 카테고리 필터
+        // 카테고리 필터 (하위 카테고리 포함)
         if (categoryId != null) {
+            // 하위 카테고리 ID들을 수집
+            List<Long> categoryIds = getAllSubCategoryIds(categoryId);
             spec = spec.and((root, query, cb) -> {
                 query.distinct(true);
                 Join<Product, ProductCategory> pcJoin = root.join("productCategories", JoinType.INNER);
-                return cb.equal(pcJoin.get("category").get("id"), categoryId);
+                return pcJoin.get("category").get("id").in(categoryIds);
             });
         }
 
@@ -164,7 +167,9 @@ public class ProductService {
         Page<Product> products;
 
         if (categoryId != null) {
-            products = productRepository.findByCategoryIdOrderBySalesDesc(categoryId, pageable);
+            // 하위 카테고리 ID들을 수집
+            List<Long> categoryIds = getAllSubCategoryIds(categoryId);
+            products = productRepository.findByCategoryIdsOrderBySalesDesc(categoryIds, pageable);
         } else {
             products = productRepository.findAllOrderBySalesDesc(pageable);
         }
@@ -190,6 +195,11 @@ public class ProductService {
         Page<Product> products = productRepository.findAllOrderByAvgRatingDesc(pageable);
 
         return products.map(ProductListDto::fromEntity).getContent();
+    }
+
+    // 특정 카테고리와 모든 하위 카테고리 ID를 재귀적으로 수집
+    private List<Long> getAllSubCategoryIds(Long categoryId) {
+        return categoryService.getAllSubCategoryIds(categoryId);
     }
 
 }
