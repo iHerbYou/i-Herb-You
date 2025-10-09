@@ -1,9 +1,29 @@
--- 각 상품당 10~15개의 리뷰 생성
-INSERT INTO review (product_id, user_id, rating, text, created_at, is_deleted)
+-- 리뷰 더미데이터: 각 상품당 10~15개 보장 (MySQL 8.0+)
+-- 전제: `user` 테이블에 최소 1명 이상 존재
+
+INSERT INTO `review` (product_id, user_id, rating, text, created_at, is_deleted)
+WITH RECURSIVE
+    seq AS (
+        SELECT 1 AS n
+        UNION ALL
+        SELECT n + 1 FROM seq WHERE n < 15  -- 1..15
+    ),
+    prod AS (
+        -- 각 상품에 10~15개 할당 (상품 id 기반 결정적 분포)
+        SELECT p.id AS product_id, 10 + (p.id % 6) AS max_reviews
+        FROM `product` p
+    ),
+    user_pool AS (
+        SELECT u.id, ROW_NUMBER() OVER (ORDER BY u.id) AS u_rn
+        FROM `user` u
+    ),
+    user_cnt AS (
+        SELECT COUNT(*) AS c FROM `user`
+    )
 SELECT
-    x.product_id,
-    x.user_id,
-    ROUND(3.0 + (RAND() * 2.0), 1) AS rating,  -- 3.0 ~ 5.0 사이 소수점 1자리
+    p.product_id,
+    up.id AS user_id,
+    ROUND(3.0 + (RAND() * 2.0), 1) AS rating,  -- 3.0 ~ 5.0
     CASE FLOOR(RAND() * 30)
         WHEN 0 THEN '효과 좋아요. 재구매 의사 있습니다!'
         WHEN 1 THEN '배송 빠르고 제품 품질도 만족스럽습니다.'
@@ -38,25 +58,12 @@ SELECT
         END AS text,
     NOW() - INTERVAL FLOOR(RAND() * 180) DAY AS created_at,
     0 AS is_deleted
-FROM (
-         SELECT
-             p.id AS product_id,
-             u.id AS user_id,
-             ROW_NUMBER() OVER (PARTITION BY p.id ORDER BY RAND()) AS rn,
-             pr.max_reviews
-         FROM product p
-                  CROSS JOIN (SELECT id FROM user) u
-                  CROSS JOIN (
-             SELECT
-                 p2.id AS pid,
-                 10 + FLOOR(RAND() * 6) AS max_reviews
-             FROM product p2
-         ) pr
-         WHERE p.id = pr.pid
-     ) x
-WHERE x.rn <= x.max_reviews
-  AND NOT EXISTS (
-    SELECT 1 FROM review r
-    WHERE r.product_id = x.product_id
-      AND r.user_id = x.user_id
+FROM prod p
+         JOIN seq s ON s.n <= p.max_reviews
+         JOIN user_cnt uc ON uc.c > 0
+         JOIN user_pool up
+              ON up.u_rn = ((s.n - 1) % uc.c) + 1  -- 유저 라운드로빈
+WHERE NOT EXISTS (
+    SELECT 1 FROM `review` r
+    WHERE r.product_id = p.product_id AND r.user_id = up.id
 );
