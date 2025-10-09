@@ -17,8 +17,7 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
 
-    // N+1 문제 해결을 위한 EntityGraph 사용
-    @EntityGraph(attributePaths = {"productVariants", "productVariants.stock", "productImgs", "reviews"})
+    // 기본 조회 (연관 엔티티 lazy loading)
     Page<Product> findAll(Specification<Product> spec, Pageable pageable);
 
     // 카테고리 기반 상품 조회 (페이징)

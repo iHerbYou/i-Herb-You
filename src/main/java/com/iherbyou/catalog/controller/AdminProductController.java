@@ -1,6 +1,7 @@
 package com.iherbyou.catalog.controller;
 
 import com.iherbyou.catalog.dto.ProductCreateRequest;
+import com.iherbyou.catalog.dto.ProductListDto;
 import com.iherbyou.catalog.dto.ProductUpdateRequest;
 import com.iherbyou.catalog.entity.Product;
 import com.iherbyou.catalog.service.ProductService;
@@ -9,6 +10,7 @@ import com.iherbyou.security.auth.UserPrincipal;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -37,6 +39,23 @@ public class AdminProductController {
         Product saved = productService.createProduct(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
+
+    // 상품 목록 조회 API
+//    @GetMapping
+//    public ResponseEntity<Page<ProductListDto>> getProductsForAdmin(
+//            @RequestParam(defaultValue = "1") int page,
+//            @RequestParam(defaultValue = "8") int size,
+//            @RequestParam(required = false) Boolean excludeSoldOut,
+//            @RequestParam(required = false) Integer minPrice,
+//            @RequestParam(required = false) Integer maxPrice,
+//            @RequestParam(required = false) Long categoryId,
+//            @RequestParam(required = false) String keyword
+//    ) {
+//        // 관리자는 품절 포함 여부 선택 가능
+//        Page<ProductListDto> result = productService.getProducts(
+//                page
+//        )
+//    }
 
     // 상품 수정 API
     @PutMapping("/{id}")
