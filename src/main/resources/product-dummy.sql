@@ -1447,11 +1447,7 @@ VALUES ((SELECT id FROM brand WHERE name = '고려은단'),
         '2025-02-04 00:00:00', 30, 6, 1890, 4.6, 280, 49890);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P51929176649' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192917/51929176649.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P51929176649' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192917/51929176649.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P51929176649' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_5192917/51929176649.3.jpg', '성분 정보', 2, 0);
+        'https://shopping-phinf.pstatic.net/main_5192917/51929176649.20241213203933.jpg', '대표 이미지', 0, 1);
 INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
                              nutrition_facts, max_qty_per_order, restock_eta)
 VALUES ((SELECT id FROM product WHERE code = 'P51929176649' LIMIT 1), '2개', 49890, 47890, 2, '600000000073', '포',
@@ -14320,11 +14316,7 @@ VALUES ((SELECT id FROM brand WHERE name = '종근당'),
         '2025-12-18 00:00:00', 30, 6, 3120, 4.1, 480, 59900);
 INSERT INTO product_img (product_id, image_url, alt_text, sort_idx, is_primary)
 VALUES ((SELECT id FROM product WHERE code = 'P89698994397' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8969899/89698994397.1.jpg', '대표 이미지', 0, 1),
-       ((SELECT id FROM product WHERE code = 'P89698994397' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8969899/89698994397.2.jpg', '상품 상세', 1, 0),
-       ((SELECT id FROM product WHERE code = 'P89698994397' LIMIT 1),
-        'https://shopping-phinf.pstatic.net/main_8969899/89698994397.3.jpg', '성분 정보', 2, 0);
+        'https://shopping-phinf.pstatic.net/main_8969899/89698994397.jpg', '대표 이미지', 0, 1);
 INSERT INTO product_variant (product_id, variant_name, list_price, sale_price, volume, upc_code, pill_size,
                              nutrition_facts, max_qty_per_order, restock_eta)
 VALUES ((SELECT id FROM product WHERE code = 'P89698994397' LIMIT 1), '120정', 59900, 57900, 120, '600000000689',
