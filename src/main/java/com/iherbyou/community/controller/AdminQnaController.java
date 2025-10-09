@@ -30,10 +30,9 @@ public class AdminQnaController {
     @PersistenceContext
     private EntityManager em;
 
-    // 정렬 허용 컬럼(엔티티 필드명 기준)
     private static final Set<String> ALLOWED_SORTS = Set.of("createdAt", "id", "statusCodeId");
 
-    // 상품별 질문 목록 (statusValue 필터 가능) - Pageable 제거
+    // 상품별 질문 목록 (statusValue 필터 가능)
     @GetMapping("/questions")
     public Page<QnaQuestion> listQuestions(
             @AuthenticationPrincipal UserPrincipal me,
@@ -48,7 +47,7 @@ public class AdminQnaController {
         return qnaService.listByProduct(productId, statusValue, pageable);
     }
 
-    // 답변 등록 (관리자)
+    // 답변 등록
     @PostMapping("/answers")
     public ResponseEntity<Void> createAnswer(
             @AuthenticationPrincipal UserPrincipal me,
@@ -59,7 +58,7 @@ public class AdminQnaController {
         return ResponseEntity.created(URI.create("/api/admin/qna/answers/" + saved.getId())).build();
     }
 
-    // 답변 삭제 (관리자)
+    // 답변 삭제
     @DeleteMapping("/answers/{answerId}")
     public ResponseEntity<Void> deleteAnswer(
             @AuthenticationPrincipal UserPrincipal me,
@@ -84,17 +83,22 @@ public class AdminQnaController {
         return PageRequest.of(p, s, Sort.by(dir, safeProp));
     }
 
-    // 관리자 권한 확인
+    // ===== NPE 방어 포함 관리자 권한 확인 =====
     private void ensureAdmin(UserPrincipal me) {
-        if (me != null && me.getAuthorities() != null) {
+        // 0) 로그인 자체가 안 되어 있으면 차단
+        if (me == null) throw new AccessDeniedException("FORBIDDEN");
+
+        // 1) 토큰 권한에 ADMIN 계열이 있으면 통과
+        if (me.getAuthorities() != null) {
             boolean hasAdmin = me.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
-                    .anyMatch(a -> "ROLE_ADMIN".equals(a) || a.endsWith(":ADMIN") || a.contains("ADMIN"));
+                    .anyMatch(a -> a != null && ("ROLE_ADMIN".equals(a) || a.endsWith(":ADMIN") || a.contains("ADMIN")));
             if (hasAdmin) return;
         }
 
+        // 2) DB 폴백: role value 조회 후 CodeService로 판별
         Integer roleValue = em.createQuery(
-                        "select rc.value from User u left join u.roleCode rc where u.id = :uid",
+                        "select rc.value from com.iherbyou.user.entity.User u left join u.roleCode rc where u.id = :uid",
                         Integer.class
                 )
                 .setParameter("uid", me.getId())
