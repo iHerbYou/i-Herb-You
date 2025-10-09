@@ -1,24 +1,23 @@
 -- 시드용 유저 (없으면 생성)
-INSERT INTO user (name, email, password, created_at, updated_at)
-SELECT 'Seed Bot', 'seed@iherbyou.com', '{noop}', NOW(), NOW()
-WHERE NOT EXISTS (SELECT 1 FROM user WHERE email = 'seed@iherbyou.com');
+INSERT INTO `user` (name, email, password, created_at, updated_at)
+SELECT 'Seed Bot', 'seed@iherbyou.com', '{noop}password123', NOW(), NOW()
+WHERE NOT EXISTS (SELECT 1 FROM `user` u WHERE u.email = 'seed@iherbyou.com');
 
--- 추가 더미 유저들 생성 (리뷰 작성용)
-INSERT INTO user (name, email, password, created_at, updated_at)
-SELECT
-    CONCAT('User', seq.n),
-    CONCAT('user', seq.n, '@example.com'),
-    '{noop}',
-    NOW() - INTERVAL FLOOR(RAND() * 365) DAY,
-    NOW()
-FROM (
-         SELECT 1 as n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5
-         UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10
-         UNION SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15
-         UNION SELECT 16 UNION SELECT 17 UNION SELECT 18 UNION SELECT 19 UNION SELECT 20
-         UNION SELECT 21 UNION SELECT 22 UNION SELECT 23 UNION SELECT 24 UNION SELECT 25
-         UNION SELECT 26 UNION SELECT 27 UNION SELECT 28 UNION SELECT 29 UNION SELECT 30
-     ) seq
-WHERE NOT EXISTS (
-    SELECT 1 FROM user WHERE email = CONCAT('user', seq.n, '@example.com')
-);
+-- 더미 유저 50~100명 자동 생성 (중복 방지)
+-- MySQL 8.0 이상: 재귀 CTE 사용
+INSERT INTO `user` (name, email, password, created_at, updated_at)
+WITH RECURSIVE seq AS (SELECT 1 AS n
+                       UNION ALL
+                       SELECT n + 1
+                       FROM seq
+                       WHERE n < (50 + FLOOR(RAND() * 51)) -- 50~100명
+)
+SELECT CONCAT('User', LPAD(s.n, 3, '0'))                 AS name,
+       CONCAT('user', LPAD(s.n, 3, '0'), '@example.com') AS email,
+       '{noop}password123'                               AS password, -- 테스트용 평문 비밀번호 (NoOp)
+       NOW() - INTERVAL FLOOR(RAND() * 365) DAY          AS created_at,
+       NOW()                                             AS updated_at
+FROM seq s
+WHERE NOT EXISTS (SELECT 1
+                  FROM `user` u
+                  WHERE u.email = CONCAT('user', LPAD(s.n, 3, '0'), '@example.com'));
