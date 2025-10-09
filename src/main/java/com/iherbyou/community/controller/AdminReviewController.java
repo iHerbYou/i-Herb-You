@@ -7,7 +7,10 @@ import com.iherbyou.security.auth.UserPrincipal;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,7 +31,7 @@ public class AdminReviewController {
 
     private static final Set<String> ALLOWED_SORTS = Set.of("createdAt", "id", "rating");
 
-    // 상품 기준 리뷰 목록 (관리자) - Pageable 제거
+    // 상품 기준 리뷰 목록 (관리자)
     @GetMapping
     public Page<Review> listByProduct(
             @AuthenticationPrincipal UserPrincipal me,
@@ -55,11 +58,9 @@ public class AdminReviewController {
         return PageRequest.of(p, s, Sort.by(dir, safeProp));
     }
 
-    // 관리자 권한 확인 (NPE 방어 포함)
+    // 관리자 권한 확인 (null 방어 + DB 폴백)
     private void ensureAdmin(UserPrincipal me) {
-        if (me == null) {
-            throw new AccessDeniedException("AUTH_REQUIRED");
-        }
+        if (me == null) throw new AccessDeniedException("FORBIDDEN");
 
         if (me.getAuthorities() != null) {
             boolean hasAdmin = me.getAuthorities().stream()
@@ -81,5 +82,4 @@ public class AdminReviewController {
             throw new AccessDeniedException("FORBIDDEN");
         }
     }
-
 }
