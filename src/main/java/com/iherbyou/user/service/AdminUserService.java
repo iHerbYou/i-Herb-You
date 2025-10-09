@@ -4,10 +4,7 @@ import com.iherbyou.common.code.entity.Code;
 import com.iherbyou.common.code.service.CodeService;
 import com.iherbyou.exception.user.UserNotFoundException;
 import com.iherbyou.security.auth.UserPrincipal;
-import com.iherbyou.user.dto.admin.AdminUserDto;
-import com.iherbyou.user.dto.admin.AdminUserListResponseDto;
-import com.iherbyou.user.dto.admin.ChangeUserStatusDto;
-import com.iherbyou.user.dto.admin.UserSearchDto;
+import com.iherbyou.user.dto.admin.*;
 import com.iherbyou.user.entity.User;
 import com.iherbyou.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -114,6 +111,23 @@ public class AdminUserService {
         Page<AdminUserDto> userDtos = users.map(user -> AdminUserDto.from(user));
 
         return AdminUserListResponseDto.from(userDtos);
+    }
+
+    /**
+     * 회원 상세 조회
+     */
+    @Transactional(readOnly = true)
+    public AdminUserDetailDto getUserDetail(UserPrincipal userPrincipal, Long userId) {
+        // 관리자 권한 확인
+        checkAdminPermission(userPrincipal);
+
+        log.info("회원 상세 조회 - 관리자: {}, 대상 회원 ID: {}", userPrincipal.getEmail(), userId);
+
+        // 회원 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
+
+        return AdminUserDetailDto.from(user);
     }
 
 }

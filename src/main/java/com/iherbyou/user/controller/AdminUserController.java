@@ -1,6 +1,7 @@
 package com.iherbyou.user.controller;
 
 import com.iherbyou.security.auth.UserPrincipal;
+import com.iherbyou.user.dto.admin.AdminUserDetailDto;
 import com.iherbyou.user.dto.admin.AdminUserListResponseDto;
 import com.iherbyou.user.dto.admin.ChangeUserStatusDto;
 import com.iherbyou.user.dto.admin.UserSearchDto;
@@ -52,6 +53,16 @@ public class AdminUserController {
             @ModelAttribute UserSearchDto searchDto,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         AdminUserListResponseDto response = adminUserService.searchUsers(userPrincipal, searchDto, pageable);
+        return ResponseEntity.ok(response);
+    }
+
+    // 회원 상세 조회
+    @Operation(summary = "회원 상세 조회", description = "특정 회원의 상세 정보를 조회합니다 (관리자 전용).")
+    @GetMapping("/{userId}")
+    public ResponseEntity<AdminUserDetailDto> getUserDetail(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long userId) {
+        AdminUserDetailDto response = adminUserService.getUserDetail(userPrincipal, userId);
         return ResponseEntity.ok(response);
     }
 
