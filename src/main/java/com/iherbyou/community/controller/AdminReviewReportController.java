@@ -53,7 +53,6 @@ public class AdminReviewReportController {
         reportService.changeStatus(me.getId(), true, reportId, req.newStatusValue());
     }
 
-    // value로 받도록 변경
     public record ChangeStatusRequest(Integer newStatusValue) {}
 
     private Pageable buildPageable(int page, int size, String sortParam, Set<String> allowedSorts) {
@@ -69,13 +68,14 @@ public class AdminReviewReportController {
         return PageRequest.of(p, s, Sort.by(dir, safeProp));
     }
 
+    // ===== NPE 방어 포함 관리자 권한 확인 =====
     private void ensureAdmin(UserPrincipal me) {
         if (me == null) throw new AccessDeniedException("FORBIDDEN");
 
         if (me.getAuthorities() != null) {
             boolean hasAdmin = me.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
-                    .anyMatch(a -> "ROLE_ADMIN".equals(a) || a.endsWith(":ADMIN") || a.contains("ADMIN"));
+                    .anyMatch(a -> a != null && ("ROLE_ADMIN".equals(a) || a.endsWith(":ADMIN") || a.contains("ADMIN")));
             if (hasAdmin) return;
         }
 

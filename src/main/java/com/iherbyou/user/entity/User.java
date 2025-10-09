@@ -107,7 +107,7 @@ public class User {
 
     // 관리자인지 확인
     public boolean isAdmin() {
-        return this.roleCode != null && "ADMIN".equals(this.roleCode.getDisplayName());
+        return this.roleCode != null && this.roleCode.getDisplayName().startsWith("ADMIN_");
     }
 
     /**

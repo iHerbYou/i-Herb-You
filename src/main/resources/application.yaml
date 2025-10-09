@@ -18,6 +18,7 @@ spring:
         - classpath:qna-data.sql
         - classpath:review-data.sql
         - classpath:user-data.sql
+        - classpath:admin-init.sql
       #mode: never  # 임시로 비활성화
       mode: always
 
