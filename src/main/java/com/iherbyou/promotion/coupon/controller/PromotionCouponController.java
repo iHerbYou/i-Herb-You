@@ -30,22 +30,18 @@ public class PromotionCouponController {
 
     private final PromotionCouponFacade promotionCouponFacade;
 
-    @PostMapping("/users/{userId}/coupons/welcome")
-    public WelcomeCouponResponse issueWelcomeCoupon(@AuthenticationPrincipal UserPrincipal principal,
-                                                   @PathVariable Long userId) {
+    @PostMapping("/users/me/coupons/welcome")
+    public WelcomeCouponResponse issueWelcomeCoupon(@AuthenticationPrincipal UserPrincipal principal) {
         Long principalId = requirePrincipal(principal);
-        ensureSameUser(principalId, userId);
         return promotionCouponFacade.issueWelcomeCoupon(principalId)
                 .map(UsableCouponDto::from)
                 .map(WelcomeCouponResponse::issuedResponse)
                 .orElseGet(WelcomeCouponResponse::skippedResponse);
     }
 
-    @GetMapping("/users/{userId}/coupons/usable")
-    public List<UsableCouponDto> getUsableCoupons(@AuthenticationPrincipal UserPrincipal principal,
-                                                  @PathVariable Long userId) {
+    @GetMapping("/users/me/coupons/usable")
+    public List<UsableCouponDto> getUsableCoupons(@AuthenticationPrincipal UserPrincipal principal) {
         Long principalId = requirePrincipal(principal);
-        ensureSameUser(principalId, userId);
         return promotionCouponFacade.getUsableCoupons(principalId).stream()
                 .map(UsableCouponDto::from)
                 .toList();
@@ -91,9 +87,4 @@ public class PromotionCouponController {
         return principal.getId();
     }
 
-    private void ensureSameUser(Long principalId, Long userId) {
-        if (!principalId.equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "userId mismatch");
-        }
-    }
 }

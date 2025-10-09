@@ -36,7 +36,6 @@ public class PromotionPointController {
                                                              @PathVariable Long reviewId,
                                                              @Valid @RequestBody GrantReviewPointsRequest request) {
         Long principalId = requirePrincipal(principal);
-        ensureRequestUser(principalId, request.getUserId());
         Optional<PointHistory> history = promotionPointFacade.grantReviewPoints(principalId, reviewId, request.isContainsImage());
         int balance = history.map(PointHistory::getBalanceAfter)
                 .orElseGet(() -> promotionPointFacade.currentBalance(principalId));
@@ -48,7 +47,6 @@ public class PromotionPointController {
                                                                       @PathVariable Long orderId,
                                                                       @Valid @RequestBody GrantOrderCompletionPointsRequest request) {
         Long principalId = requirePrincipal(principal);
-        ensureRequestUser(principalId, request.getUserId());
         Optional<PointHistory> history = promotionPointFacade.grantOrderCompletionPoints(principalId, orderId, request.getPaymentAmount());
         int balance = history.map(PointHistory::getBalanceAfter)
                 .orElseGet(() -> promotionPointFacade.currentBalance(principalId));
@@ -60,7 +58,6 @@ public class PromotionPointController {
                                                      @PathVariable Long orderId,
                                                      @Valid @RequestBody UsePointsRequest request) {
         Long principalId = requirePrincipal(principal);
-        ensureRequestUser(principalId, request.getUserId());
         try {
             promotionPointFacade.usePoints(principalId, orderId, request.getAmount());
         } catch (IllegalArgumentException ex) {
@@ -75,7 +72,6 @@ public class PromotionPointController {
                                                          @PathVariable Long orderId,
                                                          @Valid @RequestBody UsePointsRequest request) {
         Long principalId = requirePrincipal(principal);
-        ensureRequestUser(principalId, request.getUserId());
         promotionPointFacade.restorePoints(principalId, orderId, request.getAmount());
         int balance = promotionPointFacade.currentBalance(principalId);
         return ResponseEntity.ok(PointBalanceDto.of(principalId, balance));
@@ -87,20 +83,16 @@ public class PromotionPointController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/users/{userId}/points")
-    public PointBalanceDto getPointBalance(@AuthenticationPrincipal UserPrincipal principal,
-                                           @PathVariable Long userId) {
+    @GetMapping("/users/me/points")
+    public PointBalanceDto getPointBalance(@AuthenticationPrincipal UserPrincipal principal) {
         Long principalId = requirePrincipal(principal);
-        ensureSameUser(principalId, userId);
         int balance = promotionPointFacade.currentBalance(principalId);
         return PointBalanceDto.of(principalId, balance);
     }
 
-    @GetMapping("/users/{userId}/points/history")
-    public List<PointHistoryItemDto> getPointHistory(@AuthenticationPrincipal UserPrincipal principal,
-                                                     @PathVariable Long userId) {
+    @GetMapping("/users/me/points/history")
+    public List<PointHistoryItemDto> getPointHistory(@AuthenticationPrincipal UserPrincipal principal) {
         Long principalId = requirePrincipal(principal);
-        ensureSameUser(principalId, userId);
         List<PointHistory> histories = promotionPointFacade.getHistories(principalId);
         return histories.stream()
                 .map(PointHistoryItemDto::from)
@@ -114,18 +106,4 @@ public class PromotionPointController {
         return principal.getId();
     }
 
-    private void ensureRequestUser(Long principalId, Long requestUserId) {
-        if (requestUserId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "userId is required");
-        }
-        if (!principalId.equals(requestUserId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "userId mismatch");
-        }
-    }
-
-    private void ensureSameUser(Long principalId, Long userId) {
-        if (!principalId.equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "userId mismatch");
-        }
-    }
 }

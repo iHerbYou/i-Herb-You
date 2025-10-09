@@ -1,6 +1,5 @@
 package com.iherbyou.promotion.point.dto;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,9 +8,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class GrantReviewPointsRequest {
-
-    @NotNull
-    private Long userId;
 
     private boolean containsImage;
 }
