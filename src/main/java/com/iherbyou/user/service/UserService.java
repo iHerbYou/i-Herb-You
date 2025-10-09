@@ -18,6 +18,7 @@ import com.iherbyou.user.entity.User;
 import com.iherbyou.user.repository.EmailVerificationTokenRepository;
 import com.iherbyou.user.repository.PasswordResetTokenRepository;
 import com.iherbyou.user.repository.UserRepository;
+import com.iherbyou.promotion.coupon.service.PromotionCouponFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,6 +40,7 @@ public class UserService {
     private final EmailService emailService;
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final PromotionCouponFacade promotionCouponFacade;
 
     /**
      * 회원가입 (SignUp)
@@ -82,6 +84,12 @@ public class UserService {
 
         // 저장
         User savedUser = userRepository.save(user);
+
+        try {
+            promotionCouponFacade.issueWelcomeCoupon(savedUser.getId());
+        } catch (Exception e) {
+            log.warn("[WelcomeCoupon][failed] userId={}", savedUser.getId(), e);
+        }
 
         // 이메일 인증 토큰 생성
         String token = UUID.randomUUID().toString();

@@ -32,7 +32,8 @@ public class ReviewController {
                 me.getId(),
                 req.productId(),
                 req.rating(),
-                req.text()
+                req.text(),
+                req.containsImage() != null && req.containsImage()
         );
 
         ReviewProduct res = new ReviewProduct(

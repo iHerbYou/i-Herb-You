@@ -3,5 +3,6 @@ package com.iherbyou.community.dto;
 public record ReviewCreateRequest(
         Long productId,
         Integer rating,
-        String text
+        String text,
+        Boolean containsImage
 ) {}

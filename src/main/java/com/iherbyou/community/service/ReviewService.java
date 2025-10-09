@@ -4,6 +4,7 @@ import com.iherbyou.catalog.entity.Product;
 import com.iherbyou.community.entity.Review;
 import com.iherbyou.community.repository.ReviewRepository;
 import com.iherbyou.user.entity.User;
+import com.iherbyou.promotion.point.service.PromotionPointFacade;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.data.domain.Page;
@@ -12,10 +13,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 @Service
+@Slf4j
 public class ReviewService {
 
     private static final int MAX_TEXT_LEN = 1000;
@@ -24,12 +27,14 @@ public class ReviewService {
             Boolean.parseBoolean(System.getProperty("REVIEWS_VERIFY_PURCHASE", "false"));
 
     private final ReviewRepository reviewRepo;
+    private final PromotionPointFacade promotionPointFacade;
 
     @PersistenceContext
     private EntityManager em;
 
-    public ReviewService(ReviewRepository reviewRepo) {
+    public ReviewService(ReviewRepository reviewRepo, PromotionPointFacade promotionPointFacade) {
         this.reviewRepo = reviewRepo;
+        this.promotionPointFacade = promotionPointFacade;
     }
 
     // ---------- 신규: page/size/sort 오버로드 ----------
@@ -58,7 +63,7 @@ public class ReviewService {
 
     // 리뷰 등록
     @Transactional
-    public Review createReview(Long userId, Long productId, Integer rating, String text) {
+    public Review createReview(Long userId, Long productId, Integer rating, String text, boolean containsImage) {
         Product product = em.find(Product.class, productId);
         if (product == null) throw new IllegalArgumentException("상품이 없습니다.");
 
@@ -85,7 +90,15 @@ public class ReviewService {
                 .text(body)
                 .build();
 
-        return reviewRepo.save(review);
+        Review savedReview = reviewRepo.save(review);
+
+        try {
+            promotionPointFacade.grantReviewPoints(userId, savedReview.getId(), containsImage);
+        } catch (Exception e) {
+            log.warn("[ReviewPoint][failed] userId={} reviewId={}", userId, savedReview.getId(), e);
+        }
+
+        return savedReview;
     }
 
     // 리뷰 내용 수정
