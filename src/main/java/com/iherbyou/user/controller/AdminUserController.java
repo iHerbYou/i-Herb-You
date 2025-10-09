@@ -1,10 +1,7 @@
 package com.iherbyou.user.controller;
 
 import com.iherbyou.security.auth.UserPrincipal;
-import com.iherbyou.user.dto.admin.AdminUserDetailDto;
-import com.iherbyou.user.dto.admin.AdminUserListResponseDto;
-import com.iherbyou.user.dto.admin.ChangeUserStatusDto;
-import com.iherbyou.user.dto.admin.UserSearchDto;
+import com.iherbyou.user.dto.admin.*;
 import com.iherbyou.user.service.AdminUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -63,6 +60,15 @@ public class AdminUserController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long userId) {
         AdminUserDetailDto response = adminUserService.getUserDetail(userPrincipal, userId);
+        return ResponseEntity.ok(response);
+    }
+
+    // 회원 통계 조회
+    @Operation(summary = "회원 통계 조회", description = "전체 회원 통계를 조회합니다 (관리자 전용).")
+    @GetMapping("/statistics")
+    public ResponseEntity<UserStatisticsDto> getUserStatistics(
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        UserStatisticsDto response = adminUserService.getUserStatistics(userPrincipal);
         return ResponseEntity.ok(response);
     }
 

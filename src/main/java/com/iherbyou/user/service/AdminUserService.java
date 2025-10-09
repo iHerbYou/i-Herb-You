@@ -15,6 +15,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -118,6 +120,7 @@ public class AdminUserService {
      */
     @Transactional(readOnly = true)
     public AdminUserDetailDto getUserDetail(UserPrincipal userPrincipal, Long userId) {
+
         // 관리자 권한 확인
         checkAdminPermission(userPrincipal);
 
@@ -128,6 +131,46 @@ public class AdminUserService {
                 .orElseThrow(() -> new UserNotFoundException("회원을 찾을 수 없습니다."));
 
         return AdminUserDetailDto.from(user);
+    }
+
+    /**
+     * 회원 통계 조회
+     */
+    @Transactional(readOnly = true)
+    public UserStatisticsDto getUserStatistics(UserPrincipal userPrincipal) {
+
+        // 관리자 권한 확인
+        checkAdminPermission(userPrincipal);
+
+        log.info("회원 통계 조회 - 관리자: {}", userPrincipal.getEmail());
+
+        // 상태별 회원 수
+        Long totalUsers = userRepository.count();
+        Long activeUsers = userRepository.countByStatusCode(712);      // ACTIVE
+        Long inactiveUsers = userRepository.countByStatusCode(711);    // INACTIVE
+        Long suspendedUsers = userRepository.countByStatusCode(713);   // SUSPENDED
+        Long deletedUsers = userRepository.countByStatusCode(715);     // DELETED
+
+        // 기간별 가입자 수
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfToday = now.toLocalDate().atStartOfDay();
+        LocalDateTime startOfWeek = now.minusWeeks(1);
+        LocalDateTime startOfMonth = now.minusMonths(1);
+
+        Long todaySignups = userRepository.countByCreatedAtAfter(startOfToday);
+        Long thisWeekSignups = userRepository.countByCreatedAtAfter(startOfWeek);
+        Long thisMonthSignups = userRepository.countByCreatedAtAfter(startOfMonth);
+
+        return UserStatisticsDto.builder()
+                .totalUsers(totalUsers)
+                .activeUsers(activeUsers)
+                .inactiveUsers(inactiveUsers)
+                .suspendedUsers(suspendedUsers)
+                .deletedUsers(deletedUsers)
+                .todaySignups(todaySignups)
+                .thisWeekSignups(thisWeekSignups)
+                .thisMonthSignups(thisMonthSignups)
+                .build();
     }
 
 }

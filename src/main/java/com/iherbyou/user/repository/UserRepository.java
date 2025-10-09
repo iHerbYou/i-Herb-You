@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,4 +61,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.phoneNumber LIKE %:keyword%")
     Page<User> searchByPhone(@Param("keyword") String keyword, Pageable pageable);
 
+    // 상태별 회원 수 조회
+    @Query("SELECT COUNT(u) FROM User u WHERE u.statusCode.value = :statusCode")
+    Long countByStatusCode(@Param("statusCode") Integer statusCode);
+
+    // 기간별 가입자 수 조회
+    @Query("SELECT COUNT(u) FROM User u WHERE u.createdAt >= :startDate")
+    Long countByCreatedAtAfter(@Param("startDate") LocalDateTime startDate);
 }
