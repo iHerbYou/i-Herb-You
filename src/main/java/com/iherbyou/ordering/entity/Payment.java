@@ -47,6 +47,9 @@ public class Payment {
     @Column
     private LocalDateTime paidAt; // 결제 완료 시각
 
+    @Column(name = "external_order_key", length = 64)
+    private String externalOrderKey; // PG 주문 키
+
     public void markRequested(Code status, Code method, BigDecimal amount, LocalDateTime requestedAt) {
         this.paymentStatusCode = status;
         this.paymentMethodCode = method;
@@ -58,6 +61,10 @@ public class Payment {
     public void markPaid(Code status, LocalDateTime paidAt) {
         this.paymentStatusCode = status;
         this.paidAt = paidAt;
+    }
+
+    public void assignExternalOrderKey(String key) {
+        this.externalOrderKey = key;
     }
 
     public void addRefund(Refund refund) {

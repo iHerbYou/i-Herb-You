@@ -1,10 +1,19 @@
 package com.iherbyou.exception;
 
+import com.iherbyou.exception.banner.*;
 import com.iherbyou.exception.catalog.*;
+import com.iherbyou.exception.email.AlreadyVerifiedTokenException;
+import com.iherbyou.exception.email.ExpiredEmailTokenException;
+import com.iherbyou.exception.email.InvalidEmailTokenException;
+import com.iherbyou.exception.password.ExpiredPasswordResetTokenException;
+import com.iherbyou.exception.password.InvalidPasswordResetTokenException;
+import com.iherbyou.exception.password.UsedPasswordResetTokenException;
 import com.iherbyou.exception.user.*;
 import com.iherbyou.exception.wishlist.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -26,6 +35,7 @@ public class GlobalExceptionHandler {
     }
 
     // ===================== 회원가입 / 로그인 관련 예외 =====================
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException e) {
         return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -56,6 +66,39 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
+    // ===================== 이메일 인증 관련 예외 =====================
+
+    @ExceptionHandler(InvalidEmailTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidEmailToken(InvalidEmailTokenException e) {
+        return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(ExpiredEmailTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleExpiredEmailToken(ExpiredEmailTokenException e) {
+        return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(AlreadyVerifiedTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleAlreadyVerifiedEmail(AlreadyVerifiedTokenException e) {
+        return buildResponse(HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    // ===================== 비밀번호 재설정 관련 예외 =====================
+
+    @ExceptionHandler(InvalidPasswordResetTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidPasswordResetToken(InvalidPasswordResetTokenException e) {
+        return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(ExpiredPasswordResetTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleExpiredPasswordResetToken(ExpiredPasswordResetTokenException e) {
+        return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(UsedPasswordResetTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleUsedPasswordResetToken(UsedPasswordResetTokenException e) {
+        return buildResponse(HttpStatus.CONFLICT, e.getMessage());
+    }
 
     // ===================== 카테고리 / 상품 관련 예외 =====================
 
@@ -99,7 +142,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
-
     // ===================== 위시리스트 관련 예외 =====================
 
     @ExceptionHandler(WishlistException.class)
@@ -121,8 +163,47 @@ public class GlobalExceptionHandler {
         };
     }
 
+    // ===================== 배너 관련 예외 =====================
+
+    /**
+     * 배너를 찾을 수 없을 때
+     */
+    @ExceptionHandler(BannerNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleBannerNotFound(BannerNotFoundException e) {
+        return buildResponse(HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
+    /**
+     * 배너 정렬 순서 중복
+     */
+    @ExceptionHandler(DuplicateSortOrderException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicateSortOrder(DuplicateSortOrderException e) {
+        return buildResponse(HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    /**
+     * Validation 예외 처리 (@Valid 검증 실패 시)
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException e) {
+        Map<String, String> errors = new HashMap<>();
+        e.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("error", "Validation Failed");
+        response.put("errors", errors);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
 
     // ===================== 그 외 모든 예외 =====================
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleServerError(Exception e) {
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류 발생: " + e.getMessage());

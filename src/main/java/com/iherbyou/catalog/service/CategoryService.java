@@ -10,6 +10,7 @@ import com.iherbyou.catalog.repository.ProductRepository;
 import com.iherbyou.exception.catalog.CategoryNotFoundException;
 import com.iherbyou.exception.catalog.InvalidParentIdException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -124,7 +125,7 @@ public class CategoryService {
             throw new CategoryNotFoundException(categoryId);
         }
 
-        List<Product> products = productRepository.findByCategoryId(categoryId);
+        List<Product> products = productRepository.findByCategoryId(categoryId, Pageable.unpaged()).getContent();
 
         return products.stream()
                 .map(ProductListDto::fromEntity)

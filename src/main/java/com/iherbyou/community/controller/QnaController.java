@@ -42,6 +42,7 @@ public class QnaController {
                 saved.getId(),
                 saved.getProduct().getId(),
                 saved.getUser().getId(),
+                saved.getUser().getEmail(),
                 saved.getTitle(),
                 saved.getContent(),
                 saved.getCreatedAt().format(ISO),
@@ -68,13 +69,14 @@ public class QnaController {
                 q.getId(),
                 q.getProduct().getId(),
                 q.getUser().getId(),
+                q.getUser().getEmail(),
                 q.getTitle(),
                 q.getContent(),
                 q.getCreatedAt().format(ISO),
                 q.getQnaAnswers().stream()
                         .map(a -> new QnaAnswerProduct(
                                 a.getId(),
-                                a.getUser().getId(),
+                                a.getUser().getEmail(),
                                 a.getContent(),
                                 a.getCreatedAt().format(ISO)
                         ))
@@ -99,6 +101,7 @@ public class QnaController {
                 q.getId(),
                 q.getProduct().getId(),
                 q.getUser().getId(),
+                q.getUser().getEmail(),
                 q.getTitle(),
                 q.getContent(),
                 q.getCreatedAt().format(ISO),
@@ -117,7 +120,7 @@ public class QnaController {
         QnaAnswer saved = qnaService.createAnswer(me.getId(), req.questionId(), req.content());
         QnaAnswerProduct res = new QnaAnswerProduct(
                 saved.getId(),
-                saved.getUser().getId(),
+                saved.getUser().getEmail(),
                 saved.getContent(),
                 saved.getCreatedAt().format(ISO)
         );
