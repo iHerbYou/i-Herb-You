@@ -1,6 +1,8 @@
 package com.iherbyou.user.repository;
 
 import com.iherbyou.user.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -45,4 +47,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // email, 전화번호로 사용자 찾기 (비밀번호 찾기 등에 사용)
     Optional<User> findByEmailAndPhoneNumber(String email, String phoneNumber);
+
+    // 이메일로 검색 (부분 일치)
+    @Query("SELECT u FROM User u WHERE u.email LIKE %:keyword%")
+    Page<User> searchByEmail(@Param("keyword") String keyword, Pageable pageable);
+
+    // 이름으로 검색 (부분 일치)
+    @Query("SELECT u FROM User u WHERE u.name LIKE %:keyword%")
+    Page<User> searchByName(@Param("keyword") String keyword, Pageable pageable);
+
+    // 전화번호로 검색 (부분 일치)
+    @Query("SELECT u FROM User u WHERE u.phoneNumber LIKE %:keyword%")
+    Page<User> searchByPhone(@Param("keyword") String keyword, Pageable pageable);
+
 }

@@ -7,6 +7,7 @@ import com.iherbyou.security.auth.UserPrincipal;
 import com.iherbyou.user.dto.admin.AdminUserDto;
 import com.iherbyou.user.dto.admin.AdminUserListResponseDto;
 import com.iherbyou.user.dto.admin.ChangeUserStatusDto;
+import com.iherbyou.user.dto.admin.UserSearchDto;
 import com.iherbyou.user.entity.User;
 import com.iherbyou.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -81,6 +82,38 @@ public class AdminUserService {
         // user 상태 변경
         user.changeUserStatus(newStatus);
         log.info("회원 상태 변경 완료 - 회원: {}, 새상태: {}, 사유: {}", user.getEmail(), newStatus.getDisplayName(), request.getReason());
+    }
+
+    /**
+     * 회원 검색 (페이징)
+     */
+    @Transactional
+    public AdminUserListResponseDto searchUsers(UserPrincipal userPrincipal, UserSearchDto searchDto, Pageable pageable) {
+
+        // 관리자 권한 확인
+        checkAdminPermission(userPrincipal);
+        log.info("회원 검색 - 관리자: {}, 검색 타입: {}, 키워드: {}", userPrincipal.getEmail(), searchDto.getSearchType(), searchDto.getKeyword());
+
+        // 검색 타입에 따라 검색
+        Page<User> users;
+        switch (searchDto.getSearchType().toLowerCase()) {
+            case "email":
+                users = userRepository.searchByEmail(searchDto.getKeyword(), pageable);
+                break;
+            case "name":
+                users = userRepository.searchByName(searchDto.getKeyword(), pageable);
+                break;
+            case "phone":
+                users = userRepository.searchByPhone(searchDto.getKeyword(), pageable);
+                break;
+            default:
+                throw new IllegalArgumentException("유효하지 않은 검색 타입입니다. (email, name, phone 중 선택)");
+        }
+
+        // DTO 변환
+        Page<AdminUserDto> userDtos = users.map(user -> AdminUserDto.from(user));
+
+        return AdminUserListResponseDto.from(userDtos);
     }
 
 }

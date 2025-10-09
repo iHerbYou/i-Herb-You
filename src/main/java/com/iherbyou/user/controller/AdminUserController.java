@@ -3,6 +3,7 @@ package com.iherbyou.user.controller;
 import com.iherbyou.security.auth.UserPrincipal;
 import com.iherbyou.user.dto.admin.AdminUserListResponseDto;
 import com.iherbyou.user.dto.admin.ChangeUserStatusDto;
+import com.iherbyou.user.dto.admin.UserSearchDto;
 import com.iherbyou.user.service.AdminUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,8 +34,7 @@ public class AdminUserController {
     }
 
     // 회원 상태 변경
-    // 회원 상태 변경
-    @Operation(summary = "회원 상태 변경", description = "회원의 상태를 변경합니다 (정지/복구 등) (관리자 전용).")
+    @Operation(summary = "회원 상태 변경", description = "회원의 상태를 변경합니다 (정지/복구 등) (관리자 전용)")
     @PatchMapping("/{userId}/status")
     public ResponseEntity<Void> changeUserStatus(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
@@ -43,4 +43,16 @@ public class AdminUserController {
         adminUserService.changeUserStatus(userPrincipal, userId, request);
         return ResponseEntity.ok().build();
     }
+
+    // 회원 검색
+    @Operation(summary = "회원 검색", description = "이메일, 이름, 전화번호로 회원을 검색합니다 (관리자 전용)")
+    @GetMapping("/search")
+    public ResponseEntity<AdminUserListResponseDto> searchUsers(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @ModelAttribute UserSearchDto searchDto,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        AdminUserListResponseDto response = adminUserService.searchUsers(userPrincipal, searchDto, pageable);
+        return ResponseEntity.ok(response);
+    }
+
 }
