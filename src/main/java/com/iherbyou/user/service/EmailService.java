@@ -161,4 +161,75 @@ public class EmailService {
                 """.formatted(resetUrl, resetUrl, resetUrl);
     }
 
+    /**
+     * 재입고 알림 메일 발송
+     */
+    public void sendRestockNotification(String toEmail, String productName, String variantName) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject("[iHerbYou] 재입고 알림 - " + productName);
+
+            String htmlContent = buildRestockNotificationHtml(productName, variantName);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+            log.info("재입고 알림 메일 발송 완료: {} - [{} - {}]", toEmail, productName, variantName);
+
+        } catch (MessagingException e) {
+            log.error("재입고 알림 메일 발송 실패: {} - [{} - {}]", toEmail, productName, variantName, e);
+            throw new RuntimeException("재입고 알림 메일 발송에 실패했습니다", e);
+        }
+    }
+
+    /**
+     * 재입고 알림 메일 HTML 생성
+     */
+    private String buildRestockNotificationHtml(String productName, String variantName) {
+        String productUrl = frontendUrl + "/products/" + productName.replaceAll(" ", "-").toLowerCase();
+        
+        return """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                </head>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                    <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+                        <h2 style="color: #4CAF50;">🎉 재입고 알림</h2>
+                        <p>안녕하세요!</p>
+                        <p>요청하신 상품이 재입고되었습니다.</p>
+                        
+                        <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                            <h3 style="color: #333; margin-top: 0;">📦 상품 정보</h3>
+                            <p><strong>상품명:</strong> %s</p>
+                            <p><strong>옵션:</strong> %s</p>
+                        </div>
+                        
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="%s" 
+                               style="display: inline-block; padding: 12px 24px; background-color: #4CAF50; 
+                                      color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                                지금 구매하기
+                            </a>
+                        </div>
+                        
+                        <p style="color: #666; font-size: 14px;">
+                            재입고된 상품은 수량이 한정되어 있을 수 있습니다.<br>
+                            빠른 구매를 권장드립니다.
+                        </p>
+                        
+                        <p style="color: #999; font-size: 12px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+                            본 메일은 발신 전용입니다. 문의사항은 고객센터를 이용해주세요.<br>
+                            © 2025 아이허브유. All rights reserved.
+                        </p>
+                    </div>
+                </body>
+                </html>
+                """.formatted(productName, variantName, productUrl);
+    }
+
 }

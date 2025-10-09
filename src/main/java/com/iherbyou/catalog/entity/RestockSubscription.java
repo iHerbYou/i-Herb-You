@@ -47,4 +47,10 @@ public class RestockSubscription { // 재입고 알림
         this.isActive = false;
     }
 
+    // 알림 발송 완료 처리
+    public void markAsNotified() {
+        this.isActive = false;
+        this.lastNotifiedAt = LocalDateTime.now();
+    }
+
 }

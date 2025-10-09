@@ -1,12 +1,10 @@
 package com.iherbyou.catalog.service;
 
-import com.iherbyou.catalog.dto.ProductDetailDto;
-import com.iherbyou.catalog.dto.ProductListDto;
-import com.iherbyou.catalog.entity.Product;
-import com.iherbyou.catalog.entity.ProductCategory;
-import com.iherbyou.catalog.entity.ProductVariant;
-import com.iherbyou.catalog.entity.Stock;
-import com.iherbyou.catalog.repository.ProductRepository;
+import com.iherbyou.catalog.dto.*;
+import com.iherbyou.catalog.entity.*;
+import com.iherbyou.catalog.repository.*;
+import com.iherbyou.exception.catalog.BrandNotFoundException;
+import com.iherbyou.exception.catalog.CategoryNotFoundException;
 import com.iherbyou.exception.catalog.InvalidParameterException;
 import com.iherbyou.exception.catalog.ProductNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,15 +19,22 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final BrandRepository brandRepository;
+    private final CategoryRepository categoryRepository;
+    private final ProductCategoryRepository productCategoryRepository;
+    private final ProductImgRepository productImgRepository;
+    private final ProductVariantRepository productVariantRepository;
+    private final StockRepository stockRepository;
+    private final RestockSubscriptionRepository restockSubscriptionRepository;
 
     @Transactional(readOnly = true)
     public Page<ProductListDto> getProducts(Pageable pageable,
@@ -182,6 +187,7 @@ public class ProductService {
         return products.map(ProductListDto::fromEntity).getContent();
     }
 
+    // 별점 높은 상품 가져옴
     @Transactional(readOnly = true)
     public List<ProductListDto> findTopRatedProducts(int size) {
         Pageable pageable = PageRequest.of(0, size,
@@ -190,6 +196,230 @@ public class ProductService {
         Page<Product> products = productRepository.findAllOrderByAvgRatingDesc(pageable);
 
         return products.map(ProductListDto::fromEntity).getContent();
+    }
+
+    // admin - 상품(+브랜드, 이미지, 옵션, 재고) 등록
+    @Transactional
+    public Product createProduct(ProductCreateRequest dto) {
+        // 브랜드 조회
+        Brand brand = brandRepository.findById(dto.getBrandId())
+                .orElseThrow(() -> new BrandNotFoundException(dto.getBrandId()));
+
+        // 상품 생성 및 저장
+        Product product = Product.builder()
+                .name(dto.getName())
+                .code(dto.getProductCode())
+                .description(dto.getDescription())
+                .instruction(dto.getInstruction())
+                .ingredients(dto.getIngredients())
+                .cautions(dto.getCautions())
+                .disclaimer(dto.getDisclaimer())
+                .saleStartDate(LocalDateTime.now())
+                .expirationDate(dto.getExpirationDate())
+                .maxQtyPerOrder(dto.getMaxQtyPerOrder())
+                .brand(brand)
+                .build();
+        productRepository.save(product);
+
+        // 카테고리 연결
+        if (dto.getCategoryIds() != null) {
+            for (Long categoryId : dto.getCategoryIds()) {
+                Category category = categoryRepository.findById((categoryId))
+                        .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+
+                ProductCategory pc = ProductCategory.builder()
+                        .product(product)
+                        .category(category)
+                        .build();
+
+                productCategoryRepository.save(pc);
+            }
+        }
+
+        // 이미지 등록
+        if (dto.getProductImgs() != null) {
+            for (ProductImgDto imgDto : dto.getProductImgs()) {
+                ProductImg img = ProductImg.builder()
+                        .product(product)
+                        .imageUrl(imgDto.getImageUrl())
+                        .isPrimary(imgDto.isPrimary())
+                        .build();
+
+                productImgRepository.save(img);
+            }
+        }
+
+        // 옵션 + 재고
+        if (dto.getVariants() != null) {
+            for (ProductVariantDto variantDto : dto.getVariants()) {
+                ProductVariant variant = ProductVariant.builder()
+                        .product(product)
+                        .variantName(variantDto.getVariantName())
+                        .listPrice(variantDto.getListPrice())
+                        .salePrice(variantDto.getSalePrice())
+                        .volume(variantDto.getVolume())
+                        .upcCode(variantDto.getUpcCode())
+                        .pillSize(variantDto.getPillSize())
+                        .nutritionFacts(variantDto.getNutritionFacts())
+                        .maxQtyPerOrder(variantDto.getMaxQtyPerOrder())
+                        .restockEta(variantDto.getRestockEta())
+                        .build();
+
+                productVariantRepository.save(variant);
+
+                StockDto stockDto = variantDto.getStock();
+                if (stockDto != null) {
+                    Stock stock = Stock.builder()
+                            .productVariant(variant)
+                            .amount(stockDto.getAmount())
+                            .restockedAt(stockDto.getRestockedAt())
+                            .build();
+
+                    stockRepository.save(stock);
+                }
+            }
+        }
+
+        return product;
+    }
+
+    // admin - 상품 수정
+    @Transactional
+    public void updateProduct(Long id, ProductUpdateRequest dto) {
+        // 기존 상품 조회
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+
+        // 브랜드 조회
+        Brand brand = null;
+        if (dto.getBrandId() != null) {
+            brand = brandRepository.findById(dto.getBrandId())
+                    .orElseThrow(() -> new BrandNotFoundException(dto.getBrandId()));
+        }
+
+        product.updateBasicInfo(dto, brand);
+
+        // 연결된 하위 엔티티들 별도 갱신
+        updateCategories(product, dto.getCategoryIds());
+        updateImages(product, dto.getProductImgs());
+        updateVariants(product, dto.getVariants());
+    }
+
+    // 카테고리 갱신
+    private void updateCategories(Product product, List<Long> categoryIds) {
+        if (categoryIds == null) return;
+
+        // 기존 연결 삭제
+        productCategoryRepository.deleteByProduct(product);
+
+        // 새로 추가
+        for (Long categoryId : categoryIds) {
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+
+            ProductCategory pc = ProductCategory.builder()
+                    .product(product)
+                    .category(category)
+                    .build();
+
+            productCategoryRepository.save(pc);
+        }
+    }
+
+    // 이미지 갱신
+    private void updateImages(Product product, List<ProductImgDto> images) {
+        if (images == null) return;
+
+        // 기존 이미지 삭제
+        productImgRepository.deleteByProduct(product);
+
+        // 새로 저장
+        for (ProductImgDto imgDto : images) {
+            ProductImg img = ProductImg.builder()
+                    .product(product)
+                    .imageUrl(imgDto.getImageUrl())
+                    .altText(imgDto.getAltText())
+                    .sortIdx(imgDto.getSortIdx())
+                    .isPrimary(imgDto.isPrimary())
+                    .build();
+
+            productImgRepository.save(img);
+        }
+    }
+
+    // 옵션 + 재고 갱신
+    private void updateVariants(Product product, List<ProductVariantDto> variants) {
+        if (variants == null) return;
+
+        // 기존 옵션들 + 연결된 재고 삭제
+        List<ProductVariant> existingVariants = productVariantRepository.findByProduct(product);
+        for (ProductVariant variant : existingVariants) {
+            if (variant.getStock() != null) {
+                stockRepository.delete(variant.getStock());
+            }
+        }
+        productVariantRepository.deleteAll(existingVariants);
+
+        // 새로 등록
+        for (ProductVariantDto variantDto : variants) {
+            ProductVariant variant = ProductVariant.builder()
+                    .product(product)
+                    .variantName(variantDto.getVariantName())
+                    .listPrice(variantDto.getListPrice())
+                    .salePrice(variantDto.getSalePrice())
+                    .volume(variantDto.getVolume())
+                    .upcCode(variantDto.getUpcCode())
+                    .pillSize(variantDto.getPillSize())
+                    .nutritionFacts(variantDto.getNutritionFacts())
+                    .maxQtyPerOrder(variantDto.getMaxQtyPerOrder())
+                    .restockEta(variantDto.getRestockEta())
+                    .build();
+
+            productVariantRepository.save(variant);
+
+            StockDto stockDto = variantDto.getStock();
+            if (stockDto != null) {
+                Stock stock = Stock.builder()
+                        .productVariant(variant)
+                        .amount(stockDto.getAmount())
+                        .restockedAt(stockDto.getRestockedAt())
+                        .build();
+
+                stockRepository.save(stock);
+            }
+        }
+    }
+
+    // admin - 상품 삭제
+    @Transactional
+    public void deleteProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+
+        // 재입고 알림 삭제
+        List<ProductVariant> variants = productVariantRepository.findByProduct(product);
+        for (ProductVariant variant : variants) {
+            restockSubscriptionRepository.deleteAllByProductVariant(variant);
+        }
+
+        // 재고 삭제
+        for (ProductVariant variant : variants) {
+            if (variant.getStock() != null) {
+                stockRepository.delete(variant.getStock());
+            }
+        }
+
+        // 옵션 삭제
+        productVariantRepository.deleteAll(variants);
+
+        // 이미지 삭제
+        productImgRepository.deleteByProduct(product);
+
+        // 카테고리 연결 삭제
+        productCategoryRepository.deleteByProduct(product);
+
+        // 상품 삭제
+        productRepository.delete(product);
     }
 
 }

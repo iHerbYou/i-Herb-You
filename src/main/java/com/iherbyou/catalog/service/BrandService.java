@@ -30,7 +30,7 @@ public class BrandService {
                                 .map(ProductImg::getImageUrl)       // url 컬럼
                                 .orElse(null);
                     }
-                    
+
                     return new BrandResponse(
                             brand.getId(),
                             brand.getName(),
