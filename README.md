@@ -18,3 +18,63 @@
 - **Build Tool**: Gradle
 - **Utilities**: Lombok
 - **Testing**: JUnit 5, Spring Boot Starter Test
+
+## 📊 ERD
+
+![ERD Diagram](./docs/erd.png)
+
+## 👨🏻‍💻 Team Members
+
+<!-- TEAM-MEMBERS-LIST:START - Do not remove or modify this section -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top">
+        <a href="https://github.com/soojjung">
+          <img src="https://github.com/soojjung.png" width="100px" alt="soojjung" />
+          <br />
+          <sub><b>정수진</b></sub>
+        </a>
+        <br />
+        Frontend / Backend
+      </td>
+      <td align="center" valign="top">
+        <a href="https://github.com/shawnchoi8">
+          <img src="https://github.com/shawnchoi8.png" width="100px" alt="shawnchoi8" />
+          <br />
+          <sub><b>최승현</b></sub>
+        </a>
+        <br />
+        Backend
+      </td>
+      <td align="center" valign="top">
+        <a href="https://github.com/jaeaeee">
+          <img src="https://github.com/jaeaeee.png" width="100px" alt="jaeaeee" />
+          <br />
+          <sub><b>최재희</b></sub>
+        </a>
+        <br />
+        Backend
+      </td>
+      <td align="center" valign="top">
+        <a href="https://github.com/ye0nuu">
+          <img src="https://github.com/ye0nuu.png" width="100px" alt="ye0nuu" />
+          <br />
+          <sub><b>장연우</b></sub>
+        </a>
+        <br />
+        Backend
+      </td>
+      <td align="center" valign="top">
+        <a href="https://github.com/juncity-kim">
+          <img src="https://github.com/juncity-kim.png" width="100px" alt="juncity-kim" />
+          <br />
+          <sub><b>김준휘</b></sub>
+        </a>
+        <br />
+        Backend
+      </td>
+    </tr>
+  </tbody>
+</table>
+<!-- TEAM-MEMBERS-LIST:END -->
