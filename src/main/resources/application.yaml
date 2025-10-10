@@ -1,24 +1,90 @@
 spring:
+  config:
+    import: optional:application-personal.yaml
   datasource:
-    url: jdbc:mysql://localhost:3306/iherbyou?serverTimezone=UTC&characterEncoding=UTF-8
-    username: root
-    password: your_password
+    url: jdbc:mysql://localhost:3306/iherbyou?serverTimezone=UTC&characterEncoding=UTF-8&useUnicode=true&useSSL=false
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  sql:
+    init:
+      data-locations:
+        - classpath:banner-data.sql
+        - classpath:category-data.sql
+        - classpath:code-data.sql
+        - classpath:promotion-code-data.sql
+        - classpath:product-dummy.sql
+        - classpath:qna-data.sql
+        - classpath:review-data.sql
+        - classpath:user-data.sql
+        - classpath:admin-init.sql
+      #mode: never  # 임시로 비활성화
+      mode: always
+
   jpa:
+    defer-datasource-initialization: true  # JPA 테이블 생성 후 데이터 삽입
     hibernate:
-      ddl-auto: update   # 개발 단계: update (운영시 validate 또는 none 권장)
+      ddl-auto: create  # 개발 단계: update (운영시 validate 또는 none 권장)
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
     show-sql: true
 
+  mail: # 이메일 발송
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
   output:
     ansi:
       enabled: always
+  web:
+    locale: ko_KR   # UTF-8 설정
+
+server:
+  tomcat:
+    uri-encoding: UTF-8
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+springdoc:
+  api-docs:
+    enabled: true
+  packages-to-scan: com.iherbyou           # 루트 패키지로 넓게
+  paths-to-match: /**                      # 전체 허용
 
 logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace   # Spring Boot 3.x에서 바인딩 값 로그 찍기
+
+jwt:
+  secret: your-very-secure-secret-key-here-make-it-long-and-random
+  access-token:
+    expiration: 1800000    # 30분 (30분 * 60초 * 1000ms)
+  refresh-token:
+    expiration: 86400000   # 24시간 (24시간 * 60분 * 60초 * 1000ms)
+
+app: # 이메일 인증 부분에서 링크
+  base-url: http://localhost:8080 # 배포 후에는 주소 변경 필요
+  frontend-url: https://www.iherbyou.store/ # 배포 후에는 주소 변경 필요 -> https://www.iherbyou.store/, http://localhost:5173
+
+toss:
+  confirm-url: https://api.tosspayments.com/v1/payments/confirm
+  secret-key: ${TOSS_SECRET_KEY:test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6}
