@@ -28,6 +28,13 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "WHERE pc.category.id = :categoryId")
     Page<Product> findByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
 
+    // 여러 카테고리 기반 상품 조회 (페이징) - 하위 카테고리 포함용
+    @EntityGraph(attributePaths = {"brand", "productImgs", "reviews", "productVariants", "productVariants.stock"})
+    @Query("SELECT DISTINCT p FROM Product p " +
+            "JOIN p.productCategories pc " +
+            "WHERE pc.category.id IN :categoryIds")
+    Page<Product> findByCategoryIds(@Param("categoryIds") List<Long> categoryIds, Pageable pageable);
+
     // 카테고리 기반 베스트셀러 조회
     @Query("SELECT p " +
             "FROM Product p " +
@@ -35,6 +42,14 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "WHERE pc.category.id = :categoryId " +
             "ORDER BY p.sales DESC")
     Page<Product> findByCategoryIdOrderBySalesDesc(@Param("categoryId") Long categoryId, Pageable pageable);
+
+    // 여러 카테고리 기반 베스트셀러 조회 - 하위 카테고리 포함용
+    @Query("SELECT p " +
+            "FROM Product p " +
+            "JOIN p.productCategories pc " +
+            "WHERE pc.category.id IN :categoryIds " +
+            "ORDER BY p.sales DESC")
+    Page<Product> findByCategoryIdsOrderBySalesDesc(@Param("categoryIds") List<Long> categoryIds, Pageable pageable);
 
     // 전체 베스트셀러 조회
     @Query("SELECT p FROM Product p ORDER BY p.sales DESC")
