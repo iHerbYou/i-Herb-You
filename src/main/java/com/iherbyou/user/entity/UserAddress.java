@@ -36,4 +36,33 @@ public class UserAddress {
     @Column
     private boolean isDefault; // 기본 배송지 여부 0=아님, 1=기본
 
+    public void update(String recipient,
+                       String phone,
+                       String zipcode,
+                       String address,
+                       String addressDetail,
+                       boolean isDefault) {
+        this.recipient = requireNonBlank(recipient, "recipient");
+        this.phone = requireNonBlank(phone, "phone");
+        this.zipcode = requireNonBlank(zipcode, "zipcode");
+        this.address = requireNonBlank(address, "address");
+        this.addressDetail = addressDetail;
+        this.isDefault = isDefault;
+    }
+
+    public void changeDefault(boolean isDefault) {
+        this.isDefault = isDefault;
+    }
+
+    private String requireNonBlank(String value, String fieldName) {
+        if (value == null) {
+            throw new IllegalArgumentException(fieldName + " must not be null");
+        }
+        String trimmed = value.trim();
+        if (trimmed.isEmpty()) {
+            throw new IllegalArgumentException(fieldName + " must not be blank");
+        }
+        return trimmed;
+    }
+
 }

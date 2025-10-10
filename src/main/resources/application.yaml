@@ -13,6 +13,7 @@ spring:
         - classpath:banner-data.sql
         - classpath:category-data.sql
         - classpath:code-data.sql
+        - classpath:promotion-code-data.sql
         - classpath:product-dummy.sql
         - classpath:qna-data.sql
         - classpath:review-data.sql

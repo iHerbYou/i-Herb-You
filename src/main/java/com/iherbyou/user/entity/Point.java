@@ -1,12 +1,15 @@
 package com.iherbyou.user.entity;
 
+import com.iherbyou.exception.Promotion.PointInsufficientBalanceException;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -22,14 +25,38 @@ public class Point { // 현재 잔액과 생성/수정 일자 저장 (포인트 
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
+    @Builder.Default
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
-    private Integer balance; // 포인트 잔액
+    private Integer balance = 0; // 포인트 잔액
 
-    @CreatedDate // TODO
+    @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    @LastModifiedDate // TODO
+    @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    public void earn(int amount) {
+        this.balance += amount;
+    }
+
+    public void spend(int amount) {
+        if (amount > balance) {
+            Long userId = user != null ? user.getId() : null;
+            throw new PointInsufficientBalanceException(userId, balance, amount);
+        }
+        this.balance -= amount;
+    }
+
+    public void restore(int amount) {
+        this.balance += amount;
+    }
+
+    public void expire(int amount) {
+        if (amount > balance) {
+            amount = balance;
+        }
+        this.balance -= amount;
+    }
 
 }

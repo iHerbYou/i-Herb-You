@@ -3,7 +3,8 @@ package com.iherbyou.ordering.entity;
 import com.iherbyou.ordering.code.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "order_status_history",
         uniqueConstraints = {
@@ -52,7 +54,7 @@ public class OrderStatusHistory {
     @Column(name = "correlation_id", length = 100, nullable = false)
     private String correlationId;
 
-    @CreationTimestamp
+    @CreatedDate
     @Column(name = "changed_at", nullable = false, updatable = false)
     private LocalDateTime changedAt;
 }

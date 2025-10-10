@@ -11,6 +11,7 @@ import java.time.Duration;
 @ConfigurationProperties(prefix = "refund.policy")
 public class RefundPolicyProperties {
 
-    private Duration completionWindow = Duration.ofMinutes(2);
+    // 배송 완료 시점부터 환불 가능 기간
+    private Duration completionWindow = Duration.ofMinutes(5);
 }
 

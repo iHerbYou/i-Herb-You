@@ -37,6 +37,7 @@ public class Review {
     @Column(length = 1000) // 본문 길이 제한 (예: 1000자)
     private String text;
 
+    @Builder.Default
     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean isDeleted = false; // soft delete flag
 

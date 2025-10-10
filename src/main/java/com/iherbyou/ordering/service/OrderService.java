@@ -11,6 +11,7 @@ import com.iherbyou.ordering.entity.OrderProduct;
 import com.iherbyou.ordering.entity.OrderStatusHistory;
 import com.iherbyou.ordering.repository.OrderRepository;
 import com.iherbyou.ordering.repository.OrderStatusHistoryRepository;
+import com.iherbyou.promotion.point.service.PromotionPointFacade;
 import com.iherbyou.user.entity.User;
 import com.iherbyou.user.entity.UserAddress;
 import jakarta.persistence.EntityManager;
@@ -39,6 +40,7 @@ public class OrderService {
     private final CodeService codeService;
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
     private final EntityManager em;
+    private final PromotionPointFacade promotionPointFacade;
 
     // 상태 전이 가드: 현재 상태 -> 허용 대상 상태 목록
     private static final Map<OrderStatus, Set<OrderStatus>> ALLOWED_TRANSITIONS = Map.ofEntries(
@@ -228,6 +230,10 @@ public class OrderService {
             return order;
         }
 
+        if (targetStatus == OrderStatus.COMPLETED) {
+            grantCompletionPoints(order);
+        }
+
         log.info(
                 "[OrderStatusChange] orderId={} prevStatus={} nextStatus={} trigger={} actor={} correlation={}",
                 orderId,
@@ -239,6 +245,21 @@ public class OrderService {
         );
 
         return order;
+    }
+
+    private void grantCompletionPoints(Order order) {
+        if (order == null || order.getUser() == null || order.getUser().getId() == null) {
+            return;
+        }
+        Integer totalPrice = order.getTotalPrice();
+        if (totalPrice == null || totalPrice <= 0) {
+            return;
+        }
+        try {
+            promotionPointFacade.grantOrderCompletionPoints(order.getUser().getId(), order.getId(), totalPrice);
+        } catch (Exception e) {
+            log.warn("[OrderCompletionPoint][failed] orderId={} userId={}", order.getId(), order.getUser().getId(), e);
+        }
     }
 
     private void ensureTransitionAllowed(OrderStatus currentStatus, OrderStatus targetStatus, Long orderId) {
