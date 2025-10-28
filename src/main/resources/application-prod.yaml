@@ -1,0 +1,31 @@
+spring:
+  sql:
+    init:
+      mode: never  # 운영 환경에서는 초기 데이터 삽입 비활성화
+
+  jpa:
+    defer-datasource-initialization: false
+    hibernate:
+      ddl-auto: update  # 테이블 없으면 생성, 있으면 컬럼 추가 (데이터 보존)
+    properties:
+      hibernate:
+        format_sql: false  # SQL 포맷팅 비활성화
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    show-sql: false  # SQL 로그 비활성화
+
+logging:
+  level:
+    org.hibernate.SQL: warn  # SQL 로그 레벨 warn으로 변경
+    org.hibernate.orm.jdbc.bind: warn
+    com.iherbyou: info
+
+jwt:
+  secret: ${JWT_SECRET}  # 환경변수에서 주입
+  access-token:
+    expiration: 1800000    # 30분
+  refresh-token:
+    expiration: 86400000   # 24시간
+
+app:
+  base-url: ${APP_BASE_URL}
+  frontend-url: ${APP_FRONTEND_URL}
