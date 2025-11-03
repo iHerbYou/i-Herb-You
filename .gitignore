@@ -38,3 +38,6 @@ out/
 
 # 개인용 DB 계정/비밀번호
 **/application-personal.yaml
+
+# Environment variables
+.env
